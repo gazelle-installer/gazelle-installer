@@ -43,23 +43,28 @@
 #include <QDialogButtonBox>
 #include <QStandardPaths>
 
+#include "core.h"
 #include "mprocess.h"
 #include "msettings.h"
+#include "crypto.h"
 #include "autopart.h"
 #include "partman.h"
 
-PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const MIni &appConf, const QCommandLineParser &appArgs)
-    : QAbstractItemModel(ui.boxMain), proc(mproc), gui(ui)
+using namespace Qt::Literals::StringLiterals;
+
+PartMan::PartMan(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, Crypto &cman,
+    const MIni &appConf, const QCommandLineParser &appArgs, QObject *parent)
+    : QAbstractItemModel(parent), proc(mproc), core(mcore), gui(ui), crypto(cman)
 {
     root = new Device(*this);
-    const QString &projShort = appConf.getString("ShortName");
-    volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
-    volSpecs["/boot"] = {"boot"};
-    volSpecs["/boot/efi"] = volSpecs["ESP"] = {"EFI-SYSTEM"};
-    volSpecs["/"] = {"root" + projShort + appConf.getString("Version")};
-    volSpecs["/home"] = {"home" + projShort};
-    volSpecs["SWAP"] = {"swap" + projShort};
-    brave = appArgs.isSet("brave");
+    const QString &projShort = appConf.getString(u"ShortName"_s);
+    volSpecs[u"BIOS-GRUB"_s] = {u"BIOS GRUB"_s};
+    volSpecs[u"/boot"_s] = {u"boot"_s};
+    volSpecs[u"/boot/efi"_s] = volSpecs[u"ESP"_s] = {u"EFI-SYSTEM"_s};
+    volSpecs[u"/"_s] = {"root"_L1 + projShort + appConf.getString(u"Version"_s)};
+    volSpecs[u"/home"_s] = {"home"_L1 + projShort};
+    volSpecs[u"SWAP"_s] = {"swap"_L1 + projShort};
+    brave = appArgs.isSet(u"brave"_s);
 
     gui.treePartitions->setModel(this);
     gui.treePartitions->setItemDelegate(new ItemDelegate);
@@ -83,15 +88,13 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const MIni &appConf, const 
     connect(gui.pushGrid, &QToolButton::toggled, gui.treePartitions, &MTreeView::setGrid);
 
     // Hide encryption options if cryptsetup not present.
-    QFileInfo cryptsetup("/usr/sbin/cryptsetup");
-    QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
-    if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
+    if (!crypto.supported()) {
         gui.treePartitions->setColumnHidden(COL_ENCRYPT, true);
     }
 
     // UUID of the device that the live system is booted from.
-    const MIni livecfg("/live/config/initrd.out", MIni::ReadOnly);
-    bootUUID = livecfg.getString("BOOT_UUID");
+    const MIni livecfg(u"/live/config/initrd.out"_s, MIni::ReadOnly);
+    bootUUID = livecfg.getString(u"BOOT_UUID"_s);
 }
 PartMan::~PartMan()
 {
@@ -100,30 +103,30 @@ PartMan::~PartMan()
 
 void PartMan::scan(Device *drvstart)
 {
-    QStringList cargs({"-T", "-bJo",
-        "TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,FSVER,LABEL,MODEL,PARTFLAGS"});
+    QStringList cargs({u"-T"_s, u"-bJo"_s,
+        u"TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,FSVER,LABEL,MODEL,PARTFLAGS"_s});
     if (drvstart) cargs.append(drvstart->path);
-    proc.exec("lsblk", cargs, nullptr, true);
+    proc.exec(u"lsblk"_s, cargs, nullptr, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
-    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+    const QJsonArray &jsonBD = jsonObjBD[u"blockdevices"_s].toArray();
 
     // Partitions listed in order of their physical locations.
     QStringList order;
     QString curdev;
-    proc.exec("parted", {"-lm"}, nullptr, true);
-    for(const QString &line : proc.readOutLines()) {
+    proc.exec(u"parted"_s, {u"-lm"_s}, nullptr, true);
+    for(const QStringList &lines = proc.readOutLines(); const QString &line : lines) {
         const QString &sect = line.section(':', 0, 0);
         const int part = sect.toInt();
         if (part) order.append(joinName(curdev, part));
-        else if (sect.startsWith("/dev/")) curdev = sect.mid(5);
+        else if (sect.startsWith("/dev/"_L1)) curdev = sect.mid(5);
     }
 
     if (!drvstart) root->clear();
     for (const QJsonValue &jsonDrive : jsonBD) {
-        const QString &jdName = jsonDrive["name"].toString();
-        const QString &jdPath = jsonDrive["path"].toString();
-        if (jsonDrive["type"] != "disk") continue;
-        if (jdName.startsWith("zram")) continue;
+        const QString &jdName = jsonDrive[u"name"_s].toString();
+        const QString &jdPath = jsonDrive[u"path"_s].toString();
+        if (jsonDrive[u"type"_s] != "disk") continue;
+        if (jdName.startsWith("zram"_L1)) continue;
         Device *drive = drvstart;
         if (!drvstart) drive = new Device(Device::DRIVE, root);
         else if (jdPath != drvstart->path) continue;
@@ -133,42 +136,42 @@ void PartMan::scan(Device *drvstart)
         drive->flags.oldLayout = true;
         drive->name = jdName;
         drive->path = jdPath;
-        const QString &ptType = jsonDrive["pttype"].toString();
+        const QString &ptType = jsonDrive[u"pttype"_s].toString();
         drive->format = drive->curFormat = ptType.toUpper();
-        drive->flags.rotational = jsonDrive["rota"].toBool();
-        drive->discgran = jsonDrive["disc-gran"].toInt();
-        drive->size = jsonDrive["size"].toVariant().toLongLong();
-        drive->physec = jsonDrive["phy-sec"].toInt();
-        drive->curLabel = jsonDrive["label"].toString();
-        drive->model = jsonDrive["model"].toString();
-        const QJsonArray &jsonParts = jsonDrive["children"].toArray();
+        drive->flags.rotational = jsonDrive[u"rota"_s].toBool();
+        drive->discgran = jsonDrive[u"disc-gran"_s].toInt();
+        drive->size = jsonDrive[u"size"_s].toVariant().toLongLong();
+        drive->physec = jsonDrive[u"phy-sec"_s].toInt();
+        drive->curLabel = jsonDrive[u"label"_s].toString();
+        drive->model = jsonDrive[u"model"_s].toString();
+        const QJsonArray &jsonParts = jsonDrive[u"children"_s].toArray();
         for (const QJsonValue &jsonPart : jsonParts) {
-            const QString &partTypeName = jsonPart["parttypename"].toString();
-            if (partTypeName == "Extended" || partTypeName == "W95 Ext'd (LBA)"
-                || partTypeName == "Linux extended") continue;
+            const QString &partTypeName = jsonPart[u"parttypename"_s].toString();
+            if (partTypeName == "Extended"_L1 || partTypeName == "W95 Ext'd (LBA)"_L1
+                || partTypeName == "Linux extended"_L1) continue;
             Device *part = new Device(Device::PARTITION, drive);
             drive->flags.curEmpty = false;
             part->flags.oldLayout = true;
-            part->name = jsonPart["name"].toString();
-            part->path = jsonPart["path"].toString();
-            part->uuid = jsonPart["uuid"].toString();
+            part->name = jsonPart[u"name"_s].toString();
+            part->path = jsonPart[u"path"_s].toString();
+            part->uuid = jsonPart[u"uuid"_s].toString();
             part->order = order.indexOf(part->name);
-            part->size = jsonPart["size"].toVariant().toLongLong();
-            part->physec = jsonPart["phy-sec"].toInt();
-            part->curLabel = jsonPart["label"].toString();
-            part->model = jsonPart["model"].toString();
-            part->flags.rotational = jsonPart["rota"].toBool();
-            part->discgran = jsonPart["disc-gran"].toInt();
-            const int partflags = jsonPart["partflags"].toString().toUInt(nullptr, 0);
+            part->size = jsonPart[u"size"_s].toVariant().toLongLong();
+            part->physec = jsonPart[u"phy-sec"_s].toInt();
+            part->curLabel = jsonPart[u"label"_s].toString();
+            part->model = jsonPart[u"model"_s].toString();
+            part->flags.rotational = jsonPart[u"rota"_s].toBool();
+            part->discgran = jsonPart[u"disc-gran"_s].toInt();
+            const int partflags = jsonPart[u"partflags"_s].toString().toUInt(nullptr, 0);
             if ((partflags & 0x80) || (partflags & 0x04)) part->setActive(true);
-            part->mapCount = jsonPart["children"].toArray().count();
-            part->flags.sysEFI = part->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
+            part->mapCount = jsonPart[u"children"_s].toArray().count();
+            part->flags.sysEFI = part->flags.curESP = partTypeName.startsWith("EFI "_L1); // "System"/"(FAT-12/16/32)"
             part->flags.bootRoot = (!bootUUID.isEmpty() && part->uuid == bootUUID);
-            part->curFormat = jsonPart["fstype"].toString();
-            if (part->curFormat == "vfat") part->curFormat = jsonPart["fsver"].toString();
-            if (partTypeName == "BIOS boot") part->curFormat = "BIOS-GRUB";
+            part->curFormat = jsonPart[u"fstype"_s].toString();
+            if (part->curFormat == "vfat"_L1) part->curFormat = jsonPart[u"fsver"_s].toString();
+            if (partTypeName == "BIOS boot"_L1) part->curFormat = "BIOS-GRUB"_L1;
             // Touching Microsoft LDM may brick the system.
-            if (partTypeName.startsWith("Microsoft LDM")) part->flags.nasty = true;
+            if (partTypeName.startsWith("Microsoft LDM"_L1)) part->flags.nasty = true;
             // Propagate the boot and nasty flags up to the drive.
             if (part->flags.bootRoot) drive->flags.bootRoot = true;
             if (part->flags.nasty) drive->flags.nasty = true;
@@ -204,10 +207,10 @@ void PartMan::scanVirtualDevices(bool rescan)
             }
         }
     }
-    proc.shell("lsblk -T -bJo TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/*", nullptr, true);
+    proc.shell(u"lsblk -T -bJo TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/*"_s, nullptr, true);
     const QString &bdRaw = proc.readOut(true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
-    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+    const QJsonArray &jsonBD = jsonObjBD[u"blockdevices"_s].toArray();
     if (jsonBD.empty()) {
         if (virtdevs) delete virtdevs;
         return;
@@ -219,13 +222,13 @@ void PartMan::scanVirtualDevices(bool rescan)
     }
     assert(virtdevs != nullptr);
     for (const QJsonValue &jsonDev : jsonBD) {
-        const QString &path = jsonDev["path"].toString();
-        const bool rota = jsonDev["rota"].toBool();
-        const int discgran = jsonDev["disc-gran"].toInt();
-        const long long size = jsonDev["size"].toVariant().toLongLong();
-        const int physec = jsonDev["phy-sec"].toInt();
-        const QString &label = jsonDev["label"].toString();
-        const bool crypto = (jsonDev["type"].toString() == "crypt");
+        const QString &path = jsonDev[u"path"_s].toString();
+        const bool rota = jsonDev[u"rota"_s].toBool();
+        const int discgran = jsonDev[u"disc-gran"_s].toInt();
+        const long long size = jsonDev[u"size"_s].toVariant().toLongLong();
+        const int physec = jsonDev[u"phy-sec"_s].toInt();
+        const QString &label = jsonDev[u"label"_s].toString();
+        const bool crypto = (jsonDev[u"type"_s].toString() == "crypt"_L1);
         // Check if the device is already in the list.
         Device *device = nullptr;
         const auto fit = listed.find(path);
@@ -243,16 +246,16 @@ void PartMan::scanVirtualDevices(bool rescan)
         // Create a new list entry if needed.
         if (!device) {
             device = new Device(Device::VIRTUAL, virtdevs);
-            device->name = jsonDev["name"].toString();
+            device->name = jsonDev[u"name"_s].toString();
             device->path = path;
-            device->uuid = jsonDev["uuid"].toString();
+            device->uuid = jsonDev[u"uuid"_s].toString();
             device->flags.rotational = rota;
             device->discgran = discgran;
             device->size = size;
             device->physec = physec;
             device->flags.bootRoot = (!bootUUID.isEmpty() && device->uuid == bootUUID);
             device->curLabel = label;
-            device->curFormat = jsonDev["fstype"].toString();
+            device->curFormat = jsonDev[u"fstype"_s].toString();
             device->flags.volCrypto = crypto;
             device->flags.oldLayout = true;
         }
@@ -263,10 +266,10 @@ void PartMan::scanVirtualDevices(bool rescan)
         const QString &name = virt->name;
         virt->origin = nullptr; // Clear stale origin pointer.
         // Find the associated partition and decrement its reference count if found.
-        proc.exec("cryptsetup", {"status", virt->path}, nullptr, true);
-        for (const QString &line : proc.readOutLines()) {
+        proc.exec(u"cryptsetup"_s, {u"status"_s, virt->path}, nullptr, true);
+        for (const QStringList &lines = proc.readOutLines(); const QString &line : lines) {
             const QString &trline = line.trimmed();
-            if (!trline.startsWith("device:")) continue;
+            if (!trline.startsWith("device:"_L1)) continue;
             virt->origin = findByPath(trline.mid(8).trimmed());
             if (virt->origin) {
                 virt->origin->map = name;
@@ -278,25 +281,19 @@ void PartMan::scanVirtualDevices(bool rescan)
     gui.treePartitions->expand(index(virtdevs));
 }
 
-bool PartMan::manageConfig(MSettings &config) noexcept
+bool PartMan::loadConfig(MSettings &config) noexcept
 {
-    const bool save = config.isSave();
-    config.setSection("Storage", gui.treePartitions);
-    for (Device *drive : root->children) {
+    config.setSection(u"Storage"_s, gui.treePartitions);
+    for (Device *const drive : root->children) {
         // Check if the drive is to be cleared and formatted.
         size_t partCount = drive->children.size();
         bool drvPreserve = drive->flags.oldLayout;
         config.beginGroup(drive->name);
-        if (save) {
-            if (!drvPreserve) {
-                config.setString("Format", drive->format);
-                config.setInteger("Partitions", partCount);
-            }
-        } else if (config.contains("Format")) {
-            drive->format = config.getString("Format");
+        if (config.contains(u"Format"_s)) {
+            drive->format = config.getString(u"Format"_s);
             drvPreserve = false;
             drive->clear();
-            partCount = config.getInteger("Partitions");
+            partCount = config.getInteger(u"Partitions"_s);
             if (partCount > PARTMAN_MAX_PARTS) return false;
         }
         // Partition configuration.
@@ -304,85 +301,106 @@ bool PartMan::manageConfig(MSettings &config) noexcept
         long long sizeTotal = 0;
         for (size_t ixPart = 0; ixPart < partCount; ++ixPart) {
             Device *part = nullptr;
-            if (save || drvPreserve) {
+            if (drvPreserve) {
                 part = drive->child(ixPart);
-                if (!save) part->flags.oldLayout = true;
+                part->flags.oldLayout = true;
             } else {
                 part = new Device(Device::PARTITION, drive);
                 part->name = joinName(drive->name, ixPart+1);
             }
             // Configuration management, accounting for automatic control correction order.
-            config.beginGroup("Partition" + QString::number(ixPart+1));
-            if (save) {
-                config.setInteger("Size", part->size);
-                if (part->isActive()) config.setBoolean("Active", true);
-                if (part->flags.sysEFI) config.setBoolean("ESP", true);
-                if (part->addToCrypttab) config.setBoolean("AddToCrypttab", true);
-                if (!part->usefor.isEmpty()) config.setString("UseFor", part->usefor);
-                if (!part->format.isEmpty()) config.setString("Format", part->format);
-                config.setBoolean("Encrypt", part->encrypt);
-                if (!part->label.isEmpty()) config.setString("Label", part->label);
-                if (!part->options.isEmpty()) config.setString("Options", part->options);
-                config.setBoolean("CheckBadBlocks", part->chkbadblk);
-                config.setBoolean("Dump", part->dump);
-                config.setInteger("Pass", part->pass);
-            } else {
-                if (!drvPreserve && config.contains("Size")) {
-                    part->size = config.getInteger("Size");
-                    sizeTotal += part->size;
-                    if (sizeTotal > sizeMax) return false;
-                    if (config.getBoolean("Active")) part->setActive(true);
-                }
-                part->flags.sysEFI = config.getBoolean("ESP", part->flags.sysEFI);
-                part->usefor = config.getString("UseFor", part->usefor);
-                part->format = config.getString("Format", part->format);
-                part->chkbadblk = config.getBoolean("CheckBadBlocks", part->chkbadblk);
-                part->encrypt = config.getBoolean("Encrypt", part->encrypt);
-                part->addToCrypttab = config.getBoolean("AddToCrypttab", part->encrypt);
-                part->label = config.getString("Label", part->label);
-                part->options = config.getString("Options", part->options);
-                part->dump = config.getBoolean("Dump", part->dump);
-                part->pass = config.getInteger("Pass", part->pass);
+            config.beginGroup("Partition"_L1 + QString::number(ixPart+1));
+            if (!drvPreserve && config.contains(u"Size"_s)) {
+                part->size = config.getInteger(u"Size"_s);
+                sizeTotal += part->size;
+                if (sizeTotal > sizeMax) return false;
+                if (config.getBoolean(u"Active"_s)) part->setActive(true);
             }
+            part->flags.sysEFI = config.getBoolean(u"ESP"_s, part->flags.sysEFI);
+            part->usefor = config.getString(u"UseFor"_s, part->usefor);
+            part->format = config.getString(u"Format"_s, part->format);
+            part->chkbadblk = config.getBoolean(u"CheckBadBlocks"_s, part->chkbadblk);
+            part->encrypt = config.getBoolean(u"Encrypt"_s, part->encrypt);
+            part->addToCrypttab = config.getBoolean(u"AddToCrypttab"_s, part->encrypt);
+            part->label = config.getString(u"Label"_s, part->label);
+            part->options = config.getString(u"Options"_s, part->options);
+            part->dump = config.getBoolean(u"Dump"_s, part->dump);
+            part->pass = config.getInteger(u"Pass"_s, part->pass);
             size_t subvolCount = 0;
-            if (part->format == "btrfs") {
-                if (!save) subvolCount = config.getInteger("Subvolumes");
-                else {
-                    subvolCount = part->children.size();
-                    config.setInteger("Subvolumes", subvolCount);
-                }
+            if (part->format == "btrfs"_L1) {
+                subvolCount = config.getInteger(u"Subvolumes"_s);
             }
             // Btrfs subvolume configuration.
             for (size_t ixSV=0; ixSV<subvolCount; ++ixSV) {
-                Device *subvol = nullptr;
-                if (save) subvol = part->child(ixSV);
-                else subvol = new Device(Device::SUBVOLUME, part);
-                if (!subvol) return false;
-                config.beginGroup("Subvolume" + QString::number(ixSV+1));
-                if (save) {
-                    if (subvol->isActive()) config.setBoolean("Default", true);
-                    if (!subvol->usefor.isEmpty()) config.setString("UseFor", subvol->usefor);
-                    if (!subvol->label.isEmpty()) config.setString("Label", subvol->label);
-                    if (!subvol->options.isEmpty()) config.setString("Options", subvol->options);
-                    config.setBoolean("Dump", subvol->dump);
-                    config.setInteger("Pass", subvol->pass);
-                } else {
-                    if (config.getBoolean("Default")) subvol->setActive(true);
-                    subvol->usefor = config.getString("UseFor");
-                    subvol->label = config.getString("Label");
-                    subvol->options = config.getString("Options");
-                    subvol->dump = config.getBoolean("Dump");
-                    subvol->pass = config.getInteger("Pass");
-                }
+                Device *subvol = new Device(Device::SUBVOLUME, part);
+                assert(subvol != nullptr);
+                config.beginGroup("Subvolume"_L1 + QString::number(ixSV+1));
+                if (config.getBoolean(u"Default"_s)) subvol->setActive(true);
+                subvol->usefor = config.getString(u"UseFor"_s);
+                subvol->label = config.getString(u"Label"_s);
+                subvol->options = config.getString(u"Options"_s);
+                subvol->dump = config.getBoolean(u"Dump"_s);
+                subvol->pass = config.getInteger(u"Pass"_s);
                 config.endGroup(); // Subvolume#
             }
             config.endGroup(); // Partition#
-            if (!save) gui.treePartitions->expand(index(part));
+            gui.treePartitions->expand(index(part));
         }
         config.endGroup(); // (drive name)
     }
     treeSelChange();
     return true;
+}
+void PartMan::saveConfig(MSettings &config) const noexcept
+{
+    config.setSection(u"Storage"_s, gui.treePartitions);
+    for (const Device *const drive : root->children) {
+        // Check if the drive is to be cleared and formatted.
+        const size_t partCount = drive->children.size();
+        config.beginGroup(drive->name);
+        if (!drive->flags.oldLayout) {
+            config.setString(u"Format"_s, drive->format);
+            config.setInteger(u"Partitions"_s, partCount);
+        }
+        // Partition configuration.
+        for (size_t ixPart = 0; ixPart < partCount; ++ixPart) {
+            const Device *const part = drive->child(ixPart);
+            // Configuration management, accounting for automatic control correction order.
+            config.beginGroup(u"Partition"_s + QString::number(ixPart+1));
+            config.setInteger(u"Size"_s, part->size);
+            if (part->isActive()) config.setBoolean(u"Active"_s, true);
+            if (part->flags.sysEFI) config.setBoolean(u"ESP"_s, true);
+            if (part->addToCrypttab) config.setBoolean(u"AddToCrypttab"_s, true);
+            if (!part->usefor.isEmpty()) config.setString(u"UseFor"_s, part->usefor);
+            if (!part->format.isEmpty()) config.setString(u"Format"_s, part->format);
+            config.setBoolean(u"Encrypt"_s, part->encrypt);
+            if (!part->label.isEmpty()) config.setString(u"Label"_s, part->label);
+            if (!part->options.isEmpty()) config.setString(u"Options"_s, part->options);
+            config.setBoolean(u"CheckBadBlocks"_s, part->chkbadblk);
+            config.setBoolean(u"Dump"_s, part->dump);
+            config.setInteger(u"Pass"_s, part->pass);
+            size_t subvolCount = 0;
+            if (part->format == "btrfs"_L1) {
+                subvolCount = part->children.size();
+                config.setInteger(u"Subvolumes"_s, subvolCount);
+            }
+            // Btrfs subvolume configuration.
+            for (size_t ixSV=0; ixSV<subvolCount; ++ixSV) {
+                const Device *const subvol = part->child(ixSV);
+                assert(subvol != nullptr);
+                config.beginGroup("Subvolume"_L1 + QString::number(ixSV+1));
+                if (subvol->isActive()) config.setBoolean(u"Default"_s, true);
+                if (!subvol->usefor.isEmpty()) config.setString(u"UseFor"_s, subvol->usefor);
+                if (!subvol->label.isEmpty()) config.setString(u"Label"_s, subvol->label);
+                if (!subvol->options.isEmpty()) config.setString(u"Options"_s, subvol->options);
+                config.setBoolean(u"Dump"_s, subvol->dump);
+                config.setInteger(u"Pass"_s, subvol->pass);
+                config.endGroup(); // Subvolume#
+            }
+            config.endGroup(); // Partition#
+        }
+        config.endGroup(); // (drive name)
+    }
 }
 
 void PartMan::resizeColumnsToFit() noexcept
@@ -420,7 +438,7 @@ void PartMan::treeSelChange() noexcept
         if (!drive) drive = seldev;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else {
-            const size_t maxparts = (drive->format == "DOS") ? 4 : PARTMAN_MAX_PARTS;
+            const size_t maxparts = (drive->format == "DOS"_L1) ? 4 : PARTMAN_MAX_PARTS;
             gui.pushPartAdd->setEnabled(seldev->driveFreeSpace(true) >= 1*MB
                 && !isold && drive->children.size() < maxparts);
         }
@@ -455,7 +473,7 @@ void PartMan::treeMenu(const QPoint &)
             if (seldev->flags.volCrypto) actLock = menu.addAction(tr("&Lock"));
         } else {
             bool allowCryptTab = seldev->encrypt;
-            if (seldev->flags.oldLayout && seldev->curFormat == "crypto_LUKS") {
+            if (seldev->flags.oldLayout && seldev->curFormat == "crypto_LUKS"_L1) {
                 actUnlock = menu.addAction(tr("&Unlock"));
                 allowCryptTab = true;
             }
@@ -465,7 +483,7 @@ void PartMan::treeMenu(const QPoint &)
                 actAddCrypttab->setChecked(seldev->addToCrypttab);
             }
         }
-        if (seldev->finalFormat() == "btrfs") {
+        if (seldev->finalFormat() == "btrfs"_L1) {
             menu.addSeparator();
             actNewSubvolume = menu.addAction(tr("New subvolume"));
             actScanSubvols = menu.addAction(tr("Scan subvolumes"));
@@ -500,7 +518,7 @@ void PartMan::treeMenu(const QPoint &)
         actClear->setDisabled(locked);
         actReset->setDisabled(locked);
 
-        const long long minSpace = brave ? 0 : volSpecTotal("/", QStringList()).minimum;
+        const long long minSpace = brave ? 0 : volSpecTotal(u"/"_s, QStringList()).minimum;
         actBuilder->setEnabled(!locked && autopart && seldev->size >= minSpace);
 
         QAction *action = menu.exec(QCursor::pos());
@@ -598,8 +616,8 @@ void PartMan::partReloadClick()
 void PartMan::partManRunClick()
 {
     gui.boxMain->setEnabled(false);
-    if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted");
-    else proc.exec("partitionmanager");
+    if (QFile::exists(u"/usr/sbin/gparted"_s)) proc.exec(u"/usr/sbin/gparted"_s);
+    else proc.exec(u"partitionmanager"_s);
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     scan();
     gui.boxMain->setEnabled(true);
@@ -628,7 +646,7 @@ void PartMan::partMenuUnlock(Device *part)
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
         try {
-            luksOpen(part, editPass->text().toUtf8());
+            crypto.open(part, editPass->text().toUtf8());
             part->usefor.clear();
             part->addToCrypttab = checkCrypttab->isChecked();
             part->mapCount++;
@@ -641,8 +659,11 @@ void PartMan::partMenuUnlock(Device *part)
             // This time, failure is not a dealbreaker.
             gui.boxMain->setEnabled(true);
             qApp->restoreOverrideCursor();
-            QMessageBox::warning(gui.boxMain, QString(),
-                tr("Could not unlock device. Possible incorrect password."));
+            QMessageBox msgbox(gui.boxMain);
+            msgbox.setIcon(QMessageBox::Warning);
+            msgbox.setText(tr("Could not unlock device."));
+            msgbox.setInformativeText(tr("Possible incorrect password ."));
+            msgbox.exec();
         }
     }
 }
@@ -654,7 +675,7 @@ void PartMan::partMenuLock(Device *volume)
     bool ok = false;
     // Find the associated partition and decrement its reference count if found.
     Device *origin = volume->origin;
-    if (origin) ok = proc.exec("cryptsetup", {"close", volume->path});
+    if (origin) ok = proc.exec(u"cryptsetup"_s, {u"close"_s, volume->path});
     if (ok) {
         if (origin->mapCount > 0) origin->mapCount--;
         origin->map.clear();
@@ -670,7 +691,10 @@ void PartMan::partMenuLock(Device *volume)
     qApp->restoreOverrideCursor();
     // If not OK then a command failed, or trying to close a non-LUKS device.
     if (!ok) {
-        QMessageBox::critical(gui.boxMain, QString(), tr("Failed to close %1").arg(volume->name));
+        QMessageBox msgbox(gui.boxMain);
+        msgbox.setIcon(QMessageBox::Critical);
+        msgbox.setText(tr("Failed to close %1").arg(volume->name));
+        msgbox.exec();
     }
 }
 
@@ -680,18 +704,18 @@ void PartMan::scanSubvolumes(Device *part)
     gui.boxMain->setEnabled(false);
     while (part->children.size()) delete part->child(0);
     QStringList lines;
-    if (!proc.exec("mount", {"--mkdir", "-o", "subvolid=5,ro",
-        part->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
-    proc.exec("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"}, nullptr, true);
+    if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,ro"_s,
+        part->mappedDevice(), u"/mnt/btrfs-scratch"_s})) goto END;
+    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
     lines = proc.readOutLines();
-    proc.exec("umount", {"/mnt/btrfs-scratch"});
+    proc.exec(u"umount"_s, {u"/mnt/btrfs-scratch"_s});
     for (const QString &line : std::as_const(lines)) {
-        const int start = line.indexOf("path") + 5;
+        const int start = line.indexOf("path"_L1) + 5;
         if (line.length() <= start) goto END;
         Device *subvol = new Device(Device::SUBVOLUME, part);
         subvol->flags.oldLayout = true;
         subvol->label = subvol->curLabel = line.mid(start);
-        subvol->format = "PRESERVE";
+        subvol->format = "PRESERVE"_L1;
         notifyChange(subvol);
     }
  END:
@@ -699,22 +723,27 @@ void PartMan::scanSubvolumes(Device *part)
     qApp->restoreOverrideCursor();
 }
 
-bool PartMan::composeValidate(bool automatic) noexcept
+bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
 {
-    mounts.clear();
+    QMessageBox msgbox(gui.boxMain);
+    msgbox.setIcon(QMessageBox::Critical);
+    if (!confroot) confroot = gui.treeConfirm->invisibleRootItem();
+    std::map<QString, Device *> mounts;
     // Partition use and other validation
-    int swapnum = 0;
+    Device *rootdev = nullptr;
     for (Iterator it(*this); Device *volume = *it; it.next()) {
         if (volume->type == Device::DRIVE || volume->type == Device::VIRTUAL_DEVICES) continue;
         if (volume->type == Device::SUBVOLUME) {
             // Ensure the subvolume label entry is valid.
             bool ok = true;
             const QString &cmptext = volume->label.trimmed();
+            static const QRegularExpression labeltest(u"[^A-Za-z0-9\\/\\@\\.\\-\\_]|\\/\\/"_s);
             if (cmptext.isEmpty()) ok = false;
-            if (cmptext.count(QRegularExpression("[^A-Za-z0-9\\/\\@\\.\\-\\_]|\\/\\/"))) ok = false;
+            if (cmptext.count(labeltest)) ok = false;
             if (cmptext.startsWith('/') || cmptext.endsWith('/')) ok = false;
             if (!ok) {
-                QMessageBox::critical(gui.boxMain, QString(), tr("Invalid subvolume label"));
+                msgbox.setText(tr("Invalid subvolume label"));
+                msgbox.exec();
                 return false;
             }
             // Check for duplicate subvolume label entries.
@@ -723,55 +752,57 @@ bool PartMan::composeValidate(bool automatic) noexcept
             for (Device *sdevice : pit->children) {
                 if (sdevice == volume) continue;
                 if (sdevice->label.trimmed().compare(cmptext, Qt::CaseInsensitive) == 0) {
-                    QMessageBox::critical(gui.boxMain, QString(), tr("Duplicate subvolume label"));
+                    msgbox.setText(tr("Duplicate subvolume label"));
+                    msgbox.exec();
                     return false;
                 }
             }
         }
-        QString mount = volume->usefor;
+        const QString &mount = volume->mountPoint();
         if (mount.isEmpty()) continue;
-        if (mount == "ESP") mount = "/boot/efi";
-        if (!mount.startsWith("/") && !volume->allowedUsesFor().contains(mount)) {
-            QMessageBox::critical(gui.boxMain, QString(),
-                tr("Invalid use for %1: %2").arg(volume->shownDevice(), mount));
+        if (mount == "/"_L1) {
+            rootdev = volume;
+        } else if (!mount.startsWith("/"_L1) && !volume->allowedUsesFor().contains(volume->usefor)) {
+            msgbox.setText(tr("Invalid use for %1: %2").arg(volume->shownDevice(), mount));
+            msgbox.exec();
             return false;
-        }
-        if (mount == "SWAP") {
-            ++swapnum;
-            if (swapnum > 1) mount+=QString::number(swapnum);
         }
 
         // The mount can only be selected once.
         const auto fit = mounts.find(mount);
         if (fit != mounts.cend()) {
-            QMessageBox::critical(gui.boxMain, QString(), tr("%1 is already"
-                " selected for: %2").arg(fit->second->shownDevice(), fit->second->usefor));
+            msgbox.setText(tr("%1 is already selected for: %2")
+                .arg(fit->second->shownDevice(), fit->second->usefor));
+            msgbox.exec();
             return false;
-        } else if(volume->canMount(false)) {
+        } else if(volume->canMount(true)) {
             mounts[mount] = volume;
         }
     }
 
-    const auto fitroot = mounts.find("/");
-    if (fitroot == mounts.cend()) {
-        const long long rootMin = volSpecTotal("/").minimum;
+    if (rootdev == nullptr) {
+        const long long rootMin = volSpecTotal(u"/"_s).minimum;
         const QString &tMinRoot = QLocale::system().formattedDataSize(rootMin,
             1, QLocale::DataSizeTraditionalFormat);
-        QMessageBox::critical(gui.boxMain, QString(),
-            tr("A root partition of at least %1 is required.").arg(tMinRoot));
+        msgbox.setText(tr("A root partition of at least %1 is required.").arg(tMinRoot));
+        msgbox.exec();
         return false;
     }
 
-    if (!fitroot->second->willFormat() && mounts.count("/home")>0) {
-        QMessageBox::critical(gui.boxMain, QString(),
-            tr("Cannot preserve /home inside root (/) if a separate /home partition is also mounted."));
+    if (!rootdev->willFormat() && mounts.count(u"/home"_s)>0) {
+        msgbox.setText(tr("Cannot preserve /home inside root (/)"
+            " if a separate /home partition is also mounted."));
+        msgbox.exec();
         return false;
     }
 
     // Confirmation page action list
     for (const Device *drive : std::as_const(root->children)) {
+        QTreeWidgetItem *twdrive = new QTreeWidgetItem(confroot);
         if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
-            gui.listConfirm->addItem(tr("Prepare %1 partition table on %2").arg(drive->format, drive->name));
+            twdrive->setText(0, tr("Prepare %1 partition table on %2").arg(drive->format, drive->name));
+        } else {
+            twdrive->setText(0, tr("Re-use partition table on %1").arg(drive->name));
         }
         for (const Device *part : std::as_const(drive->children)) {
             QString actmsg;
@@ -780,7 +811,7 @@ bool PartMan::composeValidate(bool automatic) noexcept
                     if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
                     else continue;
                 } else {
-                    if (part->usefor == "FORMAT") actmsg = tr("Format %1");
+                    if (part->usefor == "FORMAT"_L1) actmsg = tr("Format %1");
                     else if (part->willFormat()) actmsg = tr("Format %1 to use for %2");
                     else if (part->usefor != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
                     else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
@@ -790,16 +821,17 @@ bool PartMan::composeValidate(bool automatic) noexcept
                 else actmsg = tr("Create %1, format to use for %2");
             }
             // QString::arg() emits warnings if a marker is not in the string.
-            gui.listConfirm->addItem(actmsg.replace("%1", part->shownDevice()).replace("%2", part->usefor));
+            QTreeWidgetItem *twpart = new QTreeWidgetItem(twdrive);
+            twpart->setText(0, actmsg.replace("%1"_L1, part->shownDevice()).replace("%2"_L1, part->usefor));
 
             for (const Device *subvol : std::as_const(part->children)) {
                 const bool svnouse = subvol->usefor.isEmpty();
-                if (subvol->format == "PRESERVE") {
+                if (subvol->format == "PRESERVE"_L1) {
                     if (svnouse) continue;
                     else actmsg = tr("Reuse subvolume %1 as %2");
-                } else if (subvol->format == "DELETE") {
+                } else if (subvol->format == "DELETE"_L1) {
                     actmsg = tr("Delete subvolume %1");
-                } else if (subvol->format == "CREATE") {
+                } else if (subvol->format == "CREATE"_L1) {
                     if (subvol->flags.oldLayout) {
                         if (svnouse) actmsg = tr("Overwrite subvolume %1");
                         else actmsg = tr("Overwrite subvolume %1 to use for %2");
@@ -809,30 +841,34 @@ bool PartMan::composeValidate(bool automatic) noexcept
                     }
                 }
                 // QString::arg() emits warnings if a marker is not in the string.
-                gui.listConfirm->addItem(" + " + actmsg.replace("%1", subvol->label).replace("%2", subvol->usefor));
+                QTreeWidgetItem *twsubvol = new QTreeWidgetItem(twpart);
+                twsubvol->setText(0, actmsg.replace("%1"_L1, subvol->label).replace("%2"_L1, subvol->usefor));
             }
         }
+        if (twdrive->childCount() < 1) delete twdrive;
     }
     if (!automatic) {
         // Warning messages
-        QMessageBox msgbox(gui.boxMain);
-        msgbox.setIcon(QMessageBox::Warning);
-        msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-        msgbox.setDefaultButton(QMessageBox::No);
-
-        if (fitroot->second->willEncrypt() && mounts.count("/boot")==0) {
-            msgbox.setText(tr("You must choose a separate boot partition when encrypting root.")
-                + '\n' + tr("Are you sure you want to continue?"));
+        if (rootdev->willEncrypt() && mounts.count(u"/boot"_s)==0) {
+            msgbox.setIcon(QMessageBox::Warning);
+            msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+            msgbox.setDefaultButton(QMessageBox::No);
+            msgbox.setText(tr("You must choose a separate boot partition when encrypting root."));
             if (msgbox.exec() != QMessageBox::Yes) return false;
         }
-        if (!confirmSpace(msgbox)) return false;
-        if (!confirmBootable(msgbox)) return false;
+        if (!confirmBootable()) return false;
+        if (!confirmSpace()) return false;
     }
 
     return true;
 }
-bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
+bool PartMan::confirmSpace() const noexcept
 {
+    QMessageBox msgbox(gui.boxMain);
+    msgbox.setIcon(QMessageBox::Warning);
+    msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+    msgbox.setDefaultButton(QMessageBox::No);
+
     // Isolate used points from each other in total calculations
     QStringList vols;
     for (Iterator it(*this); *it; it.next()) {
@@ -872,8 +908,8 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
                 }
                 if (!svsmall.isEmpty()) {
                     svsmall.sort();
-                    toosmall.last() += "<ul style='margin:0; list-style-type:circle'><li>"
-                        + svsmall.join("</li><li>") + "</li></ul>";
+                    toosmall.last() += "<ul style='margin:0; list-style-type:circle'><li>"_L1
+                        + svsmall.join(u"</li><li>"_s) + "</li></ul>"_L1;
                 }
             }
         }
@@ -882,26 +918,32 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
     if (!toosmall.isEmpty()) {
         toosmall.sort();
         msgbox.setText(tr("The installation may fail because the following volumes are too small:")
-            + "<br/><ul style='margin:0'><li>" + toosmall.join("</li><li>") + "</li></ul><br/>"
+            + "<br/><ul style='margin:0'><li>"_L1 + toosmall.join(u"</li><li>"_s) + "</li></ul><br/>"_L1
             + tr("Are you sure you want to continue?"));
         if (msgbox.exec() != QMessageBox::Yes) return false;
     }
     return true;
 }
-bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
+bool PartMan::confirmBootable() const noexcept
 {
-    if (proc.detectEFI()) {
+    QMessageBox msgbox(gui.boxMain);
+    msgbox.setIcon(QMessageBox::Warning);
+    msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+    msgbox.setDefaultButton(QMessageBox::No);
+    msgbox.setText(tr("This setup may produce an unbootable system. Do you want to continue?"));
+
+    if (core.detectEFI()) {
         const char *msgtext = nullptr;
-        auto fitefi = mounts.find("/boot/efi");
-        if (fitefi == mounts.end()) {
+        const PartMan::Device *efidev = findByMount(u"/boot/efi"_s);
+        if (efidev == nullptr) {
             msgtext = QT_TR_NOOP("This system uses EFI, but no valid"
                 " EFI system partition was assigned to /boot/efi separately.");
-        } else if (!fitefi->second->flags.sysEFI) {
+        } else if (!efidev->flags.sysEFI) {
             msgtext = QT_TR_NOOP("The volume assigned to /boot/efi"
                 " is not a valid EFI system partition.");
         }
         if (msgtext) {
-            msgbox.setText(tr(msgtext) + '\n' + tr("Are you sure you want to continue?"));
+            msgbox.setInformativeText(msgtext);
             if (msgbox.exec() != QMessageBox::Yes) return false;
         }
         return true;
@@ -912,23 +954,22 @@ bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
     for (const Device *drive : std::as_const(root->children)) {
         bool hasBiosGrub = false;
         for (const Device *part : std::as_const(drive->children)) {
-            if (part->finalFormat() == "BIOS-GRUB") {
+            if (part->finalFormat() == "BIOS-GRUB"_L1) {
                 hasBiosGrub = true;
                 break;
             }
         }
         // Potentially unbootable GPT when on a BIOS-based PC.
         const bool hasBoot = (drive->active != nullptr);
-        if (!proc.detectEFI() && drive->format=="GPT" && hasBoot && !hasBiosGrub) {
+        if (!core.detectEFI() && drive->format=="GPT"_L1 && hasBoot && !hasBiosGrub) {
             biosgpt += ' ' + drive->name;
         }
     }
     if (!biosgpt.isEmpty()) {
         biosgpt.prepend(tr("The following drives are, or will be, setup with GPT,"
-            " but do not have a BIOS-GRUB partition:") + "\n\n");
-        biosgpt += "\n\n" + tr("This system may not boot from GPT drives without a BIOS-GRUB partition.")
-            + '\n' + tr("Are you sure you want to continue?");
-        msgbox.setText(biosgpt);
+            " but do not have a BIOS-GRUB partition:") + "\n\n"_L1);
+        biosgpt += "\n\n"_L1 + tr("This system may not boot from GPT drives without a BIOS-GRUB partition.");
+        msgbox.setInformativeText(biosgpt);
         if (msgbox.exec() != QMessageBox::Yes) return false;
     }
     return true;
@@ -948,16 +989,18 @@ bool PartMan::checkTargetDrivesOK() const
         }
         // If any partitions are selected run the SMART tests.
         if (!purposes.isEmpty()) {
-            QString smartMsg = drive->name + " (" + purposes.join(", ") + ")";
-            proc.exec("smartctl", {"-H", drive->path});
+            QString smartMsg = drive->name + " ("_L1 + purposes.join(u", "_s) + ")"_L1;
+            proc.exec(u"smartctl"_s, {u"-H"_s, drive->path});
             if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & 8) {
                 // See smartctl(8) manual: EXIT STATUS (Bit 3)
-                smartFail += " - " + smartMsg + "\n";
+                smartFail += " - "_L1 + smartMsg + "\n"_L1;
             } else {
-                proc.shell("smartctl -A " + drive->path + "| grep -E \"^  5|^196|^197|^198\""
-                    " | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'", nullptr, true);
+                proc.shell("smartctl -A "_L1 + drive->path + "| grep -E \"^  5|^196|^197|^198\""
+                    " | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'"_L1, nullptr, true);
                 const QString &out = proc.readOut();
-                if (!out.isEmpty()) smartWarn += " ---- " + smartMsg + " ---\n" + out + "\n\n";
+                if (!out.isEmpty()) {
+                    smartWarn += " ---- "_L1 + smartMsg + " ---\n"_L1 + out + "\n\n"_L1;
+                }
             }
         }
     }
@@ -965,10 +1008,10 @@ bool PartMan::checkTargetDrivesOK() const
     QString msg;
     if (!smartFail.isEmpty()) {
         msg = tr("The disks with the partitions you selected for installation are failing:")
-            + "\n\n" + smartFail + "\n";
+            + "\n\n"_L1 + smartFail + "\n"_L1;
     }
     if (!smartWarn.isEmpty()) {
-        msg += tr("Smartmon tool output:") + "\n\n" + smartWarn
+        msg += tr("Smartmon tool output:") + "\n\n"_L1 + smartWarn
             + tr("The disks with the partitions you selected for installation pass the SMART monitor test (smartctl),"
                 " but the tests indicate it will have a higher than average failure rate in the near future.");
     }
@@ -976,7 +1019,7 @@ bool PartMan::checkTargetDrivesOK() const
         QMessageBox msgbox(gui.boxMain);
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         msgbox.setDefaultButton(QMessageBox::Yes);
-        msg += tr("If unsure, please exit the Installer and run GSmartControl for more information.") + "\n\n";
+        msg += tr("If unsure, please exit the Installer and run GSmartControl for more information.") + "\n\n"_L1;
         if (!smartFail.isEmpty()) {
             msgbox.setIcon(QMessageBox::Critical);
             msgbox.setEscapeButton(QMessageBox::Yes);
@@ -997,20 +1040,11 @@ bool PartMan::checkTargetDrivesOK() const
 PartMan::Device *PartMan::selectedDriveAuto() noexcept
 {
     QString drv(gui.comboDisk->currentData().toString());
-    if (!findByPath("/dev/" + drv)) return nullptr;
+    if (!findByPath("/dev/"_L1 + drv)) return nullptr;
     for (Device *drive : root->children) {
         if (drive->name == drv) return drive;
     }
     return nullptr;
-}
-
-void PartMan::clearAllUses() noexcept
-{
-    for (Iterator it(*this); Device *device = *it; it.next()) {
-        device->usefor.clear();
-        if (device->type == Device::PARTITION) device->setActive(false);
-        notifyChange(device);
-    }
 }
 
 int PartMan::countPrepSteps() noexcept
@@ -1038,34 +1072,36 @@ void PartMan::prepStorage()
 {
     // For debugging
     qDebug() << "Mount points:";
-    for (const auto &it : mounts) {
-        qDebug() << " -" << it.first << '-' << it.second->shownDevice()
-            << it.second->map << it.second->path;
+    for (Iterator it(*this); Device *dev = *it; it.next()) {
+        if (dev->canMount(false)) {
+            qDebug() << " -" << dev->mountPoint()
+                << '-' << dev->shownDevice() << dev->map << dev->path;
+        }
     }
 
     // Prepare and mount storage
     preparePartitions();
-    luksFormat();
+    crypto.formatAll(*this);
     formatPartitions();
     mountPartitions();
     // Refresh the UUIDs
-    proc.exec("lsblk", {"--list", "-bJo", "PATH,UUID"}, nullptr, true);
+    proc.exec(u"lsblk"_s, {u"--list"_s, u"-bJo"_s, u"PATH,UUID"_s}, nullptr, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
-    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+    const QJsonArray &jsonBD = jsonObjBD[u"blockdevices"_s].toArray();
     std::map<QString, Device *> alldevs;
     for (Iterator it(*this); Device *device = *it; it.next()) {
         alldevs[device->path] = device;
     }
     for (const QJsonValue &jsonDev : jsonBD) {
-        const auto fit = alldevs.find(jsonDev["path"].toString());
-        if (fit != alldevs.cend()) fit->second->uuid = jsonDev["uuid"].toString();
+        const auto fit = alldevs.find(jsonDev[u"path"_s].toString());
+        if (fit != alldevs.cend()) fit->second->uuid = jsonDev[u"uuid"_s].toString();
     }
 }
 bool PartMan::installTabs() noexcept
 {
-    proc.log("Install tabs");
+    proc.log(u"Install tabs"_s);
     if (!makeFstab()) return false;
-    if (!makeCrypttab()) return false;
+    if (!crypto.makeCrypttab(*this)) return false;
     return true;
 }
 
@@ -1085,7 +1121,7 @@ void PartMan::preparePartitions()
             }
         } else {
             // Clearing the drive, so mark all partitions on the drive for unmounting.
-            proc.exec("lsblk", {"-nro", "path", drive->path}, nullptr, true);
+            proc.exec(u"lsblk"_s, {u"-nro"_s, u"path"_s, drive->path}, nullptr, true);
             listToUnmount << proc.readOutLines();
         }
     }
@@ -1093,18 +1129,18 @@ void PartMan::preparePartitions()
     // Clean up any leftovers.
     {
         MProcess::Section sect2(proc, nullptr);
-        if (QFileInfo::exists("/mnt/antiX")) {
-            proc.exec("umount", {"-qR", "/mnt/antiX"});
-            proc.exec("rm", {"-rf", "/mnt/antiX"});
+        if (QFileInfo::exists(u"/mnt/antiX"_s)) {
+            proc.exec(u"umount"_s, {u"-qR"_s, u"/mnt/antiX"_s});
+            proc.exec(u"rm"_s, {u"-rf"_s, u"/mnt/antiX"_s});
         }
         // Detach swap and file systems of targets which may have been auto-mounted.
-        proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
+        proc.exec(u"swapon"_s, {u"--show=NAME"_s, u"--noheadings"_s}, nullptr, true);
         const QStringList swaps = proc.readOutLines();
-        proc.exec("findmnt", {"--raw", "-o", "SOURCE"}, nullptr, true);
+        proc.exec(u"findmnt"_s, {u"--raw"_s, u"-o"_s, u"SOURCE"_s}, nullptr, true);
         const QStringList fsmounts = proc.readOutLines();
         for (const QString &devpath : std::as_const(listToUnmount)) {
-            if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
-            if (fsmounts.contains(devpath)) proc.exec("umount", {"-q", devpath});
+            if (swaps.contains(devpath)) proc.exec(u"swapoff"_s, {devpath});
+            if (fsmounts.contains(devpath)) proc.exec(u"umount"_s, {u"-q"_s, devpath});
         }
     }
 
@@ -1115,26 +1151,27 @@ void PartMan::preparePartitions()
 
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
         const int gran = std::max(drive->discgran, drive->physec);
-        const char *opts = drive->discgran ? "-fv" : "-fvz";
-        if (proc.detectVirtualBox()) {
-            opts = "-fvz"; // VirtualBox incorrectly reports TRIM support.
+        QString opts = drive->discgran ? u"-fv"_s : u"-fvz"_s;
+        if (core.detectVirtualBox()) {
+            opts = u"-fvz"_s; // VirtualBox incorrectly reports TRIM support.
         }
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
         const long long length = (4*MB + (gran - 1)) / gran; // ceiling
-        sect.setExceptionMode(false);
-        if (proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path})) {
-            sect.setExceptionMode(true);
+        sect.setExceptionStrict(false);
+        if (proc.exec(u"blkdiscard"_s, {opts, u"-l"_s, QString::number(length*gran), drive->path})) {
+            sect.setExceptionStrict(true);
         } else {
-            sect.setExceptionMode(true);
-            opts = "-fvz"; // use zero instead of failing - but reported - trim support
-            proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path});
+            sect.setExceptionStrict(true);
+            opts = u"-fvz"_s; // use zero instead of failing - but reported - trim support
+            proc.exec(u"blkdiscard"_s, {opts, u"-l"_s, QString::number(length*gran), drive->path});
         }
         // Last 17KB = secondary partition table (for GPT disks).
         const long long offset = (drive->size - 4*MB) / gran; // floor
-        proc.exec("blkdiscard", {opts, "-o", QString::number(offset*gran), drive->path});
+        proc.exec(u"blkdiscard"_s, {opts, u"-o"_s, QString::number(offset*gran), drive->path});
 
-        proc.exec("parted", {"-s", drive->path, "mklabel", (drive->format=="GPT" ? "gpt" : "msdos")});
+        proc.exec(u"parted"_s, {u"-s"_s, drive->path, u"mklabel"_s,
+            (drive->format=="GPT"_L1 ? u"gpt"_s : u"msdos"_s)});
     }
 
     // Prepare partition tables, creating tables and partitions when needed.
@@ -1143,12 +1180,12 @@ void PartMan::preparePartitions()
         bool partupdate = false;
         if (drive->type == Device::VIRTUAL_DEVICES) continue;
         const int devCount = drive->children.size();
-        const bool useGPT = (drive->finalFormat() == "GPT");
+        const bool useGPT = (drive->finalFormat() == "GPT"_L1);
         if (drive->flags.oldLayout) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
-            if (useGPT) cmd = "sgdisk /dev/%1 -q --typecode=%2:%3";
-            else cmd = "sfdisk /dev/%1 -q --part-type %2 %3";
+            if (useGPT) cmd = "sgdisk /dev/%1 -q --typecode=%2:%3"_L1;
+            else cmd = "sfdisk /dev/%1 -q --part-type %2 %3"_L1;
             // Set the type for partitions that will be used in this installation.
             for (int ixdev = 0; ixdev < devCount; ++ixdev) {
                 Device *part = drive->child(ixdev);
@@ -1167,8 +1204,8 @@ void PartMan::preparePartitions()
             for (int ixdev = 0; ixdev<devCount; ++ixdev) {
                 Device *part = drive->child(ixdev);
                 const long long end = start + part->size / MB;
-                proc.exec("parted", {"-s", "--align", "optimal", drive->path,
-                    "mkpart" , "primary", QString::number(start) + "MiB", QString::number(end) + "MiB"});
+                proc.exec(u"parted"_s, {u"-s"_s, u"--align"_s, u"optimal"_s, drive->path,
+                    u"mkpart"_s , u"primary"_s, QString::number(start) + "MiB"_L1, QString::number(end) + "MiB"_L1});
                 partupdate = true;
                 start = end;
                 proc.status();
@@ -1180,48 +1217,23 @@ void PartMan::preparePartitions()
             if (part->usefor.isEmpty()) continue;
             if (part->isActive()) {
                 const NameParts &devsplit = splitName(part->name);
-                QStringList cargs({"-s", "/dev/" + devsplit.drive, "set", devsplit.partition});
-                cargs.append(useGPT ? "legacy_boot" : "boot");
-                cargs.append("on");
-                proc.exec("parted", cargs);
+                QStringList cargs({u"-s"_s, "/dev/"_L1 + devsplit.drive, u"set"_s, devsplit.partition});
+                cargs.append(useGPT ? u"legacy_boot"_s : u"boot"_s);
+                cargs.append(u"on"_s);
+                proc.exec(u"parted"_s, cargs);
                 partupdate = true;
             }
             if (part->flags.sysEFI != part->flags.curESP) {
                 const NameParts &devsplit = splitName(part->name);
-                proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition,
-                    "esp", part->flags.sysEFI ? "on" : "off"});
+                proc.exec(u"parted"_s, {u"-s"_s, "/dev/"_L1 + devsplit.drive, u"set"_s, devsplit.partition,
+                    u"esp"_s, part->flags.sysEFI ? u"on"_s : u"off"_s});
                 partupdate = true;
             }
             proc.status();
         }
         // Update kernel partition records.
-        if (partupdate) proc.exec("partx", {"-u", drive->path});
+        if (partupdate) proc.exec(u"partx"_s, {u"-u"_s, drive->path});
     }
-}
-
-void PartMan::luksFormat()
-{
-    MProcess::Section sect(proc, QT_TR_NOOP("Failed to format LUKS container."));
-    const QByteArray &encPass = gui.textCryptoPass->text().toUtf8();
-    for (Iterator it(*this); Device *part = *it; it.next()) {
-        if (!part->encrypt || !part->willFormat()) continue;
-        proc.status(tr("Creating encrypted volume: %1").arg(part->name));
-        proc.exec("cryptsetup", {"--batch-mode", "--key-size=512",
-            "--hash=sha512", "luksFormat", part->path}, &encPass);
-        proc.status();
-        luksOpen(part, encPass);
-    }
-}
-void PartMan::luksOpen(Device *part, const QByteArray &password)
-{
-    MProcess::Section sect(proc, QT_TR_NOOP("Failed to open LUKS container."));
-    if (part->map.isEmpty()) {
-        proc.exec("cryptsetup", {"luksUUID", part->path}, nullptr, true);
-        part->map = "luks-" + proc.readAll().trimmed();
-    }
-    QStringList cargs({"open", part->path, part->map, "--type", "luks"});
-    if (part->discgran) cargs.prepend("--allow-discards");
-    proc.exec("cryptsetup", cargs, &password);
 }
 
 void PartMan::formatPartitions()
@@ -1235,63 +1247,64 @@ void PartMan::formatPartitions()
         if (!volume->willFormat()) continue;
         const QString &dev = volume->mappedDevice();
         const QString &fmtstatus = tr("Formatting: %1");
-        if (volume->usefor == "FORMAT") proc.status(fmtstatus.arg(volume->name));
+        if (volume->usefor == "FORMAT"_L1) proc.status(fmtstatus.arg(volume->name));
         else proc.status(fmtstatus.arg(volume->usefor));
-        if (volume->usefor == "BIOS-GRUB") {
-            if (proc.detectVirtualBox()) {
-                proc.exec("blkdiscard", {"-fvz", dev}); // VirtualBox incorrectly reports TRIM support.
+        if (volume->usefor == "BIOS-GRUB"_L1) {
+            if (core.detectVirtualBox()) {
+                proc.exec(u"blkdiscard"_s, {u"-fvz"_s, dev}); // VirtualBox incorrectly reports TRIM support.
             } else {
-                sect.setExceptionMode(false);
-                if (! proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev})) {
-                    sect.setExceptionMode(true);
-                    proc.exec("blkdiscard", {"-fvz", dev});
+                sect.setExceptionStrict(false);
+                if (! proc.exec(u"blkdiscard"_s, {volume->discgran ? u"-fv"_s : u"-fvz"_s, dev})) {
+                    sect.setExceptionStrict(true);
+                    proc.exec(u"blkdiscard"_s, {u"-fvz"_s, dev});
                 }
-                sect.setExceptionMode(true);
+                sect.setExceptionStrict(true);
             }
             const NameParts &devsplit = splitName(dev);
-            proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
-        } else if (volume->usefor == "SWAP") {
-            QStringList cargs({"-q", dev});
-            if (!volume->label.isEmpty()) cargs << "-L" << volume->label;
-            proc.exec("mkswap", cargs);
-        } else if (volume->format.left(3) == "FAT") {
-            QStringList cargs({"-F", volume->format.mid(3)});
-            if (volume->chkbadblk) cargs.append("-c");
-            if (!volume->label.isEmpty()) cargs << "-n" << volume->label.trimmed().left(11);
+            proc.exec(u"parted"_s, {u"-s"_s, "/dev/"_L1 + devsplit.drive,
+                u"set"_s, devsplit.partition, u"bios_grub"_s, u"on"_s});
+        } else if (volume->usefor == "SWAP"_L1) {
+            QStringList cargs({u"-q"_s, dev});
+            if (!volume->label.isEmpty()) cargs << u"-L"_s << volume->label;
+            proc.exec(u"mkswap"_s, cargs);
+        } else if (volume->format.left(3) == "FAT"_L1) {
+            QStringList cargs({u"-F"_s, volume->format.mid(3)});
+            if (volume->chkbadblk) cargs.append(u"-c"_s);
+            if (!volume->label.isEmpty()) cargs << u"-n"_s << volume->label.trimmed().left(11);
             cargs.append(dev);
-            proc.exec("mkfs.msdos", cargs);
+            proc.exec(u"mkfs.msdos"_s, cargs);
         } else {
             // Transplanted from minstall.cpp and modified to suit.
             const QString &format = volume->format;
             QStringList cargs;
-            if (format == "btrfs") {
-                cargs.append("-f");
-                proc.exec("cp", {"-fp", "/usr/bin/true", "/usr/sbin/fsck.auto"});
+            if (format == "btrfs"_L1) {
+                cargs.append(u"-f"_s);
+                proc.exec(u"cp"_s, {u"-fp"_s, u"/usr/bin/true"_s, u"/usr/sbin/fsck.auto"_s});
                 if (volume->size < 6000000000) {
-                    cargs << "-M" << "-O" << "skinny-metadata"; // Mixed mode (-M)
+                    cargs << u"-M"_s << u"-O"_s << u"skinny-metadata"_s; // Mixed mode (-M)
                 }
-            } else if (format == "xfs" || format == "f2fs") {
-                cargs.append("-f");
+            } else if (format == "xfs"_L1 || format == "f2fs"_L1) {
+                cargs.append(u"-f"_s);
             } else { // jfs, ext2, ext3, ext4
-                if (format == "jfs") cargs.append("-q");
-                else cargs.append("-F");
-                if (volume->chkbadblk) cargs.append("-c");
+                if (format == "jfs"_L1) cargs.append(u"-q"_s);
+                else cargs.append(u"-F"_s);
+                if (volume->chkbadblk) cargs.append(u"-c"_s);
             }
             cargs.append(dev);
             if (!volume->label.isEmpty()) {
-                if (format == "f2fs") cargs.append("-l");
-                else cargs.append("-L");
+                if (format == "f2fs"_L1) cargs.append(u"-l"_s);
+                else cargs.append(u"-L"_s);
                 cargs.append(volume->label);
             }
-            proc.exec("mkfs." + format, cargs);
-            if (format.startsWith("ext")) {
-                proc.exec("tune2fs", {"-c0", "-C0", "-i1m", dev}); // ext4 tuning
+            proc.exec("mkfs."_L1 + format, cargs);
+            if (format.startsWith("ext"_L1)) {
+                proc.exec(u"tune2fs"_s, {u"-c0"_s, u"-C0"_s, u"-i1m"_s, dev}); // ext4 tuning
             }
         }
     }
     // Prepare subvolumes on all that (are to) contain them.
     for (Iterator it(*this); Device *device = *it; it.next()) {
-        if (device->isVolume() && device->finalFormat() == "btrfs") {
+        if (device->isVolume() && device->finalFormat() == "btrfs"_L1) {
             prepareSubvolumes(*it);
         }
     }
@@ -1304,64 +1317,50 @@ void PartMan::prepareSubvolumes(Device *part)
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
 
-    proc.exec("mount", {"--mkdir", "-o", "subvolid=5,noatime", part->mappedDevice(), "/mnt/btrfs-scratch"});
+    proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,noatime"_s, part->mappedDevice(), u"/mnt/btrfs-scratch"_s});
     const char *errmsg = nullptr;
     try {
         // Since the default subvolume cannot be deleted, ensure the default is set to the top.
-        proc.exec("btrfs", {"-q", "subvolume", "set-default", "5", "/mnt/btrfs-scratch"});
+        proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s, u"5"_s, u"/mnt/btrfs-scratch"_s});
         for (int ixsv = 0; ixsv < subvolcount; ++ixsv) {
             Device *subvol = part->child(ixsv);
             assert(subvol != nullptr);
-            const QString &svpath = "/mnt/btrfs-scratch/" + subvol->label;
-            if (subvol->format != "PRESERVE" && QFileInfo::exists(svpath)) {
-                proc.exec("btrfs", {"-q", "subvolume", "delete", svpath});
+            const QString &svpath = "/mnt/btrfs-scratch/"_L1 + subvol->label;
+            if (subvol->format != "PRESERVE"_L1 && QFileInfo::exists(svpath)) {
+                proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"delete"_s, svpath});
             }
-            if (subvol->format == "CREATE") {
-                proc.exec("btrfs", {"-q", "subvolume", "create", svpath});
+            if (subvol->format == "CREATE"_L1) {
+                proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"create"_s, svpath});
             }
             proc.status();
         }
         // Set the default subvolume if one was chosen.
         if (part->active) {
-            proc.exec("btrfs", {"-q", "subvolume", "set-default", "/mnt/btrfs-scratch/"+part->active->label});
+            proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s,
+                "/mnt/btrfs-scratch/"_L1+part->active->label});
         }
     } catch(const char *msg) {
         errmsg = msg;
     }
-    proc.exec("umount", {"/mnt/btrfs-scratch"});
+    proc.exec(u"umount"_s, {u"/mnt/btrfs-scratch"_s});
     if (errmsg) throw errmsg;
-}
-
-// write out crypttab if encrypting for auto-opening
-bool PartMan::makeCrypttab() noexcept
-{
-    // Count the number of crypttab entries.
-    int cryptcount = 0;
-    for (Iterator it(*this); Device *device = *it; it.next()) {
-        if (device->addToCrypttab) ++cryptcount;
-    }
-    // Add devices to crypttab.
-    QFile file("/mnt/antiX/etc/crypttab");
-    if (!file.open(QIODevice::WriteOnly)) return false;
-    QTextStream out(&file);
-    for (Iterator it(*this); Device *device = *it; it.next()) {
-        if (!device->addToCrypttab) continue;
-        out << device->map << " UUID=" << device->uuid << " none luks";
-        if (cryptcount > 1) out << ",keyscript=decrypt_keyctl";
-        if (!device->flags.rotational) out << ",no-read-workqueue,no-write-workqueue";
-        if (device->discgran) out << ",discard";
-        out << '\n';
-    }
-    return true;
 }
 
 // create /etc/fstab file
 bool PartMan::makeFstab() noexcept
 {
-    QFile file("/mnt/antiX/etc/fstab");
+    QFile file(u"/mnt/antiX/etc/fstab"_s);
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
     out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
+    // Use std::map to arrange mounts in alphabetical (thus, hierarchical) order.
+    std::map<QString, Device *> mounts;
+    for (Iterator it(*this); Device *dev = *it; it.next()) {
+        const QString &mount = dev->mountPoint();
+        if (!mount.isEmpty()) {
+            mounts[mount] = dev;
+        }
+    }
     // File systems and swap space.
     for (auto &it : mounts) {
         const Device *volume = it.second;
@@ -1375,27 +1374,18 @@ bool PartMan::makeFstab() noexcept
             //fallback UUID
             //some btrfs systems show incorrect UUID for volume, and so parent UUID never found
             if (UUID.isEmpty()){
-                proc.exec("blkid", {"-p", "-s","UUID", dev}, nullptr, true);
-                UUID = proc.readOut().section("=", 1, 1).section("\"",1,1);
+                proc.exec(u"blkid"_s, {u"-p"_s, u"-s"_s,u"UUID"_s, dev}, nullptr, true);
+                UUID = proc.readOut().section('=', 1, 1).section('\"',1,1);
                 qDebug() << "UUID:" << UUID;
             }
             out << "UUID=" << UUID;
         }
-        // Mount point, file system
-        QString fsfmt;
-        if (volume->type == Device::SUBVOLUME) {
-            fsfmt = "btrfs";
-        } else {
-            fsfmt = volume->finalFormat();
-        }
-
-        if (fsfmt.compare("swap", Qt::CaseInsensitive) == 0) {
-            out << " swap swap";
-        } else {
-            out << ' ' << it.first;
-            if (fsfmt.startsWith("FAT")) out << " vfat";
-            else out << ' ' << fsfmt;
-        }
+        // Mount point
+        out << ' ' << it.first;
+        // File system
+        const QString &fsfmt = volume->finalFormat();
+        if (fsfmt.startsWith("FAT"_L1)) out << " vfat";
+        else out << ' ' << fsfmt;
         // Options
         const QString &mountopts = volume->options;
         if (volume->type == Device::SUBVOLUME) {
@@ -1405,14 +1395,8 @@ bool PartMan::makeFstab() noexcept
             if (mountopts.isEmpty()) out << " defaults";
             else out << ' ' << mountopts;
         }
-        if (volume->canMount()) {
-            out << ' ' << (volume->dump ? 1 : 0);
-            out << ' ' << volume->pass;
-        }
-        if (fsfmt.compare("swap", Qt::CaseInsensitive) == 0) {
-            out <<" 0 0";
-        }
-        out << '\n';
+        // Dump, pass
+        out << ' ' << (volume->dump ? 1 : 0) << ' ' << volume->pass << '\n';
     }
     file.close();
     return true;
@@ -1422,14 +1406,22 @@ void PartMan::mountPartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to mount partition."));
+
+    // Use std::map to arrange mounts in alphabetical (thus, hierarchical) order.
+    std::map<QString, Device *> mounts;
+    for (Iterator it(*this); Device *dev = *it; it.next()) {
+        const QString &mount = dev->mountPoint();
+        if (!mount.isEmpty() && mount.at(0) == '/') {
+            mounts[mount] = dev;
+        }
+    }
     for (auto &it : mounts) {
-        if (it.first.at(0) != '/') continue;
-        const QString point("/mnt/antiX" + it.first);
+        const QString point("/mnt/antiX"_L1 + it.first);
         const QString &dev = it.second->mappedDevice();
         proc.status(tr("Mounting: %1").arg(it.first));
         QStringList opts;
         if (it.second->type == Device::SUBVOLUME) {
-            opts.append("subvol=" + it.second->label);
+            opts.append("subvol="_L1 + it.second->label);
         }
         // Use noatime to speed up the installation.
         opts.append(it.second->options.split(','));
@@ -1437,62 +1429,34 @@ void PartMan::mountPartitions()
         opts.removeAll("defaults");
         opts.removeAll("atime");
         opts.removeAll("relatime");
-        if (it.second->finalFormat() == "ext4" && !opts.contains("noinit_itable")) {
-            opts.append("noinit_itable");
+        if (it.second->finalFormat() == "ext4"_L1 && !opts.contains(u"noinit_itable"_s)) {
+            opts.append(u"noinit_itable"_s);
         }
-        if (!opts.contains("async")) opts.append("async");
-        if (!opts.contains("noiversion")) opts.append("noiversion");
-        if (!opts.contains("noatime")) opts.append("noatime");
-        if (!opts.contains("lazytime")) opts.append("lazytime");
-        proc.exec("mount", {"--mkdir", "-o", opts.join(','), dev, point});
+        if (!opts.contains(u"async"_s)) opts.append(u"async"_s);
+        if (!opts.contains(u"noiversion"_s)) opts.append(u"noiversion"_s);
+        if (!opts.contains(u"noatime"_s)) opts.append(u"noatime"_s);
+        if (!opts.contains(u"lazytime"_s)) opts.append(u"lazytime"_s);
+        proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, opts.join(','), dev, point});
     }
 }
 
 void PartMan::clearWorkArea()
 {
     // Close swap files that may have been opened (should not have swap opened in the first place)
-    proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
+    proc.exec(u"swapon"_s, {u"--show=NAME"_s, u"--noheadings"_s}, nullptr, true);
     QStringList swaps = proc.readOutLines();
     for (Iterator it(*this); *it; it.next()) {
         const QString &dev = (*it)->mappedDevice();
-        if (swaps.contains(dev)) proc.exec("swapoff", {dev});
+        if (swaps.contains(dev)) proc.exec(u"swapoff"_s, {dev});
     }
     // Unmount everything in /mnt/antiX which is only to be for working on the target system.
-    if (QFileInfo::exists("/mnt/antiX")) proc.exec("umount", {"-qR", "/mnt/antiX"});
+    if (QFileInfo::exists(u"/mnt/antiX"_s)) proc.exec(u"umount"_s, {u"-qR"_s, u"/mnt/antiX"_s});
     // Close encrypted containers that were opened by the installer.
     for (Iterator it(*this); Device *device = *it; it.next()) {
         if (device->encrypt && device->type != Device::VIRTUAL && QFile::exists(device->mappedDevice())) {
-            proc.exec("cryptsetup", {"close", device->map});
+            proc.exec(u"cryptsetup"_s, {u"close"_s, device->map});
         }
     }
-}
-
-// Public properties
-int PartMan::swapCount() const noexcept
-{
-    int count = 0;
-    for (const auto &mount : mounts) {
-        if (mount.first.startsWith("SWAP")) ++count;
-    }
-    return count;
-}
-
-int PartMan::isEncrypt(const QString &point) const noexcept
-{
-    int count = 0;
-    if (point.isEmpty()) {
-        for (const auto &mount : mounts) {
-            if (mount.second->willEncrypt()) ++count;
-        }
-    } else if (point == "SWAP") {
-        for (const auto &mount : mounts) {
-            if (mount.first.startsWith("SWAP") && mount.second->willEncrypt()) ++count;
-        }
-    } else {
-        const auto fit = mounts.find(point);
-        if (fit != mounts.cend() && fit->second->willEncrypt()) ++count;
-    }
-    return count;
 }
 
 PartMan::Device *PartMan::findByPath(const QString &devpath) const noexcept
@@ -1502,14 +1466,20 @@ PartMan::Device *PartMan::findByPath(const QString &devpath) const noexcept
     }
     return nullptr;
 }
+PartMan::Device *PartMan::findByMount(const QString &mount) const noexcept
+{
+    for (Iterator it(*this); *it; it.next()) {
+        if ((*it)->mountPoint() == mount) return *it;
+    }
+    return nullptr;
+}
 PartMan::Device *PartMan::findHostDev(const QString &path) const noexcept
 {
     QString spath = path;
     Device *device = nullptr;
     do {
         spath = QDir::cleanPath(QFileInfo(spath).path());
-        const auto fit = mounts.find(spath);
-        if (fit != mounts.cend()) device = mounts.at(spath);
+        device = findByMount(spath);
     } while(!device && !spath.isEmpty() && spath != '/' && spath != '.');
     return device;
 }
@@ -1532,7 +1502,11 @@ struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStr
 struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path) const noexcept
 {
     QStringList vols;
-    for (const auto &mount : mounts) vols.append(mount.first);
+    for (Iterator it(*this); *it; it.next()) {
+        if ((*it)->canMount()) {
+            vols.append((*it)->mountPoint());
+        }
+    }
     return volSpecTotal(path, vols);
 }
 
@@ -1604,7 +1578,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
         case COL_DEVICE:
             if (!device->model.isEmpty()) return tr("Model: %1").arg(device->model);
             else if (!device->origin) return device->path;
-            else return device->path + "\n(" + device->origin->name + ')';
+            else return device->path + "\n("_L1 + device->origin->name + ')';
             break;
         case COL_SIZE:
             if (device->type == Device::DRIVE) {
@@ -1620,9 +1594,9 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
         if ((device->type == Device::DRIVE || device->type == Device::SUBVOLUME) && !device->flags.oldLayout) {
             return QIcon(":/appointment-soon");
         } else if (device->type == Device::VIRTUAL && device->flags.volCrypto) {
-            return QIcon::fromTheme("unlock");
+            return QIcon::fromTheme(u"unlock"_s);
         } else if (device->mapCount) {
-            return QIcon::fromTheme("lock");
+            return QIcon::fromTheme(u"lock"_s);
         }
     }
     return QVariant();
@@ -1666,17 +1640,17 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const noexcept
         }
         break;
     case COL_FLAG_ESP:
-        if (device->type == Device::PARTITION && device->parent() && device->parent()->finalFormat() == "GPT") {
+        if (device->type == Device::PARTITION && device->parent() && device->parent()->finalFormat() == "GPT"_L1) {
             flagsOut |= Qt::ItemIsUserCheckable;
         }
         break;
     case COL_USEFOR:
-        if (device->allowedUsesFor().count() >= 1 && device->format != "DELETE") {
+        if (device->allowedUsesFor().count() >= 1 && device->format != "DELETE"_L1) {
             flagsOut |= Qt::ItemIsEditable;
         }
         break;
     case COL_LABEL:
-        if (device->format != "PRESERVE" && device->format != "DELETE") {
+        if (device->format != "PRESERVE"_L1 && device->format != "DELETE"_L1) {
             if (device->type == Device::SUBVOLUME) flagsOut |= Qt::ItemIsEditable;
             else if (!device->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
         }
@@ -1688,8 +1662,8 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const noexcept
         if (device->allowedFormats().count() > 1) flagsOut |= Qt::ItemIsEditable;
         break;
     case COL_CHECK:
-        if (device->format.startsWith("ext") || device->format == "jfs"
-            || device->format.startsWith("FAT", Qt::CaseInsensitive)) {
+        if (device->format.startsWith("ext"_L1) || device->format == "jfs"_L1
+            || device->format.startsWith("FAT"_L1, Qt::CaseInsensitive)) {
             flagsOut |= Qt::ItemIsUserCheckable;
         }
         break;
@@ -1826,16 +1800,16 @@ int PartMan::changeEnd(bool autofill, bool notify) noexcept
     if (changing->type != Device::DRIVE && (changing->format != root->format || changing->usefor != root->usefor)) {
         changing->dump = false;
         changing->pass = 2;
-        if (changing->usefor.isEmpty() || changing->usefor == "FORMAT") {
+        if (changing->usefor.isEmpty() || changing->usefor == "FORMAT"_L1) {
             changing->options.clear();
         }
-        if (changing->format != "btrfs") {
+        if (changing->format != "btrfs"_L1) {
             // Clear all subvolumes if not supported.
             while (changing->children.size()) delete changing->child(0);
         } else {
             // Remove preserve option from all subvolumes.
             for (Device *cdevice : changing->children) {
-                cdevice->format = "CREATE";
+                cdevice->format = "CREATE"_L1;
                 notifyChange(cdevice);
             }
         }
@@ -1961,7 +1935,7 @@ void PartMan::Device::setActive(bool on) noexcept
     parentItem->active = on ? this : nullptr;
     partman.notifyChange(this);
 }
-inline bool PartMan::Device::isActive() const noexcept
+bool PartMan::Device::isActive() const noexcept
 {
     if (!parentItem) return false;
     return (parentItem->active == this);
@@ -1975,12 +1949,12 @@ bool PartMan::Device::isLocked() const noexcept
 }
 bool PartMan::Device::willFormat() const noexcept
 {
-    return format != "PRESERVE" && !usefor.isEmpty();
+    return format != "PRESERVE"_L1 && !usefor.isEmpty();
 }
 bool PartMan::Device::canEncrypt() const noexcept
 {
     if (type != PARTITION) return false;
-    return !(flags.sysEFI || usefor.isEmpty() || usefor == "BIOS-GRUB" || usefor == "/boot");
+    return !(flags.sysEFI || usefor.isEmpty() || usefor == "BIOS-GRUB"_L1 || usefor == "/boot"_L1);
 }
 bool PartMan::Device::willEncrypt() const noexcept
 {
@@ -1998,7 +1972,7 @@ QString PartMan::Device::mappedDevice() const noexcept
     if (device->type == SUBVOLUME) device = device->parentItem;
     if (device->type == PARTITION) {
         const QString &d = device->map;
-        if (!d.isEmpty()) return "/dev/mapper/" + d;
+        if (!d.isEmpty()) return "/dev/mapper/"_L1 + d;
     }
     return device->path;
 }
@@ -2025,31 +1999,31 @@ QStringList PartMan::Device::allowedUsesFor(bool all) const noexcept
     };
 
     if (type != SUBVOLUME) {
-        checkAndAdd("FORMAT");
+        checkAndAdd(u"FORMAT"_s);
         if (type != VIRTUAL) {
-            if ((all || size <= 1*MB) && parentItem && parentItem->format == "GPT") {
-                checkAndAdd("BIOS-GRUB");
+            if ((all || size <= 1*MB) && parentItem && parentItem->format == "GPT"_L1) {
+                checkAndAdd(u"BIOS-GRUB"_s);
             }
             if (all || size <= 8*GB) {
                 if (size < (2*TB - 512)) {
-                    if (all || flags.sysEFI || size <= 512*MB) checkAndAdd("ESP");
+                    if (all || flags.sysEFI || size <= 512*MB) checkAndAdd(u"ESP"_s);
                 }
-                checkAndAdd("/boot"); // static files of the boot loader
+                checkAndAdd(u"/boot"_s); // static files of the boot loader
             }
         }
     }
     if (!flags.sysEFI) {
         // Debian 12 installer order: / /boot /home /tmp /usr /var /srv /opt /usr/local
-        checkAndAdd("/"); // the root file system
-        checkAndAdd("/home"); // user home directories
-        checkAndAdd("/usr"); // static data
-        // checkAndAdd("/usr/local"); // local hierarchy
-        checkAndAdd("/var"); // variable data
-        // checkAndAdd("/tmp"); // temporary files
-        // checkAndAdd("/srv"); // data for services provided by this system
-        // checkAndAdd("/opt"); // add-on application software packages
-        if (type != SUBVOLUME) checkAndAdd("SWAP");
-        else checkAndAdd("/swap");
+        checkAndAdd(u"/"_s); // the root file system
+        checkAndAdd(u"/home"_s); // user home directories
+        checkAndAdd(u"/usr"_s); // static data
+        // checkAndAdd(u"/usr/local"_s); // local hierarchy
+        checkAndAdd(u"/var"_s); // variable data
+        // checkAndAdd(u"/tmp"_s); // temporary files
+        // checkAndAdd(u"/srv"_s); // data for services provided by this system
+        // checkAndAdd(u"/opt"_s); // add-on application software packages
+        if (type != SUBVOLUME) checkAndAdd(u"SWAP"_s);
+        else checkAndAdd(u"/swap"_s);
     }
     return list;
 }
@@ -2057,12 +2031,12 @@ QStringList PartMan::Device::allowedFormats() const noexcept
 {
     QStringList list;
     if (type == DRIVE && !flags.oldLayout) {
-        list.append("GPT");
+        list.append(u"GPT"_s);
         if (size < 2*TB && children.size() <= 4) {
-            if (partman.proc.detectEFI()) {
-                list.append("DOS");
+            if (partman.core.detectEFI()) {
+                list.append(u"DOS"_s);
             } else {
-                list.prepend("DOS");
+                list.prepend(u"DOS"_s);
             }
         }
         return list;
@@ -2071,31 +2045,34 @@ QStringList PartMan::Device::allowedFormats() const noexcept
     bool allowPreserve = false;
     if (isVolume()) {
         if (usefor.isEmpty()) return QStringList();
-        else if (usefor == "BIOS-GRUB") list.append("BIOS-GRUB");
-        else if (usefor == "SWAP") {
-            list.append("SWAP");
+        else if (usefor == "BIOS-GRUB"_L1) {
+            list.append(u"BIOS-GRUB"_s);
+        } else if (usefor == "SWAP"_L1) {
+            list.append(u"swap"_s);
             allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         } else {
             if (!flags.sysEFI) {
-                list << "ext4";
-                if (usefor != "/boot") {
-                    list << "ext3" << "ext2";
-                    if (!QStandardPaths::findExecutable("mkfs.f2fs").isEmpty()) list << "f2fs";
-                    if (!QStandardPaths::findExecutable("mkfs.jfs").isEmpty()) list << "jfs";
-                    if (!QStandardPaths::findExecutable("mkfs.xfs").isEmpty()) list << "xfs";
-                    if (!QStandardPaths::findExecutable("mkfs.btrfs").isEmpty()) list << "btrfs";
+                list << u"ext4"_s;
+                if (usefor != u"/boot"_s) {
+                    list << u"ext3"_s << u"ext2"_s;
+                    if (!QStandardPaths::findExecutable(u"mkfs.f2fs"_s).isEmpty()) list << u"f2fs"_s;
+                    if (!QStandardPaths::findExecutable(u"mkfs.jfs"_s).isEmpty()) list << u"jfs"_s;
+                    if (!QStandardPaths::findExecutable(u"mkfs.xfs"_s).isEmpty()) list << u"xfs"_s;
+                    if (!QStandardPaths::findExecutable(u"mkfs.btrfs"_s).isEmpty()) list << u"btrfs"_s;
                 }
             }
-            if (size <= (2*TB - 64*KB)) list.append("FAT32");
-            if (size <= (4*GB - 64*KB)) list.append("FAT16");
-            if (size <= (32*MB - 512)) list.append("FAT12");
+            if (size <= (2*TB - 64*KB)) list.append(u"FAT32"_s);
+            if (size <= (4*GB - 64*KB)) list.append(u"FAT16"_s);
+            if (size <= (32*MB - 512)) list.append(u"FAT12"_s);
 
-            if (usefor != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
+            if (usefor != "FORMAT"_L1) {
+                allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
+            }
         }
     } else if (type == SUBVOLUME) {
-        list.append("CREATE");
+        list.append(u"CREATE"_s);
         if (flags.oldLayout) {
-            list.append("DELETE");
+            list.append(u"DELETE"_s);
             allowPreserve = true;
         }
     }
@@ -2103,10 +2080,10 @@ QStringList PartMan::Device::allowedFormats() const noexcept
     if (encrypt) allowPreserve = false;
     if (allowPreserve) {
         // People often share SWAP partitions between distros and need to keep the same UUIDs.
-        if (flags.sysEFI || usefor == "/home" || !allowedUsesFor().contains(usefor) || usefor == "SWAP") {
-            list.prepend("PRESERVE"); // Preserve ESP, SWAP, custom mounts and /home by default.
+        if (flags.sysEFI || usefor == "/home"_L1 || !allowedUsesFor().contains(usefor) || usefor == "SWAP"_L1) {
+            list.prepend(u"PRESERVE"_s); // Preserve ESP, SWAP, custom mounts and /home by default.
         } else {
-            list.append("PRESERVE");
+            list.append(u"PRESERVE"_s);
         }
     }
     return list;
@@ -2114,23 +2091,35 @@ QStringList PartMan::Device::allowedFormats() const noexcept
 QString PartMan::Device::finalFormat() const noexcept
 {
     if (type == SUBVOLUME) return parentItem->format;
-    return (type != DRIVE && (usefor.isEmpty() || format == "PRESERVE")) ? curFormat : format;
+    return (type != DRIVE && (usefor.isEmpty() || format == "PRESERVE"_L1)) ? curFormat : format;
+}
+QString PartMan::Device::finalLabel() const noexcept
+{
+    if (type == SUBVOLUME) return parentItem->label;
+    return (type != DRIVE && (usefor.isEmpty() || format == "PRESERVE"_L1)) ? curLabel : label;
 }
 QString PartMan::Device::shownFormat(const QString &fmt) const noexcept
 {
-    if (fmt == "CREATE") return flags.oldLayout ? tr("Overwrite") : tr("Create");
-    else if (fmt == "DELETE") return tr("Delete");
-    else if (fmt != "PRESERVE") return fmt;
+    if (fmt == "CREATE"_L1) return flags.oldLayout ? tr("Overwrite") : tr("Create");
+    else if (fmt == "DELETE"_L1) return tr("Delete");
+    else if (fmt != "PRESERVE"_L1) return fmt;
     else {
         if (type == SUBVOLUME) return tr("Preserve");
-        else if (usefor != "/") return tr("Preserve (%1)").arg(curFormat);
+        else if (usefor != "/"_L1) return tr("Preserve (%1)").arg(curFormat);
         else return tr("Preserve /home (%1)").arg(curFormat);
     }
 }
-bool PartMan::Device::canMount(bool pointonly) const noexcept
+QString PartMan::Device::mountPoint() const noexcept
 {
-    return !usefor.isEmpty() && usefor != "FORMAT" && usefor != "BIOS-GRUB"
-        && (!pointonly || usefor != "SWAP");
+    if (!canMount(false)) return QString();
+    else if (usefor == "ESP"_L1) return u"/boot/efi"_s;
+    else if (usefor == "SWAP"_L1) return u"swap"_s;
+    return usefor;
+}
+bool PartMan::Device::canMount(bool fsonly) const noexcept
+{
+    return !usefor.isEmpty() && usefor != "FORMAT"_L1 && usefor != "BIOS-GRUB"_L1
+        && (!fsonly || usefor != "SWAP"_L1);
 }
 long long PartMan::Device::driveFreeSpace(bool inclusive) const noexcept
 {
@@ -2156,9 +2145,9 @@ PartMan::Device *PartMan::Device::addPart(long long defaultSize, const QString &
 void PartMan::Device::driveAutoSetActive() noexcept
 {
     if (active) return;
-    if (partman.proc.detectEFI() && format=="GPT") return;
-    // Cannot use partman.mounts map here as it may not be populated.
-    for (const QString &pref : QStringList({"/boot", "/"})) {
+    if (partman.core.detectEFI() && format=="GPT"_L1) return;
+
+    for (const char *pref : {"/boot", "/"}) {
         for (PartMan::Iterator it(this); Device *device = *it; it.next()) {
             if (device->usefor == pref) {
                 while (device && device->type != PARTITION) device = device->parentItem;
@@ -2202,13 +2191,13 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
             else label = fit->second.defaultLabel;
         }
         // Automatic default boot device selection
-        if ((type != VIRTUAL) && (usefor == "/boot" || usefor == "/")) {
+        if ((type != VIRTUAL) && (usefor == "/boot"_L1 || usefor == "/"_L1)) {
             Device *drive = this;
             while (drive && drive->type != DRIVE) drive = drive->parentItem;
             if (drive) drive->driveAutoSetActive();
         }
-        if (type == SUBVOLUME && usefor == "/") setActive(true);
-        if (usefor == "ESP" || usefor == "/boot/efi") flags.sysEFI = true;
+        if (type == SUBVOLUME && usefor == "/"_L1) setActive(true);
+        if (usefor == "ESP"_L1 || usefor == "/boot/efi"_L1) flags.sysEFI = true;
 
         if (encrypt & !canEncrypt()) {
             encrypt = false;
@@ -2223,21 +2212,21 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
     }
     if ((changed & ((1 << PartMan::COL_USEFOR) | (1 << PartMan::COL_FORMAT))) && canMount(false)) {
         // Default options, dump and pass
-        if (usefor == "SWAP") {
-            options = discgran ? "discard=once" : "defaults";
-        } else if (finalFormat().startsWith("FAT")) {
-            options = "noatime,dmask=0002,fmask=0113";
+        if (usefor == "SWAP"_L1) {
+            options = discgran ? "discard=once"_L1 : "defaults"_L1;
+        } else if (finalFormat().startsWith("FAT"_L1)) {
+            options = "noatime,dmask=0002,fmask=0113"_L1;
             pass = 0;
             dump = false;
         } else {
-            if (usefor == "/boot" || usefor == "/") {
-                pass = (format == "btrfs") ? 0 : 1;
+            if (usefor == "/boot"_L1 || usefor == "/"_L1) {
+                pass = (format == "btrfs"_L1) ? 0 : 1;
             }
             options.clear();
-            const bool btrfs = (format == "btrfs" || type == SUBVOLUME);
-            if (!flags.rotational && btrfs) options += "ssd,";
-            options += "noatime";
-            if (btrfs && usefor != "/swap") options += ",compress=zstd:1";
+            const bool btrfs = (format == "btrfs"_L1 || type == SUBVOLUME);
+            if (!flags.rotational && btrfs) options += "ssd,"_L1;
+            options += "noatime"_L1;
+            if (btrfs && usefor != "/swap"_L1) options += ",compress=zstd:1"_L1;
             dump = true;
         }
     }
@@ -2249,7 +2238,7 @@ void PartMan::Device::labelParts() noexcept
     for (size_t ixi = 0; ixi < nchildren; ++ixi) {
         Device *cdevice = children[ixi];
         cdevice->name = PartMan::joinName(name, ixi + 1);
-        cdevice->path = "/dev/" + cdevice->name;
+        cdevice->path = "/dev/"_L1 + cdevice->name;
         partman.notifyChange(cdevice, PartMan::COL_DEVICE, PartMan::COL_DEVICE);
     }
     partman.resizeColumnsToFit();
@@ -2260,18 +2249,19 @@ void PartMan::Device::addToCombo(QComboBox *combo, bool warnNasty) const noexcep
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
     strout += ' ' + finalFormat();
-    if (!label.isEmpty()) strout += " - " + label;
-    if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
+    const QString &flabel = finalLabel();
+    if (!flabel.isEmpty()) strout += " - "_L1 + flabel;
+    if (!model.isEmpty()) strout += (flabel.isEmpty() ? " - "_L1 : "; "_L1) + model;
     QString stricon;
-    if (!flags.oldLayout || !usefor.isEmpty()) stricon = ":/appointment-soon";
-    else if (flags.nasty && warnNasty) stricon = ":/dialog-warning";
-    combo->addItem(QIcon(stricon), name + " (" + strout + ")", name);
+    if (!flags.oldLayout || !usefor.isEmpty()) stricon = ":/appointment-soon"_L1;
+    else if (flags.nasty && warnNasty) stricon = ":/dialog-warning"_L1;
+    combo->addItem(QIcon(stricon), name + " ("_L1 + strout + ")"_L1, name);
 }
 // Split a device name into its drive and partition.
 PartMan::NameParts PartMan::splitName(const QString &devname) noexcept
 {
-    const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
-    const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
+    static const QRegularExpression rxdev1(u"^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$"_s);
+    static const QRegularExpression rxdev2(u"^(?:\\/dev\\/)*([a-z]*)([0-9]*)$"_s);
     QRegularExpressionMatch rxmatch(rxdev1.match(devname));
     if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
     return {rxmatch.captured(1), rxmatch.captured(2)};
@@ -2279,7 +2269,7 @@ PartMan::NameParts PartMan::splitName(const QString &devname) noexcept
 QString PartMan::joinName(const QString &drive, int partnum) noexcept
 {
     QString name = drive;
-    if (name.startsWith("nvme") || name.startsWith("mmcblk")) name += 'p';
+    if (name.startsWith("nvme"_L1) || name.startsWith("mmcblk"_L1)) name += 'p';
     return (name + QString::number(partnum));
 }
 
@@ -2359,13 +2349,13 @@ QSize PartMan::ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const 
     const int residue = 10 + width - option.fontMetrics.boundingRect(index.data(Qt::DisplayRole).toString()).width();
     switch(index.column()) {
     case PartMan::COL_FORMAT:
-        for (const QString &fmt : device->allowedFormats()) {
+        for (const QStringList &fmts = device->allowedFormats(); const QString &fmt : fmts) {
             const int fw = option.fontMetrics.boundingRect(device->shownFormat(fmt)).width() + residue;
             if (fw > width) width = fw;
         }
         break;
     case PartMan::COL_USEFOR:
-        for (const QString &use : device->allowedUsesFor(false)) {
+        for (const QStringList &uses = device->allowedUsesFor(false); const QString &use : uses) {
             const int uw = option.fontMetrics.boundingRect(use).width() + residue;
             if (uw > width) width = uw;
         }
@@ -2377,26 +2367,28 @@ QSize PartMan::ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const 
 QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *widget = nullptr;
-    QComboBox *combo = nullptr;
     switch (index.column())
     {
     case PartMan::COL_SIZE:
         {
             QSpinBox *spin = new QSpinBox(parent);
-            spin->setSuffix("MB");
+            spin->setSuffix(u"MB"_s);
             spin->setStepType(QSpinBox::AdaptiveDecimalStepType);
             spin->setAccelerated(true);
-            spin->setSpecialValueText("MAX");
+            spin->setSpecialValueText(u"MAX"_s);
             widget = spin;
         }
         break;
     case PartMan::COL_USEFOR:
-        widget = combo = new QComboBox(parent);
-        combo->setEditable(true);
-        combo->setInsertPolicy(QComboBox::NoInsert);
-        combo->lineEdit()->setPlaceholderText("----");
+        {
+            QComboBox *combo = new QComboBox(parent);
+            combo->setEditable(true);
+            combo->setInsertPolicy(QComboBox::NoInsert);
+            combo->lineEdit()->setPlaceholderText(u"----"_s);
+            widget = combo;
+        }
         break;
-    case PartMan::COL_FORMAT: widget = combo = new QComboBox(parent); break;
+    case PartMan::COL_FORMAT: widget = new QComboBox(parent); break;
     case PartMan::COL_PASS: widget = new QSpinBox(parent); break;
     case PartMan::COL_OPTIONS:
         {
@@ -2408,9 +2400,6 @@ QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOption
         }
         break;
     default: widget = new QLineEdit(parent);
-    }
-    if (combo) {
-        connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ItemDelegate::emitCommit);
     }
     assert(widget != nullptr);
     widget->setAutoFillBackground(true);
@@ -2434,7 +2423,7 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
         {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
-            combo->addItem("");
+            combo->addItem(QString());
             combo->addItems(device->allowedUsesFor(false));
             combo->setCurrentText(device->usefor);
         }
@@ -2452,7 +2441,7 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
                 if (fmt != "PRESERVE") combo->addItem(device->shownFormat(fmt), fmt);
                 else {
                     // Add an item at the start to allow preserving the existing format.
-                    combo->insertItem(0, device->shownFormat("PRESERVE"), "PRESERVE");
+                    combo->insertItem(0, device->shownFormat(u"PRESERVE"_s), "PRESERVE");
                     combo->insertSeparator(1);
                 }
             }
@@ -2505,10 +2494,6 @@ void PartMan::ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
     }
     partman->changeEnd(true, true);
 }
-void PartMan::ItemDelegate::emitCommit() noexcept
-{
-    emit commitData(qobject_cast<QWidget *>(sender()));
-}
 
 void PartMan::ItemDelegate::partOptionsMenu() noexcept
 {
@@ -2520,17 +2505,17 @@ void PartMan::ItemDelegate::partOptionsMenu() noexcept
     menu->addSeparator();
     QMenu *menuTemplates = menu->addMenu(tr("&Templates"));
     QString selFS = part->format;
-    if (selFS == "PRESERVE") selFS = part->curFormat;
-    if ((part->type == PartMan::Device::PARTITION && selFS == "btrfs") || part->type == PartMan::Device::SUBVOLUME) {
+    if (selFS == "PRESERVE"_L1) selFS = part->curFormat;
+    if ((part->type == PartMan::Device::PARTITION && selFS == "btrfs"_L1) || part->type == PartMan::Device::SUBVOLUME) {
         QString tcommon;
-        if (!part->flags.rotational) tcommon = "ssd,";
-        tcommon += "noatime";
+        if (!part->flags.rotational) tcommon = "ssd,"_L1;
+        tcommon += "noatime"_L1;
         QAction *action = menuTemplates->addAction(tr("Compression (Z&STD)"));
-        action->setData(tcommon + ",compress=zstd");
+        action->setData(tcommon + ",compress=zstd"_L1);
         action = menuTemplates->addAction(tr("Compression (&LZO)"));
-        action->setData(tcommon + ",compress=lzo");
+        action->setData(tcommon + ",compress=lzo"_L1);
         action = menuTemplates->addAction(tr("Compression (&ZLIB)"));
-        action->setData(tcommon + ",compress=zlib");
+        action->setData(tcommon + ",compress=zlib"_L1);
     }
     menuTemplates->setDisabled(menuTemplates->isEmpty());
     QAction *action = menu->exec(QCursor::pos());

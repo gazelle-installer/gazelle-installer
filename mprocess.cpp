@@ -18,26 +18,25 @@
  ***************************************************************************/
 
 #include <unistd.h>
-#include <sys/stat.h>
 
 #include <QApplication>
 #include <QProcessEnvironment>
 #include <QDebug>
-#include <QEventLoop>
 #include <QTimer>
-#include <QDir>
 #include <QListWidget>
 #include <QProgressBar>
 #include <QScrollBar>
 
 #include "mprocess.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 MProcess::MProcess(QObject *parent)
     : QProcess(parent)
 {
     // Stop user-selected locale from interfering with command output parsing.
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("LC_ALL", "C.UTF-8");
+    env.insert(u"LC_ALL"_s, u"C.UTF-8"_s);
     setProcessEnvironment(env);
 }
 
@@ -70,7 +69,7 @@ void MProcess::syncRoot() noexcept
     }
 }
 
-inline bool MProcess::checkHalt()
+bool MProcess::checkHalt()
 {
     if (halting == THROW_HALT) throw("");
     else if (halting == HALTED) return true;
@@ -145,14 +144,14 @@ bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead
     if (checkHalt()) return false;
     ++execount;
     qDebug().nospace().noquote() << "Bash #" << execount << ": " << cmd;
-    return exec("/usr/bin/bash", {"-c", cmd}, input, needRead, log(cmd, LOG_EXEC, false));
+    return exec(u"/usr/bin/bash"_s, {u"-c"_s, cmd}, input, needRead, log(cmd, LOG_EXEC, false));
 }
 
 QString MProcess::readOut(bool everything) noexcept
 {
     QString strout(readAllStandardOutput().trimmed());
     if (everything) return strout;
-    return strout.section("\n", 0, 0);
+    return strout.section('\n', 0, 0).trimmed();
 }
 QStringList MProcess::readOutLines() noexcept
 {
@@ -199,9 +198,9 @@ QString MProcess::joinCommand(const QString &program, const QStringList &argumen
                 break;
             }
         }
-        arg.replace("\"", "\\\"");
+        arg.replace('\"', "\\\""_L1);
         if (!wspace) text += ' ' + arg;
-        else text += " \"" + arg + "\"";
+        else text += " \""_L1 + arg + '\"';
     }
     return text;
 }
@@ -241,7 +240,7 @@ void MProcess::status(const QString &text, long progress) noexcept
 {
     if (!progBar) log(text, LOG_STATUS);
     else {
-        QString fmt = "%p% - " + text;
+        QString fmt = "%p% - "_L1 + text;
         if (progBar->format() != fmt) {
             log(text, LOG_STATUS);
             progBar->setFormat(fmt);
@@ -272,77 +271,6 @@ void MProcess::advance(int space, long steps) noexcept
     qApp->processEvents();
 }
 
-// Common functions that are traditionally carried out by processes.
-
-void MProcess::sleep(const int msec, const bool silent) noexcept
-{
-    QListWidgetItem *logEntry = nullptr;
-    if (!silent) {
-        ++sleepcount;
-        logEntry = log(QString("SLEEP: %1ms").arg(msec), LOG_EXEC, false);
-        qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
-    }
-    QTimer cstimer(this);
-    QEventLoop eloop(this);
-    connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
-    cstimer.start(msec);
-    const int rc = eloop.exec();
-    if (!silent) {
-        qDebug().nospace() << "Sleep #" << sleepcount << ": exit " << rc;
-        log(logEntry, rc == 0 ? STATUS_OK : STATUS_CRITICAL);
-    }
-}
-bool MProcess::mkpath(const QString &path, mode_t mode, bool force)
-{
-    if (checkHalt()) return false;
-    if (!force && QFileInfo::exists(path)) return true;
-
-    QListWidgetItem *logEntry = log("MKPATH: "+path, LOG_EXEC, false);
-    bool rc = QDir().mkpath(path);
-    if (mode && rc) rc = (chmod(path.toUtf8().constData(), mode) == 0);
-    qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
-    log(logEntry, rc ? STATUS_OK : STATUS_CRITICAL);
-    if(!rc && section && section->failmsg) throw section->failmsg;
-    return rc;
-}
-
-const QString &MProcess::detectArch()
-{
-    if (testArch.isEmpty()) {
-        if (exec("uname", {"-m"}, nullptr, true)) testArch = readOut();
-        qDebug() << "Detect arch:" << testArch;
-    }
-    return testArch;
-}
-int MProcess::detectEFI(bool noTest)
-{
-    if (testEFI < 0) {
-        testEFI = 0;
-        QFile file("/sys/firmware/efi/fw_platform_size");
-        if (file.open(QFile::ReadOnly | QFile::Text)) {
-            testEFI = file.readLine().toInt();
-            file.close();
-        }
-        qDebug() << "Detect EFI:" << testEFI;
-    }
-    if (!noTest && testEFI == 64) {
-        // Bad combination: 32-bit OS on 64-bit EFI.
-        if (detectArch()=="i686") return 0;
-    }
-    return testEFI;
-}
-bool MProcess::detectVirtualBox()
-{
-    if (testVirtualBox < 0) {
-        Section sect(*this);
-        sect.setExceptionMode(false);
-        const bool rc = shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'");
-        qDebug() << "Detect VirtualBox:" << rc;
-        testVirtualBox = rc ? 1 : 0;
-    }
-    return (testVirtualBox != 0);
-}
-
 // Local execution environment
 
 MProcess::Section::Section(class MProcess &mproc) noexcept
@@ -359,7 +287,7 @@ MProcess::Section::~Section() noexcept
 {
     const char *oldroot = oldsection ? oldsection->rootdir : nullptr;
     if (qstrcmp(oldroot, rootdir)) {
-        proc.log(QString("Revert root: ")+oldroot, LOG_LOG);
+        proc.log("Revert root: "_L1 + oldroot, LOG_LOG);
     }
     proc.section = oldsection;
     proc.syncRoot();
@@ -369,7 +297,7 @@ MProcess::Section::~Section() noexcept
 void MProcess::Section::setRoot(const char *newroot) noexcept
 {
     if (qstrcmp(newroot, rootdir)) {
-        proc.log(QString("Change root: ")+newroot, LOG_LOG);
+        proc.log("Change root: "_L1 + newroot, LOG_LOG);
     }
     rootdir = newroot; // Might be different pointers to the same text.
     proc.syncRoot();

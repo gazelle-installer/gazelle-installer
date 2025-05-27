@@ -16,6 +16,8 @@ DEFINES += CODEBASE_VERSION=\\\"$${VERSION}\\\"
 
 FORMS += meinstall.ui
 HEADERS += \
+    core.h \
+    crypto.h \
     minstall.h \
     autopart.h \
     base.h \
@@ -24,6 +26,7 @@ HEADERS += \
     mtreeview.h \
     oobe.h \
     passedit.h \
+    replacer.h \
     swapman.h \
     version.h \
     msettings.h \
@@ -31,6 +34,8 @@ HEADERS += \
     mprocess.h
 SOURCES += \
     app.cpp \
+    core.cpp \
+    crypto.cpp \
     minstall.cpp \
     autopart.cpp \
     base.cpp \
@@ -42,6 +47,7 @@ SOURCES += \
     partman.cpp \
     passedit.cpp \
     mprocess.cpp \
+    replacer.cpp \
     swapman.cpp
 LIBS += -lzxcvbn
 

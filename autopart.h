@@ -28,9 +28,9 @@ class AutoPart : public QObject
 {
     Q_OBJECT
     class MProcess &proc;
+    class Core &core;
     class Ui::MeInstall &gui;
     class PartMan *partman;
-    class PartMan::Device *drvitem = nullptr;
     QString strRoot, strHome, strNone;
     long long available = 0;
     long long minRoot = 0, recRoot = 0, sizeRoot = 0;
@@ -48,19 +48,23 @@ class AutoPart : public QObject
     void sliderActionTriggered(int action) noexcept;
     void sliderValueChanged(int value) noexcept;
 public:
-    AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, MIni &appConf) noexcept;
+    AutoPart(class MProcess &mproc, class Core &mcore, class PartMan *pman,
+        Ui::MeInstall &ui, MIni &appConf, QObject *parent = nullptr) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void scan() noexcept;
     void refresh() noexcept;
+
+    bool validate(bool automatic, const QString &project) const noexcept;
+
     void setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot) noexcept;
     enum Part { Root, Home };
     void setPartSize(Part part, long long nbytes) noexcept;
     long long partSize(Part part = Root) const noexcept;
-    inline class PartMan::Device *selectedDrive() { return drvitem; }
+    class PartMan::Device *selectedDrive() const noexcept;
     // Layout Builder
     void builderGUI(class PartMan::Device *drive) noexcept;
-    long long buildLayout(long long rootFormatSize, bool crypto,
-        bool updateTree=true, QStringList *volList=nullptr) noexcept;
+    long long buildLayout(class PartMan::Device *drive, long long rootFormatSize,
+        bool crypto, bool updateTree=true, QStringList *volList=nullptr) noexcept;
     // Helpers
     static QString sizeString(long long size) noexcept;
 };

@@ -26,7 +26,7 @@
    <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="opaqueResize">
       <bool>false</bool>
@@ -60,10 +60,10 @@
        </sizepolicy>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <layout class="QGridLayout">
        <item row="4" column="4">
@@ -98,7 +98,7 @@
        <item row="4" column="1" colspan="3">
         <spacer>
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </spacer>
        </item>
@@ -123,7 +123,7 @@
              </sizepolicy>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="text">
              <string>Abort</string>
@@ -168,14 +168,14 @@
            <string>Gathering Information, please stand by.</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
           </property>
          </widget>
          <widget class="QWidget" name="pageTerms">
-          <layout class="QGridLayout">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -188,7 +188,7 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="0">
+           <item>
             <widget class="QGroupBox" name="boxCopyright">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -212,7 +212,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 <set>Qt::TextInteractionFlag::TextSelectableByKeyboard|Qt::TextInteractionFlag::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
@@ -232,7 +232,7 @@
                    <string>Keyboard Settings</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignCenter</set>
+                   <set>Qt::AlignmentFlag::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -247,7 +247,7 @@
                    <string>Model:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -262,7 +262,7 @@
                    <string>Variant:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -272,7 +272,7 @@
                 <item row="1" column="0" rowspan="2">
                  <spacer>
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                  </spacer>
                 </item>
@@ -294,14 +294,14 @@
                    <string>Layout:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="4" rowspan="2">
                  <spacer>
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                  </spacer>
                 </item>
@@ -316,7 +316,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageDisk">
-          <layout class="QGridLayout">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -329,14 +329,7 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="2" column="0" colspan="2">
-            <spacer>
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="0" colspan="2">
+           <item>
             <widget class="QGroupBox" name="boxInstallationType">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -348,36 +341,13 @@
               <string>Select type of installation</string>
              </property>
              <layout class="QGridLayout">
-              <item row="0" column="0" colspan="2">
-               <widget class="QRadioButton" name="radioEntireDisk">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Regular install using the entire disk</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="radioCustomPart">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Customize the disk layout</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="2">
+              <item row="1" column="0" colspan="3">
                <widget class="QGroupBox" name="boxAutoPart">
                 <layout class="QFormLayout">
-                 <item row="0" column="1">
+                 <item row="1" column="1">
+                  <widget class="QComboBox" name="comboDisk"/>
+                 </item>
+                 <item row="1" column="0">
                   <widget class="QLabel" name="labelDisk">
                    <property name="text">
                     <string>Use disk:</string>
@@ -387,16 +357,13 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="1">
-                  <widget class="QComboBox" name="comboDisk"/>
-                 </item>
-                 <item row="2" column="1">
+                 <item row="2" column="0" colspan="2">
                   <widget class="QFrame" name="boxSliderPart">
                    <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
+                    <enum>QFrame::Shape::StyledPanel</enum>
                    </property>
                    <property name="frameShadow">
-                    <enum>QFrame::Sunken</enum>
+                    <enum>QFrame::Shadow::Sunken</enum>
                    </property>
                    <layout class="QGridLayout">
                     <property name="leftMargin">
@@ -420,7 +387,7 @@
                        <string>Root</string>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignCenter</set>
+                       <set>Qt::AlignmentFlag::AlignCenter</set>
                       </property>
                      </widget>
                     </item>
@@ -430,7 +397,7 @@
                        <string>Home</string>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignCenter</set>
+                       <set>Qt::AlignmentFlag::AlignCenter</set>
                       </property>
                      </widget>
                     </item>
@@ -483,7 +450,7 @@ QSlider::handle:horizontal:disabled {
                        <number>100</number>
                       </property>
                       <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
+                       <enum>Qt::Orientation::Horizontal</enum>
                       </property>
                      </widget>
                     </item>
@@ -493,13 +460,13 @@ QSlider::handle:horizontal:disabled {
                        <bool>false</bool>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignCenter</set>
+                       <set>Qt::AlignmentFlag::AlignCenter</set>
                       </property>
                       <property name="accelerated">
                        <bool>true</bool>
                       </property>
                       <property name="correctionMode">
-                       <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+                       <enum>QAbstractSpinBox::CorrectionMode::CorrectToPreviousValue</enum>
                       </property>
                       <property name="suffix">
                        <string>%</string>
@@ -515,13 +482,13 @@ QSlider::handle:horizontal:disabled {
                        <bool>false</bool>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignCenter</set>
+                       <set>Qt::AlignmentFlag::AlignCenter</set>
                       </property>
                       <property name="accelerated">
                        <bool>true</bool>
                       </property>
                       <property name="correctionMode">
-                       <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+                       <enum>QAbstractSpinBox::CorrectionMode::CorrectToPreviousValue</enum>
                       </property>
                       <property name="suffix">
                        <string>%</string>
@@ -534,30 +501,70 @@ QSlider::handle:horizontal:disabled {
                    </layout>
                   </widget>
                  </item>
-                 <item row="4" column="1">
-                  <widget class="QCheckBox" name="checkHibernationReg">
-                   <property name="text">
-                    <string>Enable hibernation support</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
+                 <item row="3" column="0" colspan="2">
                   <widget class="QCheckBox" name="checkEncryptAuto">
                    <property name="text">
                     <string>Encrypt</string>
                    </property>
                   </widget>
                  </item>
+                 <item row="4" column="0" colspan="2">
+                  <widget class="QCheckBox" name="checkHibernationReg">
+                   <property name="text">
+                    <string>Enable hibernation support</string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="3">
+               <widget class="QRadioButton" name="radioEntireDisk">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Regular install using the entire disk</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="2">
+               <widget class="QRadioButton" name="radioCustomPart">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Customize the disk layout</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0" colspan="2">
+               <widget class="QRadioButton" name="radioReplace">
+                <property name="text">
+                 <string>Replace existing installation</string>
+                </property>
                </widget>
               </item>
              </layout>
             </widget>
            </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="pagePartitions">
-          <layout class="QGridLayout">
+         <widget class="QWidget" name="pageReplace">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -570,78 +577,48 @@ QSlider::handle:horizontal:disabled {
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="boxPartitions">
+           <item>
+            <widget class="QGroupBox" name="boxReplace">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
              <property name="title">
-              <string>Choose partitions</string>
+              <string>Replace an existing installation</string>
              </property>
              <layout class="QGridLayout">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <item row="1" column="2">
-               <widget class="QToolButton" name="pushPartClear">
-                <property name="toolTip">
-                 <string>Mark the selected drive to be cleared for a new layout.</string>
+              <item row="0" column="0" colspan="2">
+               <widget class="QTableWidget" name="tableExistInst">
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
                 </property>
-                <property name="icon">
-                 <iconset resource="images.qrc">
-                  <normaloff>:/edit-clear-all</normaloff>:/edit-clear-all</iconset>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
                 </property>
-               </widget>
-              </item>
-              <item row="5" column="2">
-               <widget class="QToolButton" name="pushGrid">
-                <property name="toolTip">
-                 <string>Show Grid</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="images.qrc">
-                  <normaloff>:/show-grid</normaloff>:/show-grid</iconset>
-                </property>
-                <property name="shortcut">
-                 <string>Ctrl+G</string>
-                </property>
-                <property name="checkable">
+                <attribute name="horizontalHeaderStretchLastSection">
                  <bool>true</bool>
-                </property>
+                </attribute>
+                <attribute name="verticalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <column>
+                 <property name="text">
+                  <string>Device</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Installation</string>
+                 </property>
+                </column>
                </widget>
               </item>
-              <item row="0" column="0" rowspan="13" colspan="2">
-               <widget class="MTreeView" name="treePartitions"/>
-              </item>
-              <item row="12" column="2">
-               <widget class="QToolButton" name="pushPartManRun">
-                <property name="toolTip">
-                 <string>Run the partition management application of this operating system.</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="images.qrc">
-                  <normaloff>:/partitionmanager</normaloff>:/partitionmanager</iconset>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QToolButton" name="pushPartRemove">
-                <property name="toolTip">
-                 <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="images.qrc">
-                  <normaloff>:/list-remove</normaloff>:/list-remove</iconset>
-                </property>
-               </widget>
-              </item>
-              <item row="11" column="2">
-               <widget class="QToolButton" name="pushPartReload">
-                <property name="toolTip">
-                 <string>Query the operating system and reload the layouts of all drives.</string>
+              <item row="1" column="0">
+               <widget class="QPushButton" name="pushReplaceScan">
+                <property name="text">
+                 <string>Scan for existing installations</string>
                 </property>
                 <property name="icon">
                  <iconset resource="images.qrc">
@@ -649,46 +626,143 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item row="8" column="2">
+              <item row="1" column="1">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Vertical</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                </spacer>
               </item>
-              <item row="4" column="2">
-               <spacer>
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </spacer>
-              </item>
-              <item row="2" column="2">
-               <widget class="QToolButton" name="pushPartAdd">
-                <property name="toolTip">
-                 <string>Add a new partition entry. This only works with a new layout.</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="images.qrc">
-                  <normaloff>:/list-add</normaloff>:/list-add</iconset>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="2">
-               <widget class="QToolButton" name="pushAdvancedFields">
-                <property name="toolTip">
-                 <string>Show advanced fields.</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="images.qrc">
-                  <normaloff>:/advanced-fields</normaloff>:/advanced-fields</iconset>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="boxReplaceOptions">
+             <property name="title">
+              <string>Replacement options</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QCheckBox" name="checkReplacePackages">
+                <property name="text">
+                 <string>Attempt to upgrade packages</string>
                 </property>
                </widget>
               </item>
              </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QGroupBox" name="boxPartitions">
+          <property name="title">
+           <string>Choose partitions</string>
+          </property>
+          <layout class="QGridLayout">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item row="1" column="2">
+            <widget class="QToolButton" name="pushPartClear">
+             <property name="toolTip">
+              <string>Mark the selected drive to be cleared for a new layout.</string>
+             </property>
+             <property name="icon">
+              <iconset resource="images.qrc">
+               <normaloff>:/edit-clear-all</normaloff>:/edit-clear-all</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="QToolButton" name="pushGrid">
+             <property name="toolTip">
+              <string>Show Grid</string>
+             </property>
+             <property name="icon">
+              <iconset resource="images.qrc">
+               <normaloff>:/show-grid</normaloff>:/show-grid</iconset>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+G</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" rowspan="13" colspan="2">
+            <widget class="MTreeView" name="treePartitions"/>
+           </item>
+           <item row="12" column="2">
+            <widget class="QToolButton" name="pushPartManRun">
+             <property name="toolTip">
+              <string>Run the partition management application of this operating system.</string>
+             </property>
+             <property name="icon">
+              <iconset resource="images.qrc">
+               <normaloff>:/partitionmanager</normaloff>:/partitionmanager</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QToolButton" name="pushPartRemove">
+             <property name="toolTip">
+              <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
+             </property>
+             <property name="icon">
+              <iconset resource="images.qrc">
+               <normaloff>:/list-remove</normaloff>:/list-remove</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="2">
+            <widget class="QToolButton" name="pushPartReload">
+             <property name="toolTip">
+              <string>Query the operating system and reload the layouts of all drives.</string>
+             </property>
+             <property name="icon">
+              <iconset resource="images.qrc">
+               <normaloff>:/view-refresh</normaloff>:/view-refresh</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="2">
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </spacer>
+           </item>
+           <item row="4" column="2">
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </spacer>
+           </item>
+           <item row="2" column="2">
+            <widget class="QToolButton" name="pushPartAdd">
+             <property name="toolTip">
+              <string>Add a new partition entry. This only works with a new layout.</string>
+             </property>
+             <property name="icon">
+              <iconset resource="images.qrc">
+               <normaloff>:/list-add</normaloff>:/list-add</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2">
+            <widget class="QToolButton" name="pushAdvancedFields">
+             <property name="toolTip">
+              <string>Show advanced fields.</string>
+             </property>
+             <property name="icon">
+              <iconset resource="images.qrc">
+               <normaloff>:/advanced-fields</normaloff>:/advanced-fields</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
           </layout>
@@ -726,7 +800,7 @@ QSlider::handle:horizontal:disabled {
                  <number>512</number>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -743,7 +817,7 @@ QSlider::handle:horizontal:disabled {
                  <number>512</number>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -753,13 +827,38 @@ QSlider::handle:horizontal:disabled {
            <item>
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </spacer>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="pageConfirm">
+         <widget class="QGroupBox" name="boxConfirm">
+          <property name="title">
+           <string>Installation Confirmation</string>
+          </property>
+          <layout class="QVBoxLayout">
+           <item>
+            <widget class="QLabel" name="labelConfirm"/>
+           </item>
+           <item>
+            <widget class="QTreeWidget" name="treeConfirm">
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+             </property>
+             <attribute name="headerVisible">
+              <bool>false</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string notr="true">1</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageBoot">
           <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
@@ -774,37 +873,6 @@ QSlider::handle:horizontal:disabled {
             <number>0</number>
            </property>
            <item>
-            <widget class="QGroupBox" name="boxConfirm">
-             <property name="title">
-              <string>Installation Confirmation</string>
-             </property>
-             <layout class="QVBoxLayout">
-              <item>
-               <widget class="QLabel" name="labelConfirm"/>
-              </item>
-              <item>
-               <widget class="QListWidget" name="listConfirm"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="pageBoot">
-          <layout class="QGridLayout">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
             <widget class="QGroupBox" name="boxBoot">
              <property name="title">
               <string>Install GRUB for Linux and Windows</string>
@@ -813,6 +881,86 @@ QSlider::handle:horizontal:disabled {
               <bool>true</bool>
              </property>
              <layout class="QGridLayout">
+              <item row="1" column="0">
+               <widget class="QLabel" name="labelBoot">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>System boot disk:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <spacer>
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="1" colspan="4">
+               <widget class="QComboBox" name="comboBoot">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QRadioButton" name="radioBootESP">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>EFI System Partition</string>
+                </property>
+                <property name="text">
+                 <string>ESP</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QRadioButton" name="radioBootPBR">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Partition Boot Record</string>
+                </property>
+                <property name="text">
+                 <string>PBR</string>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="1">
                <widget class="QRadioButton" name="radioBootMBR">
                 <property name="sizePolicy">
@@ -844,73 +992,6 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item row="0" column="3">
-               <widget class="QRadioButton" name="radioBootESP">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>EFI System Partition</string>
-                </property>
-                <property name="text">
-                 <string>ESP</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="4">
-               <spacer>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="2">
-               <widget class="QRadioButton" name="radioBootPBR">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Partition Boot Record</string>
-                </property>
-                <property name="text">
-                 <string>PBR</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="labelBoot">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>System boot disk:</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="labelBootInstall">
                 <property name="sizePolicy">
@@ -924,31 +1005,41 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item row="1" column="1" colspan="4">
-               <widget class="QComboBox" name="comboBoot">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
+              <item row="2" column="0" colspan="5">
+               <widget class="QCheckBox" name="checkBootHostSpecific">
+                <property name="text">
+                 <string>Generate host-specific initramfs image</string>
                 </property>
                </widget>
               </item>
              </layout>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item>
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </spacer>
            </item>
-           <item row="1" column="0">
-            <widget class="QGroupBox" name="boxSwap">
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageSwap">
+          <layout class="QVBoxLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="boxSwapFile">
              <property name="title">
               <string>Create a swap file</string>
              </property>
@@ -969,8 +1060,11 @@ QSlider::handle:horizontal:disabled {
                   <property name="suffix">
                    <string> MB</string>
                   </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="stepType">
-                   <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                   <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
                   </property>
                  </widget>
                 </item>
@@ -1024,67 +1118,125 @@ QSlider::handle:horizontal:disabled {
              </layout>
             </widget>
            </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="pageServices">
-          <layout class="QGridLayout">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="boxServices">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
+           <item>
+            <widget class="QGroupBox" name="boxSwapZram">
              <property name="title">
-              <string>Common Services to Enable</string>
+              <string>Enable zram swap</string>
              </property>
-             <layout class="QVBoxLayout">
-              <item>
-               <widget class="QTreeWidget" name="treeServices">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QGridLayout">
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="radioZramPercent">
+                <property name="text">
+                 <string>Allocate based on RAM:</string>
                 </property>
-                <property name="alternatingRowColors">
+                <property name="checked">
                  <bool>true</bool>
                 </property>
-                <property name="rootIsDecorated">
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="spinZramPercent">
+                <property name="suffix">
+                 <string>%</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="value">
+                 <number>100</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="labelZramRecPercent">
+                <property name="text">
+                 <string>Recommended maximum: 100%</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="radioZramSize">
+                <property name="text">
+                 <string>Allocate fixed size:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="spinZramSize">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="accelerated">
                  <bool>true</bool>
                 </property>
-                <column>
-                 <property name="text">
-                  <string>Service</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Description</string>
-                 </property>
-                </column>
+                <property name="suffix">
+                 <string> MB</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="stepType">
+                 <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QLabel" name="labelZramRecSize">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                </widget>
               </item>
              </layout>
             </widget>
            </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QGroupBox" name="boxServices">
+          <property name="title">
+           <string>Common Services to Enable</string>
+          </property>
+          <layout class="QVBoxLayout">
+           <item>
+            <widget class="QTreeWidget" name="treeServices">
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <column>
+              <property name="text">
+               <string>Service</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Description</string>
+              </property>
+             </column>
+            </widget>
+           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="pageNetwork">
-          <layout class="QGridLayout">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1097,7 +1249,7 @@ QSlider::handle:horizontal:disabled {
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="0">
+           <item>
             <widget class="QGroupBox" name="boxNetworkNames">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -1218,27 +1370,27 @@ QSlider::handle:horizontal:disabled {
               <item row="3" column="0">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                 <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
+                 <enum>QSizePolicy::Policy::Fixed</enum>
                 </property>
                </spacer>
               </item>
              </layout>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item>
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </spacer>
            </item>
           </layout>
          </widget>
          <widget class="QWidget" name="pageLocalization">
-          <layout class="QGridLayout">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1251,7 +1403,41 @@ QSlider::handle:horizontal:disabled {
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="1" column="0">
+           <item>
+            <widget class="QGroupBox" name="boxLocale">
+             <property name="title">
+              <string>Localization Defaults</string>
+             </property>
+             <layout class="QGridLayout">
+              <property name="leftMargin">
+               <number>9</number>
+              </property>
+              <property name="topMargin">
+               <number>9</number>
+              </property>
+              <property name="rightMargin">
+               <number>9</number>
+              </property>
+              <property name="bottomMargin">
+               <number>9</number>
+              </property>
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelLocale">
+                <property name="text">
+                 <string>Locale:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="comboLocale"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QGroupBox" name="boxClock">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -1288,7 +1474,7 @@ QSlider::handle:horizontal:disabled {
               <item row="3" column="3">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                </spacer>
               </item>
@@ -1330,7 +1516,7 @@ QSlider::handle:horizontal:disabled {
                 <item>
                  <spacer>
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                  </spacer>
                 </item>
@@ -1353,7 +1539,7 @@ QSlider::handle:horizontal:disabled {
                    </sizepolicy>
                   </property>
                   <property name="sizeAdjustPolicy">
-                   <enum>QComboBox::AdjustToContents</enum>
+                   <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
                   </property>
                  </widget>
                 </item>
@@ -1369,70 +1555,7 @@ QSlider::handle:horizontal:disabled {
              </layout>
             </widget>
            </item>
-           <item row="3" column="0">
-            <spacer>
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="boxLocale">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="title">
-              <string>Localization Defaults</string>
-             </property>
-             <layout class="QGridLayout">
-              <property name="leftMargin">
-               <number>9</number>
-              </property>
-              <property name="topMargin">
-               <number>9</number>
-              </property>
-              <property name="rightMargin">
-               <number>9</number>
-              </property>
-              <property name="bottomMargin">
-               <number>9</number>
-              </property>
-              <property name="spacing">
-               <number>6</number>
-              </property>
-              <item row="0" column="1">
-               <widget class="QComboBox" name="comboLocale">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="labelLocale">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Locale:</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="2" column="0">
+           <item>
             <widget class="QGroupBox" name="boxServicesAdvanced">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -1475,17 +1598,27 @@ QSlider::handle:horizontal:disabled {
               <item>
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                </spacer>
               </item>
              </layout>
             </widget>
            </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Expanding</enum>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="pageUserAccounts">
-          <layout class="QGridLayout">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1498,23 +1631,7 @@ QSlider::handle:horizontal:disabled {
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="4" column="0">
-            <widget class="QCheckBox" name="checkSaveDesktop">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="toolTip">
-              <string>Desktop modifications made in the live environment will be carried over to the installed OS</string>
-             </property>
-             <property name="text">
-              <string>Save live desktop changes</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
+           <item>
             <widget class="QGroupBox" name="boxUserAccount">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -1577,7 +1694,7 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -1603,14 +1720,14 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
              </layout>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item>
             <widget class="QGroupBox" name="boxRootAccount">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -1650,7 +1767,7 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -1676,14 +1793,14 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
              </layout>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item>
             <widget class="QCheckBox" name="checkAutoLogin">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -1696,10 +1813,20 @@ QSlider::handle:horizontal:disabled {
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item>
+            <widget class="QCheckBox" name="checkSaveDesktop">
+             <property name="toolTip">
+              <string>Desktop modifications made in the live environment will be carried over to the installed OS</string>
+             </property>
+             <property name="text">
+              <string>Save live desktop changes</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </spacer>
            </item>
@@ -1756,70 +1883,37 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item>
-               <spacer>
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </spacer>
-              </item>
              </layout>
             </widget>
            </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="pageProgress">
-          <layout class="QGridLayout">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="boxTips">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+         <widget class="QGroupBox" name="boxTips">
+          <property name="title">
+           <string>Tips</string>
+          </property>
+          <layout class="QVBoxLayout">
+           <item>
+            <widget class="QTextEdit" name="textTips">
+             <property name="undoRedoEnabled">
+              <bool>false</bool>
              </property>
-             <property name="title">
-              <string>Tips</string>
+             <property name="readOnly">
+              <bool>true</bool>
              </property>
-             <layout class="QGridLayout">
-              <item row="0" column="0">
-               <widget class="QTextEdit" name="textTips">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="acceptDrops">
-                 <bool>false</bool>
-                </property>
-                <property name="undoRedoEnabled">
-                 <bool>false</bool>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
             </widget>
            </item>
           </layout>
          </widget>
          <widget class="QWidget" name="pageEnd">
-          <layout class="QGridLayout">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1832,7 +1926,7 @@ QSlider::handle:horizontal:disabled {
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="0">
+           <item>
             <widget class="QGroupBox" name="boxEnd">
              <property name="title">
               <string>Installation complete</string>
@@ -1851,7 +1945,7 @@ QSlider::handle:horizontal:disabled {
              </layout>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item>
             <widget class="QGroupBox" name="boxReminders">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -1881,7 +1975,7 @@ QSlider::handle:horizontal:disabled {
                  <bool>false</bool>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 <set>Qt::TextInteractionFlag::TextSelectableByKeyboard|Qt::TextInteractionFlag::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
@@ -1913,6 +2007,7 @@ QSlider::handle:horizontal:disabled {
   <tabstop>comboDisk</tabstop>
   <tabstop>sliderPart</tabstop>
   <tabstop>radioCustomPart</tabstop>
+  <tabstop>radioReplace</tabstop>
   <tabstop>treePartitions</tabstop>
   <tabstop>pushPartClear</tabstop>
   <tabstop>pushPartAdd</tabstop>

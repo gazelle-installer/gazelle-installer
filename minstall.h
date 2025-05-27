@@ -17,6 +17,7 @@
  ****************************************************************************/
 #include "ui_meinstall.h"
 #include "mprocess.h"
+#include "core.h"
 
 class MInstall : public QDialog {
     Q_OBJECT
@@ -26,7 +27,7 @@ protected:
     void reject() noexcept;
 
 public:
-    MInstall(class MIni &acfg, const class QCommandLineParser &args, const QString &cfgfile) noexcept;
+    MInstall(class MIni &acfg, const class QCommandLineParser &args, const QString &cfgfile, QWidget *parent = nullptr) noexcept;
     ~MInstall();
 
     QString PROJECTFORUM;
@@ -42,6 +43,7 @@ public:
 private:
     Ui::MeInstall gui;
     MProcess proc;
+    Core core;
     class MIni &appConf;
     const class QCommandLineParser &appArgs;
     enum Phase {
@@ -64,9 +66,9 @@ private:
     // command line options
     bool pretend, automatic;
     bool oem, modeOOBE, mountkeep;
+    bool advanced = false; // Always enabled with custom partitions.
     // configuration management
     QString configFile;
-    enum ConfigAction { CONFIG_SAVE, CONFIG_LOAD1, CONFIG_LOAD2 };
 
     // auto-mount setup
     QString listMaskedMounts;
@@ -76,11 +78,12 @@ private:
     class CheckMD5 *checkmd5 = nullptr;
     class PartMan *partman = nullptr;
     class AutoPart *autopart = nullptr;
+    class Replacer *replacer = nullptr;
+    class Crypto *crypto = nullptr;
     class Base *base = nullptr;
     class Oobe *oobe = nullptr;
     class BootMan *bootman = nullptr;
     class SwapMan *swapman = nullptr;
-    class PassEdit *passCrypto = nullptr;
 
     QPixmap helpBackdrop;
     // Splash screen
@@ -105,6 +108,7 @@ private:
     void setupAutoMount(bool enabled);
     void processNextPhase() noexcept;
     void pretendNextPhase() noexcept;
-    void manageConfig(enum ConfigAction mode) noexcept;
+    void loadConfig(int stage) noexcept;
+    void saveConfig() noexcept;
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 };

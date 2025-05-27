@@ -23,12 +23,15 @@
 #include <QFileInfo>
 #include <QDir>
 #include "mprocess.h"
+#include "core.h"
 #include "msettings.h"
 #include "partman.h"
 #include "swapman.h"
 
-SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
-    : QObject(ui.boxMain), proc(mproc), partman(pman), gui(ui)
+using namespace Qt::Literals::StringLiterals;
+
+SwapMan::SwapMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui, QObject *parent) noexcept
+    : QObject(parent), proc(mproc), core(mcore), partman(pman), gui(ui)
 {
     connect(ui.textSwapFile, &QLineEdit::textEdited, this, [this](const QString &) {
         gui.pushNext->setEnabled(setupBounds());
@@ -36,25 +39,40 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
     connect(ui.spinSwapSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &SwapMan::spinSizeChanged);
     connect(ui.pushSwapSizeReset, &QToolButton::clicked, this, &SwapMan::sizeResetClicked);
     connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::checkHibernationClicked);
-    connect(ui.boxSwap, &QGroupBox::toggled, this, [this](bool on) {
-        if (on) gui.pushNext->setEnabled(true);
+    connect(ui.boxSwapFile, &QGroupBox::toggled, this, [this](bool on) {
+        if (!on) gui.pushNext->setEnabled(true);
         else gui.pushNext->setEnabled(setupBounds());
     });
+
+    connect(ui.radioZramPercent, &QRadioButton::toggled, ui.spinZramPercent, &QSpinBox::setEnabled);
+    connect(ui.radioZramPercent, &QRadioButton::toggled, ui.labelZramRecPercent, &QSpinBox::setEnabled);
+    connect(ui.radioZramSize, &QRadioButton::toggled, ui.spinZramSize, &QSpinBox::setEnabled);
+    connect(ui.radioZramSize, &QRadioButton::toggled, ui.labelZramRecSize, &QLabel::setEnabled);
+    // Set the size spin box.
+    struct sysinfo sinfo;
+    if (sysinfo(&sinfo) == 0) {
+        const int physram = ((long long)sinfo.totalram * sinfo.mem_unit) / MB;
+        gui.spinZramSize->setMaximum(10 * physram);
+        gui.spinZramSize->setValue(physram);
+        gui.labelZramRecSize->setText(tr("Recommended maximum: %1 MB").arg(physram));
+    } else {
+        gui.radioZramSize->setEnabled(false);
+        gui.labelZramRecSize->setText(tr("Unable to query RAM size."));
+        gui.spinZramSize->setMaximum(0);
+    }
 }
 
-void SwapMan::manageConfig(MSettings &config, bool advanced) noexcept
+void SwapMan::manageConfig(MSettings &config) noexcept
 {
-    config.setSection("Swap", gui.pageBoot);
-    if (advanced || !config.isSave()) {
-        config.manageGroupCheckBox("Install", gui.boxSwap);
-        config.manageLineEdit("File", gui.textSwapFile);
-        config.manageSpinBox("Size", gui.spinSwapSize);
-    }
-    config.manageCheckBox("Hibernation", gui.checkHibernation);
+    config.setSection(u"Swap"_s, gui.pageBoot);
+    config.manageGroupCheckBox(u"Install"_s, gui.boxSwapFile);
+    config.manageLineEdit(u"File"_s, gui.textSwapFile);
+    config.manageSpinBox(u"Size"_s, gui.spinSwapSize);
+    config.manageCheckBox(u"Hibernation"_s, gui.checkHibernation);
 }
 void SwapMan::setupDefaults() noexcept
 {
-    gui.boxSwap->setChecked(partman.swapCount() <= 0);
+    gui.boxSwapFile->setChecked(partman.findByMount(u"swap"_s) == nullptr);
     setupBounds();
     sizeResetClicked();
 }
@@ -79,48 +97,70 @@ void SwapMan::install(QStringList &cmdboot_out)
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     proc.advance(1, 2);
-    const int size = gui.spinSwapSize->value();
-    if (!gui.boxSwap->isChecked() || size <= 0) return;
+    if (gui.boxSwapFile->isChecked()) {
+        installSwapFile(cmdboot_out);
+    }
+    if (gui.boxSwapZram->isChecked()) {
+        MProcess::Section sect(proc, QT_TR_NOOP("Failed to configure zram swap."));
+        sect.setRoot("/mnt/antiX");
+        core.setService(u"zramswap"_s, true);
+        if (!configureZRam()) {
+            throw sect.failMessage();
+        }
+    }
+}
+void SwapMan::installSwapFile(QStringList &cmdboot_out) const
+{
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to create or install swap file."));
     const QString &swapfile = QDir::cleanPath(gui.textSwapFile->text().trimmed());
-    const QString &instpath = "/mnt/antiX" + swapfile;
+    const QString &instpath = "/mnt/antiX"_L1 + swapfile;
     const PartMan::Device *device = partman.findHostDev(swapfile);
     if (!device) throw sect.failMessage();
 
     proc.status(tr("Creating swap file"));
     // Create a blank swap file.
-    proc.mkpath(QFileInfo(instpath).path(), 0700);
-    const bool btrfs = (device->type == PartMan::Device::SUBVOLUME || device->finalFormat() == "btrfs");
+    core.mkpath(QFileInfo(instpath).path(), 0700);
+    const bool btrfs = (device->type == PartMan::Device::SUBVOLUME || device->finalFormat() == "btrfs"_L1);
+    const QString &strsize = QStringLiteral("%1M").arg(gui.spinSwapSize->value());
     if (btrfs) {
-        proc.exec("truncate", {"--size=0", instpath});
-        proc.exec("chattr", {"+C", instpath});
+        proc.exec(u"btrfs"_s, {u"filesystem"_s, u"mkswapfile"_s, u"--size"_s, strsize, instpath});
+    } else {
+        proc.exec(u"mkswap"_s, {u"-q"_s, u"--size"_s, strsize, u"--file"_s, instpath});
     }
-#if 0 // TODO: Use for trixie
-    proc.exec("mkswap", {"-q", "-U","clear", "--size",QStringLiteral("%1M").arg(size), "--file", instpath});
-#else
-    proc.exec("dd", {"status=none", "if=/dev/zero", "of="+instpath, "bs=1M", QStringLiteral("count=%1").arg(size)});
-    chmod(instpath.toUtf8().constData(), 0600);
-    proc.exec("mkswap", {"-q", instpath});
-#endif
 
     proc.status(tr("Configuring swap file"));
     // Append the fstab with the swap file entry.
-    QFile file("/mnt/antiX/etc/fstab");
+    QFile file(u"/mnt/antiX/etc/fstab"_s);
     if (!file.open(QIODevice::Append | QIODevice::WriteOnly)) throw sect.failMessage();
     file.write(swapfile.toUtf8());
     file.write(" swap swap defaults 0 0\n");
     file.close();
     // Hibernation.
     if (gui.checkHibernation->isChecked()) {
-        proc.shell("blkid -s UUID -o value $(df -P " + instpath + " | awk 'END{print $1}')", nullptr, true);
+        proc.shell("blkid -s UUID -o value $(df -P "_L1 + instpath + " | awk 'END{print $1}')"_L1, nullptr, true);
         cmdboot_out.append("resume=UUID=" + proc.readAll().trimmed());
         if (btrfs) {
-            proc.exec("btrfs", {"inspect-internal", "map-swapfile", "-r", instpath}, nullptr, true);
+            proc.exec(u"btrfs"_s, {u"inspect-internal"_s, u"map-swapfile"_s, u"-r"_s, instpath}, nullptr, true);
         } else {
-            proc.shell("filefrag -v " + instpath + " | awk 'NR==4 {print $4}' | tr -d .", nullptr, true);
+            proc.shell("filefrag -v "_L1 + instpath + " | awk 'NR==4 {print $4}' | tr -d ."_L1, nullptr, true);
         }
         cmdboot_out.append("resume_offset=" + proc.readAll().trimmed());
     }
+}
+bool SwapMan::configureZRam() const noexcept
+{
+    const QString zramfile(u"/mnt/antiX/etc/default/zramswap"_s);
+    bool ok = false;
+    QFile::copy(zramfile, zramfile+".bak"_L1);
+    MIni zramcfg(zramfile, MIni::ReadWrite, &ok);
+    if (!ok) return false;
+
+    if (gui.radioZramPercent->isChecked()) {
+        zramcfg.setInteger(u"PERCENT"_s, gui.spinZramPercent->value());
+    } else {
+        zramcfg.setInteger(u"SIZE"_s, gui.spinZramSize->value());
+    }
+    return zramcfg.save();
 }
 
 void SwapMan::setupZRam() const
@@ -129,11 +169,11 @@ void SwapMan::setupZRam() const
     if (sysinfo(&sinfo) != 0) return;
     const long long zrsize = (long long)sinfo.totalram * sinfo.mem_unit;
     // Reported compressed data can be inaccurate if zswap is enabled, especially on Liquorix.
-    proc.shell("echo 0 > /sys/module/zswap/parameters/enabled");
-    proc.exec("modprobe", {"zram"});
-    if (!proc.exec("zramctl", {"zram0", "-a","zstd", "-s", QString::number(zrsize)})) return;
-    if (!proc.exec("mkswap", {"-q", "/dev/zram0"})) return;
-    proc.exec("swapon", {"-p","32767", "/dev/zram0"});
+    proc.shell(u"echo 0 > /sys/module/zswap/parameters/enabled"_s);
+    proc.exec(u"modprobe"_s, {u"zram"_s});
+    if (!proc.exec(u"zramctl"_s, {u"zram0"_s, u"-a"_s,u"zstd"_s, u"-s"_s, QString::number(zrsize)})) return;
+    if (!proc.exec(u"mkswap"_s, {u"-q"_s, u"/dev/zram0"_s})) return;
+    proc.exec(u"swapon"_s, {u"-p"_s,u"32767"_s, u"/dev/zram0"_s});
 }
 
 long long SwapMan::recommended(bool hibernation) noexcept

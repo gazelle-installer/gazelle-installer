@@ -40,11 +40,11 @@ private:
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 public:
     PassEdit(QLineEdit *master, QLineEdit *slave, int min=0, QObject *parent = nullptr) noexcept;
-    inline int minimum() { return min; }
+    inline int minimum() const noexcept { return min; }
     inline bool valid() const noexcept { return lastValid; }
     inline bool confirmed() const noexcept { return (slave->text() == master->text()); }
     inline bool lengthOK() const noexcept { return (master->text().length() >= min); }
-    inline int length() { return master->text().length(); }
+    inline int length() const noexcept { return master->text().length(); }
 signals:
     void validationChanged(bool valid);
 };

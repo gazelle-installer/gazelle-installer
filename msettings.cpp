@@ -28,6 +28,8 @@
 
 #include "msettings.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 MIni::MIni(const QString &filename, OpenMode mode, bool *loadOK) noexcept
     : file(filename), sections(&MIni::lessCaseInsensitive)
 {
@@ -276,16 +278,20 @@ bool MIni::getBoolean(const QString &key, bool defaultValue, enum ValState *vali
     if (valid) *valid = VAL_NOTFOUND;
     if (!val.isNull()) {
         bool ok = true;
-        if (!val.compare("true", Qt::CaseInsensitive)) defaultValue = true;
-        else if (!val.compare("false", Qt::CaseInsensitive)) defaultValue = false;
-        else defaultValue = (val.toInt(&ok) != 0);
+        if (!val.compare("true"_L1, Qt::CaseInsensitive)) {
+            defaultValue = true;
+        } else if (!val.compare("false"_L1, Qt::CaseInsensitive)) {
+            defaultValue = false;
+        } else {
+            defaultValue = (val.toInt(&ok) != 0);
+        }
         if (valid) *valid = ok ? VAL_OK : VAL_INVALID;
     }
     return defaultValue;
 }
 void MIni::setBoolean(const QString &key, const bool value) noexcept
 {
-    setRaw(key, value ? "true" : "false");
+    setRaw(key, value ? u"true"_s : u"false"_s);
 }
 
 long long MIni::getInteger(const QString &key, long long defaultValue, enum ValState *valid, int base) const noexcept
@@ -333,7 +339,7 @@ void MSettings::dumpDebug() const noexcept
                 const bool show = (setting.second.isEmpty()
                     || !filter.contains(section.first + '/' + group.first + '/' + setting.first));
                 qDebug().noquote().nospace() << bullet << setting.first
-                    << ": " << (show ? setting.second : "<filter>");
+                    << ": " << (show ? setting.second : u"<filter>"_s);
             }
         }
     }
@@ -363,9 +369,9 @@ void MSettings::setSection(const QString &name, QWidget *widget) noexcept
 void MSettings::markBadWidget(QWidget *widget) noexcept
 {
     if (widget) {
-        widget->setStyleSheet("QWidget { background: maroon; border: 2px inset red; }\n"
-                              "QPushButton:!pressed { border-style: outset; }\n"
-                              "QRadioButton { border-style: dotted; }");
+        widget->setStyleSheet(u"QWidget { background: maroon; border: 2px inset red; }\n"
+          "QPushButton:!pressed { border-style: outset; }\n"
+          "QRadioButton { border-style: dotted; }"_s);
     }
     if (wgroup) wgroup->setProperty("BAD", true);
     good = false;
