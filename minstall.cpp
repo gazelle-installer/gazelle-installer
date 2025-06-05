@@ -416,10 +416,18 @@ void MInstall::processNextPhase() noexcept
             phase = PH_FINISHED;
             proc.status(tr("Finished"));
             if (appArgs.isSet(u"reboot"_s)) {
-                proc.shell(u"/usr/local/bin/persist-config --shutdown --command reboot &"_s);
+                if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
+                    proc.shell(u"/usr/local/bin/persist-config --shutdown --command reboot &"_s);
+                } else {
+                    proc.shell(u"/usr/bin/persist-config --shutdown --command reboot &"_s);
+                }
             }
             if (appArgs.isSet(u"poweroff"_s)) {
-                proc.shell(u"/usr/local/bin/persist-config --shutdown --command poweroff &"_s);
+                if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
+                    proc.shell(u"/usr/local/bin/persist-config --shutdown --command poweroff &"_s);
+                } else {
+                    proc.shell(u"/usr/bin/persist-config --shutdown --command poweroff &"_s);
+                }
             }
             gotoPage(Step::END);
         }
@@ -995,7 +1003,11 @@ void MInstall::gotoPage(int next) noexcept
         // finished
         qApp->setOverrideCursor(Qt::WaitCursor);
         if (!pretend && gui.checkExitReboot->isChecked()) {
-            proc.shell(u"/usr/local/bin/persist-config --shutdown --command reboot &"_s);
+            if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
+                proc.shell(u"/usr/local/bin/persist-config --shutdown --command reboot &"_s);
+            } else {
+                proc.shell(u"/usr/bin/persist-config --shutdown --command reboot &"_s);
+            }
         }
         qApp->exit(EXIT_SUCCESS);
         return;
