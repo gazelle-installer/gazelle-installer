@@ -134,6 +134,7 @@ MInstall::~MInstall() {
     if (swapman) delete swapman;
     if (partman) delete partman;
     if (crypto) delete crypto;
+    if (replacer) delete replacer;
     if (autopart) delete autopart;
     if (throbber) delete throbber;
 }
