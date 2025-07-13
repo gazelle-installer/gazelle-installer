@@ -335,7 +335,7 @@ bool PartMan::loadConfig(MSettings &config) noexcept
                 Device *subvol = new Device(Device::SUBVOLUME, part);
                 assert(subvol != nullptr);
                 config.beginGroup("Subvolume"_L1 + QString::number(ixSV+1));
-                if (config.getBoolean(u"Default"_s)) subvol->setActive(true);
+                // if (config.getBoolean(u"Default"_s)) subvol->setActive(true);
                 subvol->usefor = config.getString(u"UseFor"_s);
                 subvol->label = config.getString(u"Label"_s);
                 subvol->options = config.getString(u"Options"_s);
@@ -389,7 +389,7 @@ void PartMan::saveConfig(MSettings &config) const noexcept
                 const Device *const subvol = part->child(ixSV);
                 assert(subvol != nullptr);
                 config.beginGroup("Subvolume"_L1 + QString::number(ixSV+1));
-                if (subvol->isActive()) config.setBoolean(u"Default"_s, true);
+                //if (subvol->isActive()) config.setBoolean(u"Default"_s, true);
                 if (!subvol->usefor.isEmpty()) config.setString(u"UseFor"_s, subvol->usefor);
                 if (!subvol->label.isEmpty()) config.setString(u"Label"_s, subvol->label);
                 if (!subvol->options.isEmpty()) config.setString(u"Options"_s, subvol->options);
@@ -533,15 +533,19 @@ void PartMan::treeMenu(const QPoint &)
             gui.boxMain->setEnabled(true);
         }
     } else if (seldev->type == Device::SUBVOLUME) {
-        QAction *actDefault = menu.addAction(tr("Default subvolume"));
+        // QAction *actDefault = menu.addAction(tr("Default subvolume"));
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
-        actDefault->setCheckable(true);
-        actDefault->setChecked(seldev->isActive());
+        // actDefault->setCheckable(true);
+        // actDefault->setChecked(seldev->isActive());
         actRemSubvolume->setDisabled(seldev->flags.oldLayout);
 
         QAction *action = menu.exec(QCursor::pos());
-        if (action == actDefault) seldev->setActive(action->isChecked());
-        else if (action == actRemSubvolume) delete seldev;
+        if (action == actRemSubvolume) {
+            delete seldev;
+        }
+        // else if (action == actDefault) {
+        //     seldev->setActive(action->isChecked());
+        // }
     }
 }
 
@@ -703,9 +707,12 @@ void PartMan::scanSubvolumes(Device *part)
     qApp->setOverrideCursor(Qt::WaitCursor);
     gui.boxMain->setEnabled(false);
     while (part->children.size()) delete part->child(0);
+    QString defline;
     QStringList lines;
     if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,ro"_s,
         part->mappedDevice(), u"/mnt/btrfs-scratch"_s})) goto END;
+    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"get-default"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
+    defline = proc.readOut();
     proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
     lines = proc.readOutLines();
     proc.exec(u"umount"_s, {u"/mnt/btrfs-scratch"_s});
@@ -716,6 +723,9 @@ void PartMan::scanSubvolumes(Device *part)
         subvol->flags.oldLayout = true;
         subvol->label = subvol->curLabel = line.mid(start);
         subvol->format = "PRESERVE"_L1;
+        if (line == defline) {
+            subvol->setActive(true);
+        }
         notifyChange(subvol);
     }
  END:
@@ -1320,13 +1330,15 @@ void PartMan::prepareSubvolumes(Device *part)
     proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,noatime"_s, part->mappedDevice(), u"/mnt/btrfs-scratch"_s});
     const char *errmsg = nullptr;
     try {
-        // Since the default subvolume cannot be deleted, ensure the default is set to the top.
-        proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s, u"5"_s, u"/mnt/btrfs-scratch"_s});
         for (int ixsv = 0; ixsv < subvolcount; ++ixsv) {
             Device *subvol = part->child(ixsv);
             assert(subvol != nullptr);
             const QString &svpath = "/mnt/btrfs-scratch/"_L1 + subvol->label;
             if (subvol->format != "PRESERVE"_L1 && QFileInfo::exists(svpath)) {
+                if(subvol->isActive()) {
+                    // Since the default subvolume cannot be deleted, ensure the default is set to the top.
+                    proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s, u"5"_s, u"/mnt/btrfs-scratch"_s});
+                }
                 proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"delete"_s, svpath});
             }
             if (subvol->format == "CREATE"_L1) {
@@ -1334,11 +1346,11 @@ void PartMan::prepareSubvolumes(Device *part)
             }
             proc.status();
         }
-        // Set the default subvolume if one was chosen.
-        if (part->active) {
-            proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s,
-                "/mnt/btrfs-scratch/"_L1+part->active->label});
-        }
+        // // Set the default subvolume if one was chosen.
+        // if (part->active) {
+        //     proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s,
+        //         "/mnt/btrfs-scratch/"_L1+part->active->label});
+        // }
     } catch(const char *msg) {
         errmsg = msg;
     }
@@ -2196,7 +2208,7 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
             while (drive && drive->type != DRIVE) drive = drive->parentItem;
             if (drive) drive->driveAutoSetActive();
         }
-        if (type == SUBVOLUME && usefor == "/"_L1) setActive(true);
+        // if (type == SUBVOLUME && usefor == "/"_L1) setActive(true);
         if (usefor == "ESP"_L1 || usefor == "/boot/efi"_L1) flags.sysEFI = true;
 
         if (encrypt & !canEncrypt()) {
