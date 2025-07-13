@@ -341,8 +341,7 @@ void MInstall::setupAutoMount(bool enabled)
             proc.exec(u"rm"_s, {u"-f"_s, u"/run/udev/rules.d/91-mx-udisks-inhibit.rules"_s});
             proc.exec(u"udevadm"_s, {u"control"_s, u"--reload"_s});
             // For partitions to appear in the file manager.
-            proc.exec(u"service"_s, {u"udev"_s, u"stop"_s});
-            proc.exec(u"service"_s, {u"udev"_s, u"start"_s});
+            proc.exec(u"udevadm"_s, {u"trigger"_s});
         }
         // clear the rules that were temporarily overridden
         for (const QString &rule : std::as_const(udev_temp_mdadm_rules)) {
