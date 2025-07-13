@@ -43,6 +43,7 @@ private:
     int testEFI = -1;
     int testVirtualBox = -1;
     // Init systems
+    bool containsSysVinit = false;
     bool containsSystemd = false;
     bool containsRunit = false;
 };

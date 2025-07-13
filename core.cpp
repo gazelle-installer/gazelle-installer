@@ -31,7 +31,16 @@ using namespace Qt::Literals::StringLiterals;
 
 Core::Core(MProcess &mproc) : proc(mproc)
 {
-    containsSystemd = QFileInfo(u"/usr/usr/bin/systemctl"_s).isExecutable() // Online
+    // These SysVinit files are present as symlinks on systemd-only systems.
+    for (const auto &path : {u"/usr/sbin/init"_s, u"/live/aufs/usr/sbin/init"_s}) {
+        const QFileInfo initfile(path); // Online and Offline respectively
+        if (!initfile.isSymbolicLink() && initfile.isExecutable()) {
+            containsSysVinit = true;
+        }
+    }
+
+    // Cannot assume SysVinit OR systemd because some MX Linux images contain both.
+    containsSystemd = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable() // Online
         || QFileInfo(u"/live/aufs/usr/bin/systemctl"_s).isExecutable(); // Offline
 
     // Online
@@ -129,7 +138,9 @@ void Core::setService(const QString &service, bool enabled) const
     MProcess::Section sect(proc);
     const QString chroot(sect.root());
 
-    proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
+    if (containsSysVinit) {
+        proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
+    }
     if (containsSystemd) {
         if (enabled) {
             proc.exec(u"systemctl"_s, {u"unmask"_s, service});
