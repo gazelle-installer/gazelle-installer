@@ -148,9 +148,6 @@ void BootMan::install(const QStringList &cmdextra)
             proc.exec(u"grub-install"_s, {u"--target=i386-pc"_s, u"--recheck"_s,
                 u"--no-floppy"_s, u"--force"_s, u"--boot-directory=/mnt/antiX/boot"_s, bootdev});
         } else {
-            // rename arch to match grub-install target
-            proc.exec(u"cat"_s, {u"/sys/firmware/efi/fw_platform_size"_s}, nullptr, true);
-
             if (efivars_ismounted) {
                 // remove any efivars-dump-entries in NVRAM
                 sect.setExceptionStrict(false);
@@ -189,9 +186,21 @@ void BootMan::install(const QStringList &cmdextra)
             // Add a new NVRAM boot variable.
             if (espdev != nullptr) {
                 const PartMan::NameParts &bs = PartMan::splitName(espdev->name);
+                //efi size & secureboot
+                //if 32, don't bother with secure boot
+                //if 64, check for secure boot shimx64.efi
+                QString efitype;
+                if (efisize==32){
+                    efitype="/grubia32.efi";
+                } else {
+                    efitype="/grubx64.efi";
+                    if (QFile("/usr/lib/shim/shimx64.efi").exists()){
+                        efitype="/shimx64.efi";
+                    }
+                }
+
                 proc.exec(u"efibootmgr"_s, {u"-qcL"_s, loaderLabel, u"-d"_s, "/dev/"_L1 + bs.drive,
-                    u"-p"_s, bs.partition, u"-l"_s,
-                    "/EFI/"_L1 + loaderID + (efisize==32 ? "/grubia32.efi"_L1 : "/grubx64.efi"_L1)});
+                    u"-p"_s, bs.partition, u"-l"_s, "/EFI/"_L1 + loaderID + efitype});
             }
             sect.setExceptionStrict(true);
             sect.setRoot(nullptr);
