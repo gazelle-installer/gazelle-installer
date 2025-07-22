@@ -28,6 +28,7 @@ public:
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false) noexcept;
     bool mkpath(const QString &path, mode_t mode = 0, bool force = false) const;
+    bool copy(const QString &source, const QString &dest, bool force = false) const;
     // Operating system
     const QString &detectArch();
     int detectEFI(bool noTest = false);

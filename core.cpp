@@ -91,6 +91,24 @@ bool Core::mkpath(const QString &path, mode_t mode, bool force) const
     }
     return rc;
 }
+bool Core::copy(const QString &source, const QString &dest, bool force) const
+{
+    QListWidgetItem *logEntry = proc.log("COPY: "_L1 + source + " -> "_L1 + dest, MProcess::LOG_EXEC, false);
+
+    if (force && QFileInfo::exists(dest)) {
+        QFile::remove(dest);
+    }
+    const bool rc = QFile::copy(source, dest);
+    qDebug() << (rc ? "Copy(SUCCESS):" : "Copy(FAILURE):") << source << dest;
+    proc.log(logEntry, rc ? MProcess::STATUS_OK : MProcess::STATUS_CRITICAL);
+
+    if(!rc) {
+        MProcess::Section sect(proc);
+        const char *const fmsg = sect.failMessage();
+        if (fmsg) throw fmsg;
+    }
+    return rc;
+}
 
 // System environment detection
 

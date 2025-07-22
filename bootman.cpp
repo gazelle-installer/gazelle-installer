@@ -281,7 +281,7 @@ void BootMan::install(const QStringList &cmdextra)
             }
             if (!mtest.isEmpty()) {
                 core.mkpath(u"/mnt/antiX/boot/uefi-mt"_s, 0755);
-                proc.exec(u"cp"_s, {mtest, u"/mnt/antiX/boot/uefi-mt"_s});
+                core.copy(mtest, u"/mnt/antiX/boot/uefi-mt"_s);
             }
         }
         proc.status();

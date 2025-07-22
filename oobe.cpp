@@ -446,8 +446,8 @@ void Oobe::setLocale() const
     }
     proc.exec(u"hwclock"_s, {u"--hctosys"_s});
     if (!online) {
-        proc.exec(u"cp"_s, {u"-f"_s, u"/etc/adjtime"_s, u"/mnt/antiX/etc/"_s});
-        proc.exec(u"cp"_s, {u"-f"_s, u"/etc/default/rcS"_s, u"/mnt/antiX/etc/default"_s});
+        core.copy(u"/etc/adjtime"_s, u"/mnt/antiX/etc/"_s, true);
+        core.copy(u"/etc/default/rcS"_s, u"/mnt/antiX/etc/default"_s, true);
     }
 
     // Set clock format
@@ -606,10 +606,10 @@ void Oobe::setUserInfo() const
 
     if (QFileInfo::exists(dpath.toUtf8())) { // Still exists.
         sect.setExceptionMode(nullptr);
-        proc.exec(u"cp"_s, {u"-n"_s, skelpath + "/.bash_profile"_L1, dpath});
-        proc.exec(u"cp"_s, {u"-n"_s, skelpath + "/.bashrc"_L1, dpath});
-        proc.exec(u"cp"_s, {u"-n"_s, skelpath + "/.gtkrc"_L1, dpath});
-        proc.exec(u"cp"_s, {u"-n"_s, skelpath + "/.gtkrc-2.0"_L1, dpath});
+        core.copy(skelpath + "/.bash_profile"_L1, dpath);
+        core.copy(skelpath + "/.bashrc"_L1, dpath);
+        core.copy(skelpath + "/.gtkrc"_L1, dpath);
+        core.copy(skelpath + "/.gtkrc-2.0"_L1, dpath);
         proc.exec(u"cp"_s, {u"-Rn"_s, skelpath + "/.config"_L1, dpath});
         proc.exec(u"cp"_s, {u"-Rn"_s, skelpath + "/.local"_L1, dpath});
     } else { // dir does not exist, must create it
