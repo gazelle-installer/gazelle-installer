@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" connectslotsbyname="false">
  <class>MeInstall</class>
  <widget class="QDialog" name="MeInstall">
   <property name="geometry">
@@ -629,7 +629,7 @@ QSlider::handle:horizontal:disabled {
               <item row="1" column="1">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                </spacer>
               </item>
