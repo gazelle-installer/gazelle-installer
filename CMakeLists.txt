@@ -41,11 +41,6 @@ qt_add_ui(minstall SOURCES
 #	TODO: add files that are C++20 modules.
 #)
 
-qt_add_translations(minstall TS_FILES
-	translations/gazelle-installer_en.ts
-	LRELEASE_OPTIONS -compress -nounfinished -removeidentical -silent
-)
-
 target_link_libraries(minstall PRIVATE
 	Qt::Core
 	Qt::Gui
@@ -55,6 +50,7 @@ target_link_libraries(minstall PRIVATE
 
 build_compilation_setup(minstall)
 build_version_definition(minstall VERSION)
+build_translation_files(minstall translations)
 
 target_compile_definitions(minstall PRIVATE
 	QT_DISABLE_DEPRECATED_UP_TO=0x060800

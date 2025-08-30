@@ -68,6 +68,15 @@ function(build_version_definition target definition)
 	)
 endfunction()
 
+function(build_translation_files target ts_dir)
+	file(GLOB TRANSLATION_FILES ${ts_dir}/*.ts)
+	qt_add_translations(${target}
+		TS_FILES ${TRANSLATION_FILES}
+		LRELEASE_OPTIONS -compress -nounfinished -removeidentical -silent
+		QM_FILES_OUTPUT_VARIABLE qm_files # Stop qm files being embedded into the executable.
+	)
+endfunction()
+
 function(build_deferred_setup)
 	# Cannot be run before project() call
 	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
