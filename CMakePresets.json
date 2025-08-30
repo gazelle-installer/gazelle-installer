@@ -1,116 +1,116 @@
 {
-  "version": 6,
-  "configurePresets": [
-    {
-      "name": "default",
-      "displayName": "Main Configuration",
-      "description": "Recommended build using Ninja Multi-Config generator",
-      "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/_build_"
-    },
-    {
-      "name": "IDE",
-      "displayName": "IDE Configuration",
-      "description": "For IDEs like Qt Creator to avoid conflicting builds when loading the project",
-      "inherits": "default",
-      "binaryDir": "${sourceDir}/_build_/${presetName}"
-    },
-    {
-      "name": "clang",
-      "displayName": "Clang configuration",
-      "description": "Compile using clang",
-      "inherits": "default",
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clang++"
-      }
-    },
-    {
-      "name": "gcc",
-      "displayName": "GCC configuration",
-      "description": "Compile using gcc",
-      "inherits": "default",
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "g++"
-      }
-    },
-    {
-      "name": "clazy",
-      "displayName": "Check with clazy",
-      "inherits": "clang",
-      "environment": {
-        "CLAZY_CHECKS": "level0,level1,level2,qt6-deprecated-api-fixes,qt6-header-fixes,qt6-qhash-signature,qt6-qlatin1stringchar-to-u,qt6-fwd-fixes,missing-qobject-macro,$penv{CLAZY_CHECKS}",
-        "CLAZY_IGNORE_DIRS": "/usr/include/*"
-      },
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clazy"
-      }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "default",
-      "configurePreset": "default"
-    },
-    {
-      "name": "clang",
-      "configurePreset": "clang"
-    },
-    {
-      "name": "gcc",
-      "configurePreset": "gcc"
-    },
-    {
-      "name": "clazy",
-      "configurePreset": "clazy"
-    }
-  ],
-  "testPresets": [
-    {
-      "name": "default",
-      "configurePreset": "default",
-      "output": {"outputOnFailure": true},
-      "execution": {"noTestsAction": "error", "stopOnFailure": true}
-    }
-  ],
-  "workflowPresets": [
-    {
-      "name": "default",
-      "steps": [
-        { "type": "configure", "name": "default" },
-        { "type": "build", "name": "default" }
-      ]
-    },
-    {
-      "name": "clang",
-      "steps": [
-        { "type": "configure", "name": "clang" },
-        { "type": "build", "name": "clang" }
-      ]
-    },
-    {
-      "name": "gcc",
-      "steps": [
-        { "type": "configure", "name": "gcc" },
-        { "type": "build", "name": "gcc" }
-      ]
-    },
-    {
-      "name": "clazy",
-      "steps": [
-        { "type": "configure", "name": "clazy" },
-        { "type": "build", "name": "clazy" }
-      ]
-    }
-  ],
-  "vendor": {
-    "qt.io/QtCreator/1.0": {
-      "AskBeforePresetsReload": false,
-      "AskReConfigureInitialParams": false,
-      "AutorunCMake": true,
-      "PackageManagerAutoSetup": false,
-      "ShowAdvancedOptionsByDefault": true,
-      "ShowSourceSubFolders": false,
-      "UseJunctionsForSourceAndBuildDirectories": false
-    }
-  }
+	"version": 6,
+	"configurePresets": [
+		{
+			"name": "default",
+			"displayName": "Main Configuration",
+			"description": "Recommended build using Ninja Multi-Config generator",
+			"generator": "Ninja Multi-Config",
+			"binaryDir": "${sourceDir}/_build_"
+		},
+		{
+			"name": "IDE",
+			"displayName": "IDE Configuration",
+			"description": "For IDEs like Qt Creator to avoid conflicting builds when loading the project",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/_build_/${presetName}"
+		},
+		{
+			"name": "clang",
+			"displayName": "Clang configuration",
+			"description": "Compile using clang",
+			"inherits": "default",
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": "clang++"
+			}
+		},
+		{
+			"name": "gcc",
+			"displayName": "GCC configuration",
+			"description": "Compile using gcc",
+			"inherits": "default",
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": "g++"
+			}
+		},
+		{
+			"name": "clazy",
+			"displayName": "Check with clazy",
+			"inherits": "clang",
+			"environment": {
+				"CLAZY_CHECKS": "level0,level1,level2,qt6-deprecated-api-fixes,qt6-header-fixes,qt6-qhash-signature,qt6-qlatin1stringchar-to-u,qt6-fwd-fixes,missing-qobject-macro,$penv{CLAZY_CHECKS}",
+				"CLAZY_IGNORE_DIRS": "/usr/include/*"
+			},
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": "clazy"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "default",
+			"configurePreset": "default"
+		},
+		{
+			"name": "clang",
+			"configurePreset": "clang"
+		},
+		{
+			"name": "gcc",
+			"configurePreset": "gcc"
+		},
+		{
+			"name": "clazy",
+			"configurePreset": "clazy"
+		}
+	],
+	"testPresets": [
+		{
+			"name": "default",
+			"configurePreset": "default",
+			"output": {"outputOnFailure": true},
+			"execution": {"noTestsAction": "error", "stopOnFailure": true}
+		}
+	],
+	"workflowPresets": [
+		{
+			"name": "default",
+			"steps": [
+				{ "type": "configure", "name": "default" },
+				{ "type": "build", "name": "default" }
+			]
+		},
+		{
+			"name": "clang",
+			"steps": [
+				{ "type": "configure", "name": "clang" },
+				{ "type": "build", "name": "clang" }
+			]
+		},
+		{
+			"name": "gcc",
+			"steps": [
+				{ "type": "configure", "name": "gcc" },
+				{ "type": "build", "name": "gcc" }
+			]
+		},
+		{
+			"name": "clazy",
+			"steps": [
+				{ "type": "configure", "name": "clazy" },
+				{ "type": "build", "name": "clazy" }
+			]
+		}
+	],
+	"vendor": {
+		"qt.io/QtCreator/1.0": {
+			"AskBeforePresetsReload": false,
+			"AskReConfigureInitialParams": false,
+			"AutorunCMake": true,
+			"PackageManagerAutoSetup": false,
+			"ShowAdvancedOptionsByDefault": true,
+			"ShowSourceSubFolders": false,
+			"UseJunctionsForSourceAndBuildDirectories": false
+		}
+	}
 }
