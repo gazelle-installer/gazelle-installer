@@ -48,8 +48,12 @@
 #include "bootman.h"
 #include "swapman.h"
 
-#include "version.h"
 #include "minstall.h"
+
+// CODEBASE_VERSION should come from compiler flags.
+#ifndef CODEBASE_VERSION
+    #define CODEBASE_VERSION "0.0"
+#endif
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -80,7 +84,7 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     helpBackdrop = appConf.getString(u"HelpBackdrop"_s, u"/usr/share/gazelle-installer-data/backdrop-textbox.png"_s);
     appConf.setSection();
     gui.setupUi(this);
-    gui.listLog->addItem(u"Version " VERSION ""_s);
+    gui.listLog->addItem(u"Version "_s + qApp->applicationVersion());
     proc.setupUI(gui.listLog, gui.progInstall);
     gui.textHelp->installEventFilter(this);
     gui.boxInstall->hide();

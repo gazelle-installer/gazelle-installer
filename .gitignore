@@ -1,7 +1,6 @@
-version.h # no need to add this to repo
+minstall
 
 # C++ objects and libs
-
 *.slo
 *.lo
 *.o
@@ -11,11 +10,8 @@ version.h # no need to add this to repo
 *.so
 *.dll
 *.dylib
-debug/
-release/
 
 # Qt-es
-
 /.qmake.cache
 /.qmake.stash
 *.pro.user
@@ -27,10 +23,10 @@ moc_*.cpp
 moc_*.h
 qrc_*.cpp
 ui_*.h
+Makefile*
 *build-*
 
 # QtCreator
-
 *.autosave
 
 # QtCtreator Qml
@@ -39,21 +35,19 @@ ui_*.h
 
 # QtCtreator CMake
 CMakeLists.txt.user*
+CMakeCache.txt
+CMakeFiles/*
+Makefile
+cmake_install.cmake
+compile_commands.json
+.qt/*
+build/*
 
-# Debian debhelper folder
+# Debian folder
 debian/.debhelper/
-
-# Exclude debian folder, each distro will use custom debian configuration
-debian
-
-# Exclude binary
-minstall
-
-# Exclude build folder
-debs
+debian/files
+debian/*.log
+debian/*.substvars
 
 # Transifex ignore
 .tx/
-
-# Auto-generated makefile
-Makefile*

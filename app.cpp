@@ -36,7 +36,11 @@
 
 #include "minstall.h"
 #include "msettings.h"
-#include "version.h"
+
+// VERSION should come from compiler flags.
+#ifndef VERSION
+    #define VERSION "?.?.?.?"
+#endif
 
 using namespace Qt::Literals::StringLiterals;
 
