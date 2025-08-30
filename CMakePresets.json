@@ -6,14 +6,14 @@
       "displayName": "Main Configuration",
       "description": "Recommended build using Ninja Multi-Config generator",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build"
+      "binaryDir": "${sourceDir}/_build_"
     },
     {
       "name": "IDE",
       "displayName": "IDE Configuration",
       "description": "For IDEs like Qt Creator to avoid conflicting builds when loading the project",
       "inherits": "default",
-      "binaryDir": "${sourceDir}/build/${presetName}"
+      "binaryDir": "${sourceDir}/_build_/${presetName}"
     },
     {
       "name": "clang",
