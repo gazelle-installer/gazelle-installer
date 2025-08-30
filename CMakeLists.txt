@@ -53,10 +53,10 @@ target_link_libraries(minstall PRIVATE
 	zxcvbn
 )
 
-build_compilation_setup()
-build_version_definition(VERSION)
+build_compilation_setup(minstall)
+build_version_definition(minstall VERSION)
 
-add_compile_definitions(
+target_compile_definitions(minstall PRIVATE
 	QT_DISABLE_DEPRECATED_UP_TO=0x060800
 	CODEBASE_VERSION="${PROJECT_VERSION}"
 )
