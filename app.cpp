@@ -75,7 +75,6 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     if (defskin) a.setStyleSheet(u"QDialog { border: 2px ridge gray; }"_s);
-    a.setApplicationVersion(QStringLiteral(VERSION));
     //a.setWindowIcon(QIcon(u"/usr/share/gazelle-installer-data/logo.png"_s));
 
     const QString &transpath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
@@ -92,6 +91,8 @@ int main(int argc, char *argv[])
         a.installTranslator(&appTran);
     }
 
+    a.setApplicationDisplayName(QObject::tr("Gazelle Installer"));
+    a.setApplicationVersion(QStringLiteral(VERSION));
     QCommandLineParser parser;
     parser.setApplicationDescription(QObject::tr("Customizable GUI installer for MX Linux and antiX Linux"));
     parser.addHelpOption();
