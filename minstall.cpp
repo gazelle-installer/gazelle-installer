@@ -190,12 +190,10 @@ void MInstall::startup()
         // Check the installation media for errors (skip if not required).
         if (appArgs.isSet(u"media-check"_s)) nocheck = false;
         else if (appArgs.isSet(u"no-media-check"_s)) nocheck = true;
-        if(nocheck) proc.log(u"No media check"_s);
-        else {
+        if(nocheck) {
+            proc.log(u"No media check"_s);
+        } else {
             checkmd5 = new CheckMD5(proc, gui.labelSplash);
-            checkmd5->wait();
-            delete checkmd5;
-            checkmd5 = nullptr;
         }
 
         crypto = new Crypto(proc, gui, this);
@@ -263,6 +261,14 @@ void MInstall::startup()
     gui.textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
         "%1 uses some components from MEPIS Linux which are released under an Apache free license."
         " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
+
+    // Wait for any outstanding MD5 checks to finish.
+    if (checkmd5) {
+        checkmd5->wait();
+        delete checkmd5;
+        checkmd5 = nullptr;
+    }
+
     gotoPage(Step::TERMS);
 }
 

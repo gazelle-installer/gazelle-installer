@@ -46,16 +46,17 @@ CheckMD5::CheckMD5(MProcess &mproc, QLabel *splash) noexcept
     watcher.setFuture(QtConcurrent::run(&CheckMD5::check, this));
 }
 
-MProcess::Status CheckMD5::wait()
+void CheckMD5::wait()
 {
-    QEventLoop eloop;
-    connect(&watcher, &QFutureWatcher<CheckResult>::finished, &eloop, &QEventLoop::quit);
-    eloop.exec();
+    if(!watcher.isFinished()) {
+        QEventLoop eloop;
+        connect(&watcher, &QFutureWatcher<CheckResult>::finished, &eloop, &QEventLoop::quit);
+        eloop.exec();
+    }
     qApp->processEvents();
     if (status == MProcess::STATUS_CRITICAL) {
         throw(QT_TR_NOOP("The installation media is corrupt."));
     }
-    return status;
 }
 
 void CheckMD5::halt(bool silent) noexcept

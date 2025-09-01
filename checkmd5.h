@@ -30,7 +30,7 @@ class CheckMD5 : public QObject
     Q_OBJECT
 public:
     CheckMD5(MProcess &mproc, QLabel *splash) noexcept;
-    MProcess::Status wait();
+    void wait();
     void halt(bool silent = false) noexcept;
 
 private:
