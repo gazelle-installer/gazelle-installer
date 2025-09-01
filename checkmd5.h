@@ -19,20 +19,44 @@
 #ifndef CHECKMD5_H
 #define CHECKMD5_H
 
+#include <QObject>
 #include <QCoreApplication>
+#include <QFutureWatcher>
 #include <QLabel>
 #include "mprocess.h"
 
-class CheckMD5
+class CheckMD5 : public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(CheckMD5)
-    MProcess &proc;
-    QLabel *labelSplash;
-    bool checking = false;
+    Q_OBJECT
 public:
     CheckMD5(MProcess &mproc, QLabel *splash) noexcept;
-    void check(); // Must be separate from constructor for halt() to work.
+    MProcess::Status wait();
     void halt(bool silent = false) noexcept;
+
+private:
+    enum CheckState {
+        STARTED,
+        GOOD,
+        BAD,
+        ERROR,
+        MISSING
+    };
+    struct CheckResult {
+        QString path;
+        CheckState state;
+        CheckResult(const QString &path, CheckState state) noexcept : path(path), state(state) {}
+    };
+    QFutureWatcher<CheckResult> watcher;
+    MProcess &proc;
+    QLabel *labelSplash;
+    QString oldSplashText;
+    class QListWidgetItem *logEntry = nullptr;
+    MProcess::Status status = MProcess::STATUS_OK;
+    void check(class QPromise<CheckResult> &promise) const noexcept;
+
+    void watcher_progressValueChanged(int progress) noexcept;
+    void watcher_resultReadyAt(int index) noexcept;
+    void watcher_finished() noexcept;
 };
 
 #endif // CHECKMD5_H

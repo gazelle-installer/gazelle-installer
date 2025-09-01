@@ -193,7 +193,7 @@ void MInstall::startup()
         if(nocheck) proc.log(u"No media check"_s);
         else {
             checkmd5 = new CheckMD5(proc, gui.labelSplash);
-            checkmd5->check(); // Must be separate from constructor for halt() to work.
+            checkmd5->wait();
             delete checkmd5;
             checkmd5 = nullptr;
         }

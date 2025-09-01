@@ -9,10 +9,10 @@ project(minstall
 # TODO: Remove for final release
 set(PROJECT_VERSION "${PROJECT_VERSION}-ALPHA")
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets LinguistTools)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Concurrent LinguistTools)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 #set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 
 qt_standard_project_setup()
@@ -47,6 +47,7 @@ target_link_libraries(minstall PRIVATE
 	Qt::Core
 	Qt::Gui
 	Qt::Widgets
+	Qt::Concurrent
 	zxcvbn
 )
 
