@@ -200,25 +200,28 @@ void CheckMD5::watcher_resultReadyAt(int index) noexcept
     const CheckResult &result = watcher.resultAt(index);
     if(result.state == STARTED) {
         logEntry = proc.log("Check MD5: "_L1 + result.path, MProcess::LOG_EXEC);
-    } else if(result.state == GOOD) {
-        proc.log(logEntry, MProcess::STATUS_OK);
-        qDebug().noquote() << "Check MD5 Good:" << result.path;
     } else {
-        watcher.cancel();
-        proc.log(logEntry, MProcess::STATUS_CRITICAL);
-        switch(result.state) {
-        case BAD:
-            proc.log("Check MD5 Bad: "_L1 + result.path, MProcess::LOG_FAIL);
-            break;
-        case ERROR:
-            proc.log("Check MD5 Error: "_L1 + result.path, MProcess::LOG_FAIL);
-            break;
-        case MISSING:
-            proc.log("Check MD5 Missing: "_L1 + result.path, MProcess::LOG_FAIL);
-            break;
-        default:
-            std::unreachable();
+        if(result.state == GOOD) {
+            status = MProcess::STATUS_OK;
+            qDebug().noquote() << "Check MD5 Good:" << result.path;
+        } else {
+            watcher.cancel();
+            status = MProcess::STATUS_CRITICAL;
+            switch(result.state) {
+                case BAD:
+                    proc.log("Check MD5 Bad: "_L1 + result.path, MProcess::LOG_FAIL);
+                    break;
+                case ERROR:
+                    proc.log("Check MD5 Error: "_L1 + result.path, MProcess::LOG_FAIL);
+                    break;
+                case MISSING:
+                    proc.log("Check MD5 Missing: "_L1 + result.path, MProcess::LOG_FAIL);
+                    break;
+                default:
+                    std::unreachable();
+            }
         }
+        proc.log(logEntry, status);
     }
 }
 void CheckMD5::watcher_finished() noexcept
