@@ -47,6 +47,8 @@ public:
         class MIni &appConf, const QCommandLineParser &appArgs);
     bool saveHomeBasic() noexcept;
     void install();
+private:
+    void getVolumeSpec(class MIni &squashInfo, const QString &volume, const QString &source) const;
 };
 
 #endif // BASE_H

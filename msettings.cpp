@@ -310,6 +310,22 @@ void MIni::setInteger(const QString &key, const long long value) noexcept
     setRaw(key, QString::number(value));
 }
 
+double MIni::getFloat(const QString &key, double defaultValue, enum ValState *valid) const noexcept
+{
+    const QString &val = getString(key);
+    if (valid) *valid = VAL_NOTFOUND;
+    if (!val.isNull()) {
+        bool ok = false;
+        defaultValue = val.toDouble(&ok);
+        if (valid) *valid = ok ? VAL_OK : VAL_INVALID;
+    }
+    return defaultValue;
+}
+void MIni::setFloat(const QString &key, const double value, const char format, const int precision) noexcept
+{
+    setRaw(key, QString::number(value, format, precision));
+}
+
 /* Case-insensitive key comparison for maps. */
 bool MIni::lessCaseInsensitive(const QString &a, const QString &b) noexcept
 {

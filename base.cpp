@@ -52,7 +52,7 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     rootSources << u"/live/aufs/bin"_s << u"/live/aufs/dev"_s
         << u"/live/aufs/etc"_s << u"/live/aufs/lib"_s
         << u"/live/aufs/media"_s << u"/live/aufs/mnt"_s << u"/live/aufs/root"_s
-        << u"/live/aufs/sbin"_s << u"/live/aufs/usr"_s << u"/live/aufs/var"_s << u"/live/aufs/home"_s;
+        << u"/live/aufs/sbin"_s << u"/live/aufs/usr"_s << u"/live/aufs/var"_s;
     if (QFileInfo::exists(u"/live/aufs/libx32"_s)){
         rootSources << u"/live/aufs/libx32"_s ;
     }
@@ -62,39 +62,34 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     if (QFileInfo::exists(u"/live/aufs/opt"_s)){
         rootSources << u"/live/aufs/opt"_s ;
     }
-    PartMan::VolumeSpec &vspecRoot = partman.volSpecs[u"/"_s];
-    PartMan::VolumeSpec &vspecBoot = partman.volSpecs[u"/boot"_s];
-    PartMan::VolumeSpec &vspecHome = partman.volSpecs[u"/home"_s];
 
     MProcess::Section sect(proc, QT_TR_NOOP("Cannot access installation media."));
     if (pretend) sect.setExceptionMode(nullptr);
 
-    // Boot space required.
-    proc.exec(u"du"_s, {u"-scb"_s, bootSource}, nullptr, true);
-    vspecBoot.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
-    vspecBoot.minimum = vspecBoot.image * 3; // Include 1 backup and 1 new initrd image.
-    vspecBoot.preferred = vspecBoot.minimum;
-    if (vspecBoot.preferred < 1*GB) vspecBoot.preferred = 1*GB;
-
-    // Root space required.
     const MIni liveInfo(u"/live/config/initrd.out"_s, MIni::ReadOnly);
     const QString &sqpath = '/' + liveInfo.getString(u"SQFILE_PATH"_s, u"antiX"_s);
     const QString &sqtoram = liveInfo.getString(u"TORAM_MP"_s, u"/live/to-ram"_s) + sqpath;
-    const QString &sqloc = liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
-    bool floatOK = false;
     QString infile = sqtoram + "/linuxfs.info"_L1;
-    if (!QFile::exists(infile)) infile = sqloc + "/linuxfs.info"_L1;
-    if (QFile::exists(infile)) {
-        const MIni squashInfo(infile, MIni::ReadOnly);
-        vspecRoot.image = squashInfo.getString(u"UncompressedSizeKB"_s).toFloat(&floatOK) * KB;
+    if (!QFile::exists(infile)) {
+        const QString &sqloc = liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
+        infile = sqloc + "/linuxfs.info"_L1;
     }
-    if (!floatOK) {
-        rootSources.prepend(u"-scb"_s);
+    MIni squashInfo(infile, MIni::ReadOnly);
+
+    PartMan::VolumeSpec &vspecRoot = partman.volSpecs[u"/"_s];
+    PartMan::VolumeSpec &vspecBoot = partman.volSpecs[u"/boot"_s];
+    PartMan::VolumeSpec &vspecHome = partman.volSpecs[u"/home"_s];
+
+    // Root space required.
+    MSettings::ValState rootNumState = MSettings::VAL_NOTFOUND;
+    vspecRoot.image = squashInfo.getFloat(u"UncompressedSizeKB"_s, 0.0, &rootNumState) * KB;
+    if (rootNumState != MSettings::VAL_OK) {
+        rootSources.prepend(u"-scb"_s); // Arguments for command execution.
         proc.exec(u"du"_s, rootSources, nullptr, true);
-        rootSources.removeFirst();
+        rootSources.removeFirst(); // Remove temporary "-scb" item.
         vspecRoot.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
     }
-    qDebug() << "Basic image:" << vspecRoot.image << floatOK << infile;
+    qDebug() << "Basic image:" << vspecRoot.image << rootNumState << infile;
 
     // Account for persistent root.
     if (QFileInfo::exists(u"/live/perist-root"_s)) {
@@ -114,9 +109,53 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     vspecRoot.preferred = vspecRoot.minimum + bufferRoot;
     qDebug() << "Source inodes:" << sourceInodes << "Assumed block size:" << BASE_BLOCK;
 
-    vspecHome.minimum = 64*MB; // TODO: Set minimum home dynamically.
-    vspecHome.preferred = vspecHome.minimum + bufferHome;
-    qDebug() << "Minimum space:" << vspecBoot.image << "(boot)," << vspecRoot.image << "(root)";
+    getVolumeSpec(squashInfo, u"/boot"_s, bootSource);
+    // Include 1 backup and 1 new initrd image.
+    vspecBoot.minimum *= 3;
+    vspecBoot.preferred *= 3;
+    if (vspecBoot.preferred < 1*GB) {
+        vspecBoot.preferred = 1*GB;
+    }
+
+    // Account for /home on personal snapshots
+    getVolumeSpec(squashInfo, u"/home"_s, u"/live/aufs/home"_s);
+    vspecHome.preferred += bufferHome;
+    rootSources.append(u"/live/aufs/home"_s);
+
+    // Subtract components from the root if obtained the "short way".
+    if (rootNumState == MSettings::VAL_OK) {
+        vspecRoot.image -= (vspecBoot.image + vspecHome.image);
+        vspecRoot.minimum -= (vspecBoot.minimum + vspecHome.minimum);
+        vspecRoot.preferred -= (vspecBoot.preferred + vspecHome.preferred);
+    }
+
+    qDebug() << "Minimum space:" << vspecBoot.minimum << "(boot),"
+        << vspecRoot.minimum << "(root)," << vspecHome.minimum << "(home)";
+}
+
+void Base::getVolumeSpec(MIni &squashInfo, const QString &volume, const QString &source) const
+{
+    PartMan::VolumeSpec &vspec = partman.volSpecs[volume];
+    squashInfo.setGroup(volume);
+
+    MSettings::ValState valState = MSettings::VAL_NOTFOUND;
+    vspec.image = squashInfo.getFloat(u"UncompressedSizeKB"_s, 0.0, &valState) * KB;
+    if (valState != MSettings::VAL_OK) {
+        proc.exec(u"du"_s, {u"-scb"_s, source}, nullptr, true);
+        vspec.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
+    }
+    long long inodes = squashInfo.getInteger(u"Inodes"_s, 0, &valState);
+    if (valState != MSettings::VAL_OK) {
+        proc.exec(u"du"_s, {u"-sc"_s, u"--inodes"_s, source}, nullptr, true);
+        inodes = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
+    }
+
+    vspec.image += (inodes * BASE_BLOCK);
+    vspec.minimum = vspec.image + (vspec.image / 20); // +5% for general FS shenanigans.
+    vspec.preferred = vspec.minimum;
+
+    qDebug() << volume << "image:" << vspec.image << "minimum:" << vspec.minimum
+        << "preferred:" << vspec.preferred << "inodes:" << inodes;
 }
 
 bool Base::saveHomeBasic() noexcept

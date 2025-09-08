@@ -72,6 +72,8 @@ public:
     long long getInteger(const QString &key, long long defaultValue = 0,
         enum ValState *valid = nullptr, int base = 10) const noexcept;
     void setInteger(const QString &key, const long long value) noexcept;
+    double getFloat(const QString &key, double defaultValue = 0, enum ValState *valid = nullptr) const noexcept;
+    void setFloat(const QString &key, const double value, const char format = 'G', const int precision = 6) noexcept;
 };
 
 class MSettings: public MIni
