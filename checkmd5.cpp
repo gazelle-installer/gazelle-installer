@@ -45,6 +45,15 @@ CheckMD5::CheckMD5(MProcess &mproc, QLabel *splash) noexcept
     connect(&watcher, &QFutureWatcher<CheckResult>::finished, this, &CheckMD5::watcher_finished);
     watcher.setFuture(QtConcurrent::run(&CheckMD5::check, this));
 }
+CheckMD5::~CheckMD5() noexcept
+{
+    if(!watcher.isFinished()) {
+        halt(true);
+        QEventLoop eloop;
+        connect(&watcher, &QFutureWatcher<CheckResult>::finished, &eloop, &QEventLoop::quit);
+        eloop.exec();
+    }
+}
 
 void CheckMD5::wait()
 {

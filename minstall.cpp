@@ -120,6 +120,10 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
             startup();
             phase = PH_READY;
         } catch (const char *msg) {
+            if (checkmd5) {
+                delete checkmd5;
+                checkmd5 = nullptr;
+            }
             proc.unhalt();
             const bool closenow = (!msg || !*msg);
             if(!closenow) {
@@ -134,6 +138,7 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
 MInstall::~MInstall() {
     if (oobe) delete oobe;
     if (base) delete base;
+    if (checkmd5) delete checkmd5;
     if (bootman) delete bootman;
     if (swapman) delete swapman;
     if (partman) delete partman;
@@ -264,7 +269,7 @@ void MInstall::startup()
 
     // Wait for any outstanding MD5 checks to finish.
     if (checkmd5) {
-        checkmd5->wait();
+        checkmd5->wait(); // On error this throws an exception.
         delete checkmd5;
         checkmd5 = nullptr;
     }
