@@ -34,6 +34,8 @@ Replacer::Replacer(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui
     connect(gui.pushReplaceScan, &QPushButton::clicked, this, [this](bool) noexcept {
         scan(true);
     });
+
+    ui.boxReplaceOptions->hide(); // TODO: Delete when implemented.
 }
 
 void Replacer::scan(bool full) noexcept
