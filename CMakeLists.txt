@@ -9,7 +9,7 @@ project(minstall
 # TODO: Remove for final release
 set(PROJECT_VERSION "${PROJECT_VERSION}-ALPHA")
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Concurrent LinguistTools)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Concurrent LinguistTools Network)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -17,7 +17,8 @@ set(CMAKE_CXX_STANDARD 23)
 
 qt_standard_project_setup()
 
-qt_add_executable(minstall
+# Build the real installer (renamed from minstall to minstall-real)
+qt_add_executable(minstall-real
 	app.cpp
 	autopart.cpp autopart.h
 	base.cpp base.h
@@ -36,14 +37,11 @@ qt_add_executable(minstall
 	swapman.cpp swapman.h
 	images.qrc
 )
-qt_add_ui(minstall SOURCES
+qt_add_ui(minstall-real SOURCES
 	meinstall.ui
 )
-#target_sources(minstall PRIVATE FILE_SET CXX_MODULES FILES
-#	TODO: add files that are C++20 modules.
-#)
 
-target_link_libraries(minstall PRIVATE
+target_link_libraries(minstall-real PRIVATE
 	Qt::Core
 	Qt::Gui
 	Qt::Widgets
@@ -51,9 +49,30 @@ target_link_libraries(minstall PRIVATE
 	zxcvbn
 )
 
+build_compilation_setup(minstall-real)
+build_version_definition(minstall-real VERSION)
+build_translation_files(minstall-real translations)
+
+target_compile_definitions(minstall-real PRIVATE
+	QT_DISABLE_DEPRECATED_UP_TO=0x060800
+	CODEBASE_VERSION="${PROJECT_VERSION}"
+)
+
+# Build the launcher (new minstall binary)
+qt_add_executable(minstall
+	launcher.cpp
+	launcher.h
+)
+
+target_link_libraries(minstall PRIVATE
+	Qt::Core
+	Qt::Gui
+	Qt::Widgets
+	Qt::Network
+)
+
 build_compilation_setup(minstall)
 build_version_definition(minstall VERSION)
-build_translation_files(minstall translations)
 
 target_compile_definitions(minstall PRIVATE
 	QT_DISABLE_DEPRECATED_UP_TO=0x060800
@@ -61,6 +80,6 @@ target_compile_definitions(minstall PRIVATE
 )
 
 include(GNUInstallDirs)
-install(TARGETS minstall
+install(TARGETS minstall minstall-real
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
