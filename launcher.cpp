@@ -22,7 +22,7 @@
 #include <QTemporaryFile>
 
 InstallerLauncher::InstallerLauncher(int argc, char *argv[])
-    : QObject(nullptr), app(nullptr), networkManager(nullptr), progressDialog(nullptr), currentEventLoop(nullptr)
+    : QObject(nullptr), app(nullptr), networkManager(nullptr), progressDialog(nullptr), updateFound(false), downloadReply(nullptr)
 {
     // Set Qt platform to minimize display issues
     if (!qgetenv("DISPLAY").isEmpty() || !qgetenv("WAYLAND_DISPLAY").isEmpty()) {
@@ -63,17 +63,13 @@ int InstallerLauncher::run()
     qDebug() << "Gazelle Installer Launcher starting...";
 
     // Check for updates first
-    if (checkForUpdates()) {
-        qDebug() << "Update check completed";
-    } else {
-        qDebug() << "Update check failed or no internet, proceeding with existing version";
-    }
+    checkForUpdates();
 
-    // Launch the real installer
-    return launchRealInstaller();
+    // Always use the main event loop - no nested loops
+    return app->exec();
 }
 
-bool InstallerLauncher::checkForUpdates()
+void InstallerLauncher::checkForUpdates()
 {
     QString arch = getCurrentArchitecture();
     QString packagesUrl = QString("https://mxrepo.com/mx/repo/dists/trixie/main/binary-%1/Packages").arg(arch);
@@ -84,36 +80,24 @@ bool InstallerLauncher::checkForUpdates()
     request.setRawHeader("Accept", "text/plain");
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
-    networkSuccess = false;
     QNetworkReply *reply = networkManager->get(request);
 
     if (!reply) {
-        qDebug() << "Failed to create network request";
-        return false;
+        qDebug() << "Failed to create network request - launching existing installer";
+        QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
+        return;
     }
 
-    connect(reply, &QNetworkReply::finished, this, &InstallerLauncher::onNetworkReplyFinished);
-
-    // Create local event loop for this network request
-    QEventLoop eventLoop;
-    QEventLoop *previousEventLoop = currentEventLoop;
-    currentEventLoop = &eventLoop;
+    connect(reply, &QNetworkReply::finished, this, &InstallerLauncher::onUpdateCheckFinished);
 
     // Set a timeout (5 seconds for faster fallback)
-    QTimer::singleShot(5000, [this, reply]() {
+    QTimer::singleShot(5000, reply, [reply, this]() {
         if (reply && !reply->isFinished()) {
-            qDebug() << "Network timeout - assuming no internet connection";
+            qDebug() << "Network timeout - launching existing installer";
             reply->abort();
-            networkSuccess = false;
-            if (currentEventLoop) currentEventLoop->quit();
+            QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
         }
     });
-
-    // Process events until network request completes
-    eventLoop.exec();
-    currentEventLoop = previousEventLoop;
-
-    return networkSuccess;
 }
 
 QString InstallerLauncher::parseLatestVersion(const QString &packagesContent)
@@ -270,21 +254,24 @@ void InstallerLauncher::downloadAndInstallUpdate(const QString &version)
     request.setHeader(QNetworkRequest::UserAgentHeader, "Gazelle-Installer-Launcher/1.0");
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
-    QNetworkReply *reply = networkManager->get(request);
-    connect(reply, &QNetworkReply::finished, this, &InstallerLauncher::onDownloadFinished);
-    connect(reply, &QNetworkReply::downloadProgress, this, &InstallerLauncher::onDownloadProgress);
+    downloadReply = networkManager->get(request);
+    if (!downloadReply) {
+        qDebug() << "Failed to create download request";
+        if (progressDialog) {
+            progressDialog->close();
+            delete progressDialog;
+            progressDialog = nullptr;
+        }
+        QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
+        return;
+    }
 
-    QEventLoop eventLoop;
-    QEventLoop *previousEventLoop = currentEventLoop;
-    currentEventLoop = &eventLoop;
-    eventLoop.exec();
-    currentEventLoop = previousEventLoop;
+    connect(downloadReply, &QNetworkReply::finished, this, &InstallerLauncher::onDownloadFinished);
+    connect(downloadReply, &QNetworkReply::downloadProgress, this, &InstallerLauncher::onDownloadProgress);
 }
 
 void InstallerLauncher::installPackage(const QString &packagePath)
 {
-    qDebug() << "Installing package:" << packagePath;
-
     // Show installation progress dialog with pulsating progress bar
     QProgressDialog *installDialog = nullptr;
     if (!qgetenv("DISPLAY").isEmpty() || !qgetenv("WAYLAND_DISPLAY").isEmpty()) {
@@ -302,7 +289,6 @@ void InstallerLauncher::installPackage(const QString &packagePath)
     QProcess process;
 
     // Use dpkg first, then apt-get to fix dependencies if needed
-    qDebug() << "Running dpkg -i" << packagePath;
     process.start("dpkg", QStringList() << "-i" << packagePath);
 
     // Keep the progress dialog pulsating while dpkg runs
@@ -365,26 +351,33 @@ void InstallerLauncher::installPackage(const QString &packagePath)
     }
 
     qDebug() << "Package installed successfully";
-    networkSuccess = true;
 
     // Clean up
     QFile::remove(packagePath);
 }
 
-int InstallerLauncher::launchRealInstaller()
+void InstallerLauncher::launchExistingInstaller()
 {
-    qDebug() << "Launching minstall-real with args:" << cmdArgs;
-
+    qDebug() << "Launching existing minstall-real with args:" << cmdArgs;
     QString realInstallerPath = "/usr/bin/minstall-real";
 
     // For development/testing, also check in the same directory as the launcher
     if (!QFile::exists(realInstallerPath)) {
+        qDebug() << "Real installer not found at:" << realInstallerPath;
+
+        // TODO: Remove this fallback once the new installer is installed in the repos
+        realInstallerPath = "/usr/sbin/minstall";
+        if (!QFile::exists(realInstallerPath)) {
+            qDebug() << "Fallback installer not found at:" << realInstallerPath;
             // Don't show message box in headless mode
             if (!qgetenv("DISPLAY").isEmpty() || !qgetenv("WAYLAND_DISPLAY").isEmpty()) {
                 QMessageBox::critical(nullptr, "Error",
-                    "Real installer (minstall-real) not found at: " + realInstallerPath);
+                    "Installer not found at: /usr/bin/minstall-real or /usr/sbin/minstall");
             }
-        return 1;
+            app->exit(1);
+            return;
+        }
+        qDebug() << "Using fallback installer at:" << realInstallerPath;
     }
 
     // Replace current process with the real installer to preserve environment
@@ -401,19 +394,19 @@ int InstallerLauncher::launchRealInstaller()
             QMessageBox::critical(nullptr, "Error",
                 "Failed to start real installer: " + process.errorString());
         }
-        return 1;
+        app->exit(1);
+        return;
     }
 
     // Exit the launcher since the real installer is now running
-    return 0;
+    app->exit(0);
 }
 
-void InstallerLauncher::onNetworkReplyFinished()
+void InstallerLauncher::onUpdateCheckFinished()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply) {
-        networkSuccess = false;
-        if (currentEventLoop) currentEventLoop->quit();
+        QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
         return;
     }
 
@@ -421,8 +414,7 @@ void InstallerLauncher::onNetworkReplyFinished()
 
     if (reply->error() != QNetworkReply::NoError) {
         qDebug() << "Network error:" << reply->errorString();
-        networkSuccess = false;
-        if (currentEventLoop) currentEventLoop->quit();
+        QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
         return;
     }
 
@@ -434,24 +426,31 @@ void InstallerLauncher::onNetworkReplyFinished()
     if (!latestVersion.isEmpty()) {
         qDebug() << "Latest version found:" << latestVersion;
         if (isNewerVersion(latestVersion)) {
-            qDebug() << "Newer version available, starting download...";
+            qDebug() << "Newer version available, starting download";
             downloadAndInstallUpdate(latestVersion);
-            if (currentEventLoop) currentEventLoop->quit();
             return;
         } else {
             qDebug() << "Current version is up to date";
         }
     }
 
-    networkSuccess = true;
-    if (currentEventLoop) currentEventLoop->quit();
+    // No update needed, launch existing installer
+    QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
 }
 
 void InstallerLauncher::onDownloadFinished()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply) {
-        if (currentEventLoop) currentEventLoop->quit();
+        qDebug() << "Download finished but no reply object";
+        QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
+        return;
+    }
+
+    // Verify this is our expected download reply
+    if (reply != downloadReply) {
+        qDebug() << "Download finished from unexpected reply object";
+        reply->deleteLater();
         return;
     }
 
@@ -462,6 +461,7 @@ void InstallerLauncher::onDownloadFinished()
     }
 
     reply->deleteLater();
+    downloadReply = nullptr;
 
     if (reply->error() != QNetworkReply::NoError) {
         qDebug() << "Download failed:" << reply->errorString();
@@ -471,7 +471,7 @@ void InstallerLauncher::onDownloadFinished()
             QMessageBox::warning(nullptr, "Update Failed",
                 "Failed to download update: " + reply->errorString());
         }
-        if (currentEventLoop) currentEventLoop->quit();
+        QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
         return;
     }
 
@@ -483,7 +483,7 @@ void InstallerLauncher::onDownloadFinished()
     if (!tempFile->open()) {
         qDebug() << "Failed to create temporary file:" << tempFile->errorString();
         delete tempFile;
-        if (currentEventLoop) currentEventLoop->quit();
+        QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
         return;
     }
     QString tempFilePath = tempFile->fileName();
@@ -493,19 +493,28 @@ void InstallerLauncher::onDownloadFinished()
 
     // Install the update
     installPackage(tempFilePath);
-    if (currentEventLoop) currentEventLoop->quit();
+
+    qDebug() << "Update installation completed, now launching updated minstall-real";
+    // After update installation, launch the real installer and then exit
+    QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
 }
 
 void InstallerLauncher::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
+    // Verify the sender is our expected download reply
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply || reply != downloadReply) {
+        return; // Ignore progress from unexpected sources
+    }
+
     if (progressDialog && bytesTotal > 0) {
-        int percentage = (bytesReceived * 100) / bytesTotal;
+        int percentage = static_cast<int>((bytesReceived * 100) / bytesTotal);
         progressDialog->setValue(percentage);
     }
 
     // Also log progress for headless mode
     if (bytesTotal > 0) {
-        int percentage = (bytesReceived * 100) / bytesTotal;
+        int percentage = static_cast<int>((bytesReceived * 100) / bytesTotal);
         static int lastPercentage = -1;
         if (percentage != lastPercentage && percentage % 10 == 0) {
             qDebug() << "Download progress:" << percentage << "%";

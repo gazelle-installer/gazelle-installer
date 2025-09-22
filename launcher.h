@@ -23,12 +23,12 @@ public:
     int run();
 
 private slots:
-    void onNetworkReplyFinished();
+    void onUpdateCheckFinished();
     void onDownloadFinished();
     void onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 
 private:
-    bool checkForUpdates();
+    void checkForUpdates();
     QString parseLatestVersion(const QString &htmlContent);
     bool isNewerVersion(const QString &remoteVersion);
     QString getCurrentVersion();
@@ -36,12 +36,12 @@ private:
     int compareVersions(const QString &v1, const QString &v2);
     void downloadAndInstallUpdate(const QString &version);
     void installPackage(const QString &packagePath);
-    int launchRealInstaller();
+    void launchExistingInstaller();
 
     QApplication *app;
     QNetworkAccessManager *networkManager;
     QStringList cmdArgs;
-    bool networkSuccess = false;
     QProgressDialog *progressDialog;
-    QEventLoop *currentEventLoop;
+    bool updateFound = false;
+    QNetworkReply *downloadReply;
 };
