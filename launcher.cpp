@@ -254,6 +254,13 @@ void InstallerLauncher::downloadAndInstallUpdate(const QString &version)
     request.setHeader(QNetworkRequest::UserAgentHeader, "Gazelle-Installer-Launcher/1.0");
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
+    // Clean up any existing download first
+    if (downloadReply) {
+        downloadReply->disconnect();
+        downloadReply->deleteLater();
+        downloadReply = nullptr;
+    }
+
     downloadReply = networkManager->get(request);
     if (!downloadReply) {
         qDebug() << "Failed to create download request";
@@ -454,6 +461,10 @@ void InstallerLauncher::onDownloadFinished()
         return;
     }
 
+    // Disconnect all signals from this reply to prevent further callbacks
+    reply->disconnect();
+
+    // Clean up progress dialog with proper null pointer management
     if (progressDialog) {
         progressDialog->close();
         delete progressDialog;
@@ -477,19 +488,18 @@ void InstallerLauncher::onDownloadFinished()
 
     // Save the downloaded file
     QByteArray data = reply->readAll();
-    QTemporaryFile *tempFile = new QTemporaryFile(QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
-                                                 "/mx-installer_update_XXXXXX.deb", this);
-    tempFile->setAutoRemove(false); // Keep file for installPackage call
-    if (!tempFile->open()) {
-        qDebug() << "Failed to create temporary file:" << tempFile->errorString();
-        delete tempFile;
+    QTemporaryFile tempFile(QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
+                           "/mx-installer_update_XXXXXX.deb");
+    tempFile.setAutoRemove(false); // Keep file for installPackage call
+    if (!tempFile.open()) {
+        qDebug() << "Failed to create temporary file:" << tempFile.errorString();
         QTimer::singleShot(0, this, &InstallerLauncher::launchExistingInstaller);
         return;
     }
-    QString tempFilePath = tempFile->fileName();
+    QString tempFilePath = tempFile.fileName();
 
-    tempFile->write(data);
-    tempFile->close();
+    tempFile.write(data);
+    tempFile.close();
 
     // Install the update
     installPackage(tempFilePath);
@@ -503,8 +513,8 @@ void InstallerLauncher::onDownloadProgress(qint64 bytesReceived, qint64 bytesTot
 {
     // Verify the sender is our expected download reply
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    if (!reply || reply != downloadReply) {
-        return; // Ignore progress from unexpected sources
+    if (!reply || !downloadReply || reply != downloadReply) {
+        return; // Ignore progress from unexpected sources or if download is finished
     }
 
     if (progressDialog && bytesTotal > 0) {
