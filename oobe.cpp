@@ -454,9 +454,9 @@ void Oobe::setLocale() const
     setUserClockFormat(online ? u"/etc/skel"_s : u"/mnt/antiX/etc/skel"_s);
 
     // localize repo
-    qDebug() << "Localize repo";
-    if (online) proc.exec(u"localize-repo"_s, {u"default"_s});
-    else proc.exec(u"chroot"_s, {u"/mnt/antiX"_s, u"localize-repo"_s, u"default"_s});
+    //qDebug() << "Localize repo";
+    //if (online) proc.exec(u"localize-repo"_s, {u"default"_s});
+    //else proc.exec(u"chroot"_s, {u"/mnt/antiX"_s, u"localize-repo"_s, u"default"_s});
 
     //machine id
     if (online){
