@@ -747,7 +747,9 @@ void MInstall::pageDisplayed(int next) noexcept
             "<p><b>"_L1 + tr("Using a custom disk layout") + "</b><br/>"_L1
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
-                " partitions you need.").arg(PROJECTNAME, gui.radioCustomPart->text().remove('&')) + "</p>"_L1);
+                " partitions you need.").arg(PROJECTNAME, gui.radioCustomPart->text().remove('&')) + "</p>"_L1
+                              + "<p>" + "<b>"_L1 + tr("Replace existing installation") + "</b><br/>"_L1 + tr("Replace existing installation option will attempt to replace an existing installation with the same"
+                                           "disk configuration as the existing installation.  Home directories are preserved."));
         break;
 
     case Step::REPLACE:
@@ -870,14 +872,16 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.").arg(PROJECTNAME) + "</p>"_L1
             "<p>"_L1 + tr("By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.") + "</p>"_L1
             "<p>"_L1 + tr("If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.") + "</p>"_L1
-            "<p>"_L1 + tr("If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.") + "</p>"_L1);
+            "<p>"_L1 + tr("If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.") + "</p>"_L1
+        "<p>"_L1 + tr("Generate host-specific initramfs will try to create a initramfs tailored for the particular device rather than a generic all-purpose initramfs. This option is for experts only.") + "</p>"_L1);
         enableBack = false;
         break;
 
     case Step::SWAP:
         gui.textHelp->setText("<p><b>"_L1 + tr("Create a swap file") + "</b><br/>"_L1
             + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"_L1
-            "<p>"_L1 + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "</p>"_L1);
+            "<p>"_L1 + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "</p>"_L1
+            "<p>"_L1 + tr("Zram swap is a method of putting swap space in RAM.  A compressed swap device is placed in RAM.  It may be used in conjuction with other forms of swap, or on its own.") + "</p>"_L1);
         enableBack = advanced;
         break;
 
