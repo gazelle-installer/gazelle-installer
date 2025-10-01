@@ -441,7 +441,7 @@ Enjoy using %1</source>
     </message>
     <message>
         <location filename="../minstall.cpp" line="751"/>
-        <source>Replace existing installation option will attempt to replace an existing installation with the samedisk configuration as the existing installation.  Home directories are preserved.</source>
+        <source>Replace existing installation option will attempt to replace an existing installation with the same disk configuration as the existing installation.  Home directories are preserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -832,7 +832,12 @@ Enjoy using %1</source>
     </message>
     <message>
         <location filename="../minstall.cpp" line="876"/>
-        <source>Generate host-specific initramfs will try to create a initramfs tailored for the particular device rather than a generic all-purpose initramfs. This option is for experts only.</source>
+        <source>Generate host-specific initramfs will try to create an initramfs tailored for the particular device rather than a generic all-purpose initramfs. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="884"/>
+        <source>Zram swap is a method of putting swap space in RAM.  A compressed swap device is placed in RAM.  It may be used in conjunction with other forms of swap, or on its own.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -848,11 +853,6 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="883"/>
         <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="884"/>
-        <source>Zram swap is a method of putting swap space in RAM.  A compressed swap device is placed in RAM.  It may be used in conjuction with other forms of swap, or on its own.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
