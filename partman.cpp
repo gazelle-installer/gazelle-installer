@@ -1401,6 +1401,10 @@ bool PartMan::makeFstab() noexcept
         // Options
         const QString &mountopts = volume->options;
         if (volume->type == Device::SUBVOLUME) {
+            //set format information if fsfmt is empty
+            if (fsfmt.isEmpty()){
+                out << " btrfs";
+            }
             out << " subvol=" << volume->label;
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         } else {
