@@ -1338,6 +1338,8 @@ void PartMan::prepareSubvolumes(Device *part)
                 if(subvol->isActive()) {
                     // Since the default subvolume cannot be deleted, ensure the default is set to the top.
                     proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s, u"5"_s, u"/mnt/btrfs-scratch"_s});
+                    //remove contents so the subvolume can be deleted
+                    proc.exec(u"rm"_s, {u"-r"_s, u"-f"_s, svpath + "/*"});
                 }
                 proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"delete"_s, svpath});
             }
