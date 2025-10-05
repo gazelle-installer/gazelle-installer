@@ -190,9 +190,11 @@ void PartMan::scan(Device *drvstart)
             if (partTypeName.startsWith("Microsoft LDM"_L1)) part->flags.nasty = true;
             // ventoy device should be avoided
             //qDebug() << "part path " << part->path << "ventoy device" << "/dev/" +ventoydevice;
-            if (part->path == "/dev/" + ventoydevice){
-                part->flags.bootRoot = true;
-                //qDebug() << "flags nasty" << part->flags.bootRoot;
+            if (! ventoydevice.isEmpty() ){
+                if (part->path == "/dev/" + ventoydevice){
+                    part->flags.bootRoot = true;
+                    //qDebug() << "Ventoyflags boot" << part->flags.bootRoot;
+                }
             }
             // Propagate the boot and nasty flags up to the drive.
             if (part->flags.bootRoot) drive->flags.bootRoot = true;
