@@ -102,7 +102,22 @@ PartMan::~PartMan()
 }
 
 void PartMan::scan(Device *drvstart)
-{
+{   
+	//check for ventoy
+	QString ventoycheck;
+	QString ventoydevice;
+    proc.exec(u"dmsetup"_s,{u"ls"_s},nullptr, true);
+    ventoycheck = proc.readOut(true).toUtf8();
+    //qDebug() << "ventoycheck " << ventoycheck;
+    if ( ventoycheck != "No devices found" ) {
+        proc.exec(u"dmsetup"_s,{u"deps"_s,u"/dev/mapper/ventoy"_s,u"-o"_s,u"blkdevname"_s},nullptr, true);
+        ventoydevice = proc.readOut(true).toUtf8();
+        //qDebug() << "ventoydevice " << ventoydevice;
+        ventoydevice = ventoydevice.remove("\t").remove("\n").section(":",1,1).trimmed().remove("(").remove(")");
+        //qDebug() << "ventoydevice " << ventoydevice;
+        
+	}
+
     QStringList cargs({u"-T"_s, u"-bJo"_s,
         u"TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,FSVER,LABEL,MODEL,PARTFLAGS"_s});
     if (drvstart) cargs.append(drvstart->path);
@@ -154,6 +169,7 @@ void PartMan::scan(Device *drvstart)
             part->flags.oldLayout = true;
             part->name = jsonPart[u"name"_s].toString();
             part->path = jsonPart[u"path"_s].toString();
+            //qDebug() << "part path is " << part->path;
             part->uuid = jsonPart[u"uuid"_s].toString();
             part->order = order.indexOf(part->name);
             part->size = jsonPart[u"size"_s].toVariant().toLongLong();
@@ -172,6 +188,12 @@ void PartMan::scan(Device *drvstart)
             if (partTypeName == "BIOS boot"_L1) part->curFormat = "BIOS-GRUB"_L1;
             // Touching Microsoft LDM may brick the system.
             if (partTypeName.startsWith("Microsoft LDM"_L1)) part->flags.nasty = true;
+            // ventoy device should be avoided
+            //qDebug() << "part path " << part->path << "ventoy device" << "/dev/" +ventoydevice;
+            if (part->path == "/dev/" + ventoydevice){
+                part->flags.bootRoot = true;
+                //qDebug() << "flags nasty" << part->flags.bootRoot;
+            }
             // Propagate the boot and nasty flags up to the drive.
             if (part->flags.bootRoot) drive->flags.bootRoot = true;
             if (part->flags.nasty) drive->flags.nasty = true;
