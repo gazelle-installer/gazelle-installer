@@ -64,6 +64,7 @@ public:
     std::vector<struct MountEntry> mounts;
     std::vector<struct CryptEntry> crypts;
     QString devpath;
+    QString physdev;
     QString release;
     bool homeSeparate = false;
     bool ok = false;

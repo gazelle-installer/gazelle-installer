@@ -653,8 +653,10 @@ void PartMan::partManRunClick()
 }
 
 // Partition menu items
-void PartMan::partMenuUnlock(Device *part)
+bool PartMan::promptUnlock(Device *part) noexcept
 {
+    if (!part) return false;
+
     QDialog dialog(gui.boxMain);
     QFormLayout layout(&dialog);
     dialog.setWindowTitle(tr("Unlock Drive"));
@@ -670,30 +672,63 @@ void PartMan::partMenuUnlock(Device *part)
     connect(&buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
+    bool unlocked = false;
     if (dialog.exec() == QDialog::Accepted) {
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
         try {
+            clearReadOnly(part);
             crypto.open(part, editPass->text().toUtf8());
+            clearReadOnly(part);
             part->usefor.clear();
             part->addToCrypttab = checkCrypttab->isChecked();
             part->mapCount++;
             notifyChange(part);
             scanVirtualDevices(true);
             treeSelChange();
-            gui.boxMain->setEnabled(true);
-            qApp->restoreOverrideCursor();
-        } catch(...) {
-            // This time, failure is not a dealbreaker.
-            gui.boxMain->setEnabled(true);
-            qApp->restoreOverrideCursor();
+            unlocked = true;
+        } catch (...) {
             QMessageBox msgbox(gui.boxMain);
             msgbox.setIcon(QMessageBox::Warning);
             msgbox.setText(tr("Could not unlock device."));
-            msgbox.setInformativeText(tr("Possible incorrect password ."));
+            msgbox.setInformativeText(tr("Possible incorrect password."));
             msgbox.exec();
         }
+        gui.boxMain->setEnabled(true);
+        qApp->restoreOverrideCursor();
     }
+    return unlocked;
+}
+
+void PartMan::partMenuUnlock(Device *part)
+{
+    promptUnlock(part);
+}
+
+void PartMan::clearReadOnly(Device *device) noexcept
+{
+    if (!device) return;
+
+    auto ensureWritable = [this](const QString &dev) noexcept {
+        if (dev.isEmpty()) return;
+        QFileInfo info(dev);
+        if (!info.exists()) return;
+        if (!proc.exec(u"blockdev"_s, {u"--getro"_s, dev}, nullptr, true)) return;
+        const QString roflag = proc.readOut(true).trimmed();
+        if (roflag != u"1"_s) return;
+        proc.exec(u"blockdev"_s, {u"--setrw"_s, dev});
+    };
+
+    QStringList devices;
+    devices << device->path;
+    const QString mapped = device->mappedDevice();
+    if (!mapped.isEmpty() && !devices.contains(mapped)) devices << mapped;
+    if (device->origin) {
+        if (!devices.contains(device->origin->path)) devices << device->origin->path;
+        const QString orgmap = device->origin->mappedDevice();
+        if (!orgmap.isEmpty() && !devices.contains(orgmap)) devices << orgmap;
+    }
+    for (const QString &dev : devices) ensureWritable(dev);
 }
 
 void PartMan::partMenuLock(Device *volume)
@@ -841,9 +876,9 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
         for (const Device *part : std::as_const(drive->children)) {
             QString actmsg;
             if (drive->flags.oldLayout) {
-                if (part->usefor.isEmpty()) {
-                    if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
-                    else continue;
+            if (part->usefor.isEmpty()) {
+                if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
+                else continue;
                 } else {
                     if (part->usefor == "FORMAT"_L1) actmsg = tr("Format %1");
                     else if (part->willFormat()) actmsg = tr("Format %1 to use for %2");
@@ -1151,7 +1186,11 @@ void PartMan::preparePartitions()
         if (drive->flags.oldLayout) {
             // Using the existing layout, so only mark used partitions for unmounting.
             for (const Device *part : std::as_const(drive->children)) {
-                if (!part->usefor.isEmpty()) listToUnmount << part->path;
+                if (!part->usefor.isEmpty()) {
+                    listToUnmount << part->path;
+                    const QString mapped = part->mappedDevice();
+                    if (!mapped.isEmpty() && mapped != part->path) listToUnmount << mapped;
+                }
             }
         } else {
             // Clearing the drive, so mark all partitions on the drive for unmounting.
@@ -1165,7 +1204,8 @@ void PartMan::preparePartitions()
         MProcess::Section sect2(proc, nullptr);
         if (QFileInfo::exists(u"/mnt/antiX"_s)) {
             proc.exec(u"umount"_s, {u"-qR"_s, u"/mnt/antiX"_s});
-            proc.exec(u"rm"_s, {u"-rf"_s, u"/mnt/antiX"_s});
+            QDir dir(u"/mnt/antiX"_s);
+            dir.removeRecursively();
         }
         // Detach swap and file systems of targets which may have been auto-mounted.
         proc.exec(u"swapon"_s, {u"--show=NAME"_s, u"--noheadings"_s}, nullptr, true);
@@ -1460,6 +1500,7 @@ void PartMan::mountPartitions()
     for (auto &it : mounts) {
         const QString point("/mnt/antiX"_L1 + it.first);
         const QString &dev = it.second->mappedDevice();
+        clearReadOnly(it.second);
         proc.status(tr("Mounting: %1").arg(it.first));
         QStringList opts;
         if (it.second->type == Device::SUBVOLUME) {
@@ -1479,6 +1520,12 @@ void PartMan::mountPartitions()
         if (!opts.contains(u"noatime"_s)) opts.append(u"noatime"_s);
         if (!opts.contains(u"lazytime"_s)) opts.append(u"lazytime"_s);
         proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, opts.join(','), dev, point});
+        if (proc.exec(u"findmnt"_s, {u"-no"_s, u"OPTIONS"_s, point}, nullptr, true)) {
+            const QString options = proc.readOut(true);
+            if (options.contains(u"ro"_s)) {
+                proc.exec(u"mount"_s, {u"-o"_s, u"remount,rw"_s, dev, point});
+            }
+        }
     }
 }
 
@@ -2107,9 +2154,10 @@ QStringList PartMan::Device::allowedFormats() const noexcept
             if (size <= (4*GB - 64*KB)) list.append(u"FAT16"_s);
             if (size <= (32*MB - 512)) list.append(u"FAT12"_s);
 
-            if (usefor != "FORMAT"_L1) {
-                allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
-            }
+        if (usefor != "FORMAT"_L1) {
+            allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
+            if (!allowPreserve && curFormat == "crypto_LUKS"_L1) allowPreserve = true;
+        }
         }
     } else if (type == SUBVOLUME) {
         list.append(u"CREATE"_s);

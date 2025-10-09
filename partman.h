@@ -104,6 +104,8 @@ public:
     Device *findByPath(const QString &devpath) const noexcept;
     Device *findByMount(const QString &mount) const noexcept;
     Device *findHostDev(const QString &path) const noexcept;
+    bool promptUnlock(Device *part) noexcept;
+    void clearReadOnly(class Device *device) noexcept;
     struct VolumeSpec volSpecTotal(const QString &path, const QStringList &vols) const noexcept;
     struct VolumeSpec volSpecTotal(const QString &path) const noexcept;
     /* Convenience */

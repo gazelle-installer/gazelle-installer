@@ -22,6 +22,7 @@
 
 #include <sys/stat.h>
 #include <QDebug>
+#include <QDir>
 #include <QFileInfo>
 #include "mprocess.h"
 #include "core.h"
@@ -166,9 +167,15 @@ void BootMan::install(const QStringList &cmdextra)
                 "--bootloader-id="_L1 + loaderID, u"--recheck"_s});
             const PartMan::Device *espdev = partman.findByMount(u"/boot/efi"_s);
             if (!espdev) espdev = partman.findByMount(u"/boot"_s);
-            if (espdev != nullptr && espdev->flags.sysEFI) {
-                grubinstargs << "--efi-directory="_L1 + espdev->mountPoint();
+            QString efiDir;
+            if (espdev) {
+                efiDir = espdev->mountPoint();
             }
+            if (efiDir.isEmpty()) {
+                if (QDir(u"/boot/efi"_s).exists()) efiDir = u"/boot/efi"_s;
+                else efiDir = u"/boot"_s;
+            }
+            grubinstargs << "--efi-directory="_L1 + efiDir;
             proc.exec(u"grub-install"_s, grubinstargs);
 
             // Copy fallback files (not copied above because of --no-nvram switch).

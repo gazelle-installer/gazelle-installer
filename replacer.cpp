@@ -17,6 +17,9 @@
  * This file is part of the gazelle-installer.
  ****************************************************************************/
 #include <mntent.h>
+#include <QFile>
+#include <QFileInfo>
+#include <QHash>
 #include <QMessageBox>
 #include "mprocess.h"
 #include "partman.h"
@@ -40,17 +43,24 @@ Replacer::Replacer(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui
 
 void Replacer::scan(bool full) noexcept
 {
-    gui.radioReplace->setEnabled(false);
-    gui.tableExistInst->setEnabled(false);
+        gui.tableExistInst->setEnabled(false);
     while (gui.tableExistInst->rowCount() > 0) {
         gui.tableExistInst->removeRow(0);
     }
 
     long long minSpace = partman->volSpecTotal(u"/"_s, QStringList()).minimum;
     bases.clear();
+    bool rescan = false;
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::PARTITION && device->size >= minSpace
             && (!device->flags.bootRoot || installFromRootDevice)) {
+            if (device->curFormat == "crypto_LUKS"_L1 && device->mapCount == 0) {
+                if (partman->promptUnlock(device)) {
+                    rescan = true;
+                    break;
+                }
+                continue;
+            }
             gui.radioReplace->setEnabled(true);
             if(full) {
                 const auto &rbase = bases.emplace_back(proc, device);
@@ -69,6 +79,17 @@ void Replacer::scan(bool full) noexcept
     }
 
     gui.tableExistInst->setEnabled(bases.size() > 0);
+    if (rescan) {
+        scan(full);
+        return;
+    }
+
+    if (gui.tableExistInst->columnCount() > 0) {
+        gui.tableExistInst->resizeColumnToContents(0);
+        for (int col = 1; col < gui.tableExistInst->columnCount(); ++col) {
+            gui.tableExistInst->resizeColumnToContents(col);
+        }
+    }
 }
 
 bool Replacer::validate(bool automatic) const noexcept
@@ -85,7 +106,11 @@ bool Replacer::validate(bool automatic) const noexcept
 
     gui.treeConfirm->clear();
     QTreeWidgetItem *twit = new QTreeWidgetItem(gui.treeConfirm);
-    twit->setText(0, tr("Replace the installation in %1 (%2)").arg(rbase.devpath, rbase.release));
+    QString location = rbase.devpath;
+    if (!rbase.physdev.isEmpty() && rbase.physdev != rbase.devpath) {
+        location += QStringLiteral(" [%1]").arg(rbase.physdev);
+    }
+    twit->setText(0, tr("Replace the installation in %1 (%2)").arg(location, rbase.release));
     return true;
 }
 bool Replacer::preparePartMan() const noexcept
@@ -95,23 +120,191 @@ bool Replacer::preparePartMan() const noexcept
     assert(currow >= 0 && currow < (int)bases.size());
 
     partman->scan();
+    for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+        if (dev->type == PartMan::Device::PARTITION && dev->curFormat == "crypto_LUKS"_L1
+            && dev->mapCount == 0) {
+            if (!partman->promptUnlock(dev)) return false;
+            partman->scan(dev);
+        }
+    }
     // Populate layout usage information based on the selected existing installation.
     const auto &rbase = bases.at(currow);
-    for(const auto &mount : rbase.mounts) {
-        for (PartMan::Iterator it(*partman); *it; it.next()) {
-            PartMan::Device *dev = *it;
-            if ((mount.fsname.startsWith("UUID="_L1) && dev->uuid == mount.fsname.mid(5))
-                || (mount.fsname.startsWith("LABEL="_L1) && dev->curLabel == mount.fsname.mid(6))
-                || (mount.fsname == dev->path)) {
-                partman->changeBegin(dev);
-                dev->usefor = mount.dir;
-                if (mount.dir == "/"_L1 && !rbase.homeSeparate) {
-                    dev->format = "PRESERVE"_L1;
+
+    auto setMount = [&](PartMan::Device *device, const QString &dir) {
+        if (!device) return;
+        auto assign = [&](PartMan::Device *target, const QString &fmt) {
+            if (!target) return;
+            partman->changeBegin(target);
+            target->usefor = dir;
+            if (!dir.isEmpty() && !fmt.isEmpty()) target->format = fmt;
+            partman->changeEnd();
+        };
+
+        PartMan::Device *volume = device;
+        if (device->type == PartMan::Device::VIRTUAL && device->origin) volume = device->origin;
+        if (!volume) return;
+
+        if (!dir.isEmpty()) {
+            for (PartMan::Iterator it(*partman); PartMan::Device *other = *it; it.next()) {
+                if (other == volume) continue;
+                if (other->usefor == dir) {
+                    partman->changeBegin(other);
+                    other->usefor.clear();
+                    partman->changeEnd();
                 }
-                partman->changeEnd();
+            }
+        }
+
+        QString newFormat = volume->format.isEmpty() ? volume->curFormat : volume->format;
+        if (device->type == PartMan::Device::VIRTUAL && !device->curFormat.isEmpty()) newFormat = device->curFormat;
+
+        assign(volume, newFormat);
+        if (volume != device) assign(device, newFormat);
+        if (!volume->map.isEmpty()) {
+            if (PartMan::Device *virt = partman->findByPath(u"/dev/mapper/"_s + volume->map)) assign(virt, newFormat);
+        }
+    };
+
+    auto markPreserve = [&](PartMan::Device *device) {
+        if (!device) return;
+        auto preserve = [&](PartMan::Device *target) {
+            if (!target) return;
+            partman->changeBegin(target);
+            target->format = "PRESERVE"_L1;
+            partman->changeEnd();
+        };
+        preserve(device);
+        if (device->type == PartMan::Device::VIRTUAL && device->origin) preserve(device->origin);
+        else if (!device->map.isEmpty()) preserve(partman->findByPath(u"/dev/mapper/"_s + device->map));
+    };
+
+    auto resolveFsDevice = [&](const QString &source) -> PartMan::Device * {
+        QString fs = source.trimmed();
+        if (fs.isEmpty()) return nullptr;
+        if (fs.startsWith(u"UUID="_s)) {
+            const QString uuid = fs.mid(5);
+            for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+                if (dev->uuid.compare(uuid, Qt::CaseInsensitive) == 0) return dev;
+            }
+            return nullptr;
+        }
+        if (fs.startsWith(u"LABEL="_s)) {
+            const QString label = fs.mid(6);
+            for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+                if (dev->label.compare(label, Qt::CaseInsensitive) == 0
+                    || dev->curLabel.compare(label, Qt::CaseInsensitive) == 0) return dev;
+            }
+            return nullptr;
+        }
+        QFileInfo info(fs);
+        if (!fs.startsWith(u"/dev/"_s) && info.exists()) {
+            const QString canon = info.canonicalFilePath();
+            if (!canon.isEmpty()) fs = canon;
+        }
+        PartMan::Device *dev = partman->findByPath(fs);
+        if (!dev && fs.startsWith(u"/dev/mapper/"_s)) {
+            dev = partman->findByPath(fs.mid(5));
+        }
+        if (dev && dev->type == PartMan::Device::VIRTUAL && dev->origin) return dev->origin;
+        return dev;
+    };
+
+    for (const auto &mount : rbase.mounts) {
+        PartMan::Device *dev = resolveFsDevice(mount.fsname);
+        if (!dev) continue;
+        setMount(dev, mount.dir);
+        if (mount.dir == "/"_L1 && !rbase.homeSeparate) markPreserve(dev);
+    }
+
+    auto dedupeMounts = [&]() {
+        QHash<QString, PartMan::Device *> owners;
+        for (PartMan::Iterator it(*partman); PartMan::Device *node = *it; it.next()) {
+            if (node->usefor.isEmpty()) continue;
+            if (!node->usefor.startsWith('/')) continue;
+            auto found = owners.find(node->usefor);
+            if (found == owners.end()) {
+                owners.insert(node->usefor, node);
+                continue;
+            }
+            if (found.value() == node) continue;
+            partman->changeBegin(node);
+            node->usefor.clear();
+            partman->changeEnd();
+        }
+    };
+    dedupeMounts();
+
+    auto ensureMountFromFstab = [&](const QString &dir) {
+        if (partman->findByMount(dir)) return;
+        for (const auto &mount : rbase.mounts) {
+            if (mount.dir == dir) {
+                if (PartMan::Device *dev = resolveFsDevice(mount.fsname)) {
+                    setMount(dev, dir);
+                }
+                return;
+            }
+        }
+    };
+    ensureMountFromFstab(u"/boot/efi"_s);
+    ensureMountFromFstab(u"/boot"_s);
+    if (!partman->findByMount(u"/boot/efi"_s)) {
+        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+            if (dev->flags.sysEFI && dev->type == PartMan::Device::PARTITION) {
+                setMount(dev, u"/boot/efi"_s);
+                break;
             }
         }
     }
+    if (!partman->findByMount(u"/boot"_s)) {
+        PartMan::Device *cand = nullptr;
+        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+            if (dev->type != PartMan::Device::PARTITION) continue;
+            if (dev->flags.sysEFI) continue;
+            const QString fmt = dev->format.isEmpty() ? dev->curFormat : dev->format;
+            if (!fmt.startsWith(u"ext"_s, Qt::CaseInsensitive)) continue;
+            if (dev->flags.bootRoot) continue;
+            cand = dev;
+            if (dev->curLabel.compare(u"boot"_s, Qt::CaseInsensitive) == 0
+                || dev->label.compare(u"boot"_s, Qt::CaseInsensitive) == 0) {
+                break;
+            }
+        }
+        if (cand) setMount(cand, u"/boot"_s);
+    }
+
+    auto ensureMount = [&](const QString &dir, auto &&predicate) {
+        if (partman->findByMount(dir)) return;
+        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+            if (predicate(dev)) {
+                setMount(dev, dir);
+                partman->changeBegin(dev);
+                dev->format = dev->format.isEmpty() ? dev->curFormat : dev->format;
+                partman->changeEnd();
+                break;
+            }
+        }
+    };
+    ensureMount(u"/boot/efi"_s, [](PartMan::Device *dev) {
+        return dev->flags.sysEFI;
+    });
+    ensureMount(u"/boot"_s, [](PartMan::Device *dev) {
+        return dev->usefor.isEmpty() && dev->format.startsWith(u"ext"_s, Qt::CaseInsensitive)
+            && !dev->flags.sysEFI && dev->type == PartMan::Device::PARTITION;
+    });
+
+    auto resolveCryptDevice = resolveFsDevice;
+
+    for (const auto &crypt : rbase.crypts) {
+        PartMan::Device *cryptdev = resolveCryptDevice(crypt.encdev);
+        if (!cryptdev) continue;
+        partman->changeBegin(cryptdev);
+        cryptdev->addToCrypttab = true;
+        if (!crypt.volume.isEmpty() && (cryptdev->map.isEmpty() || cryptdev->map == crypt.volume)) {
+            cryptdev->map = crypt.volume;
+        }
+        partman->changeEnd();
+    }
+
     return partman->validate(true);
 }
 
@@ -122,7 +315,9 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
 
     QString mountpoint;
     bool premounted = false;
-    devpath = device->path;
+    devpath = device->mappedDevice();
+    physdev = device->path;
+    if (devpath.isEmpty() || !QFile::exists(devpath)) return;
     if (proc.exec(u"findmnt"_s, {u"-AfncoTARGET"_s, u"--source"_s, devpath}, nullptr, true)) {
         mountpoint = proc.readOut();
         premounted = !mountpoint.isEmpty();
@@ -169,8 +364,11 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
         }
     }
 
-    if (premounted && !mountpoint.isEmpty()) {
-        proc.exec(u"umount"_s, {mountpoint});
+    if (!mountpoint.isEmpty()) {
+        if (premounted) proc.exec(u"umount"_s, {mountpoint});
+        else if (!proc.exec(u"umount"_s, {mountpoint})) {
+            proc.exec(u"umount"_s, {u"-l"_s, mountpoint});
+        }
     }
 }
 

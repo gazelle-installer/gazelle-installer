@@ -267,8 +267,9 @@ void Base::install()
     }
 
     //remove home unless a demo home is found in remastered linuxfs
-    if (!QFileInfo(u"/live/linux/home/demo"_s).isDir())
+    if (!skiphome && !QFileInfo(u"/live/linux/home/demo"_s).isDir()) {
         proc.exec(u"rm"_s, {u"-rf"_s, u"/mnt/antiX/home/demo"_s});
+    }
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
     sect.setRoot("/mnt/antiX");
@@ -313,7 +314,11 @@ void Base::copyLinux(bool skiphome)
             args << u"--filter"_s << u"protect home/*"_s;
         }
     }
-    args << bootSource << rootSources << u"/mnt/antiX"_s;
+    QStringList sources(rootSources);
+    if (skiphome && !sync) {
+        sources.removeAll(u"/live/aufs/home"_s);
+    }
+    args << bootSource << sources << u"/mnt/antiX"_s;
     proc.advance(80, sourceInodes);
     proc.status(tr("Copying new system"));
     // Placed here so the progress bar moves to the right position before the next step.
