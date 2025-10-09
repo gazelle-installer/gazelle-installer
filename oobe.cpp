@@ -489,7 +489,7 @@ void Oobe::setUserClockFormat(const QString &skelpath) const noexcept
         //mx systems
         proc.shell("sed -i '/data0=/c\\data0=%H:%M' "_L1 + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc"_L1);
         proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' "_L1 + skelpath + "/.config/xfce4/panel/datetime-1.rc"_L1);
-        proc.shell("sed -i 's/%l/%H/' "_L1 + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"_L1);
+        proc.shell("sed -i 's/%l/%M/' "_L1 + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"_L1);
 
         //mx kde
         proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' "_L1 + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc"_L1);
