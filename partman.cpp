@@ -1461,7 +1461,21 @@ bool PartMan::makeFstab() noexcept
         // Mount point
         out << ' ' << it.first;
         // File system
-        const QString &fsfmt = volume->finalFormat();
+        QString fsfmt = volume->finalFormat();
+        if (volume->willMap() && fsfmt == "crypto_LUKS"_L1) {
+            const QString mappedPath = volume->mappedDevice();
+            if (!mappedPath.isEmpty()) {
+                Device *mappedDev = findByPath(mappedPath);
+                if (mappedDev) {
+                    const QString mappedFmt = mappedDev->finalFormat();
+                    if (!mappedFmt.isEmpty() && mappedFmt != "crypto_LUKS"_L1) {
+                        fsfmt = mappedFmt;
+                    } else if (!mappedDev->curFormat.isEmpty()) {
+                        fsfmt = mappedDev->curFormat;
+                    }
+                }
+            }
+        }
         if (fsfmt.startsWith("FAT"_L1)) out << " vfat";
         else out << ' ' << fsfmt;
         // Options
