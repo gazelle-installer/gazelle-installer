@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <QString>
+#include <QStringList>
 #include "ui_meinstall.h"
 #include "partman.h"
 
@@ -50,6 +51,10 @@ public:
         QString dir;    /* filesystem path prefix */
         QString type;   /* mount type (see mntent.h) */
         QString opts;   /* mount options (see mntent.h) */
+        QStringList optionList; /* parsed mount options */
+        QString subvol; /* btrfs subvolume path */
+        QString subvolId; /* btrfs subvolume id */
+        bool isBtrfs = false;
         int freq;       /* dump frequency in days */
         int passno;     /* pass number on parallel fsck */
         MountEntry(struct mntent *mntent);

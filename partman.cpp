@@ -1382,9 +1382,17 @@ void PartMan::formatPartitions()
         }
     }
     // Prepare subvolumes on all that (are to) contain them.
-    for (Iterator it(*this); Device *device = *it; it.next()) {
-        if (device->isVolume() && device->finalFormat() == "btrfs"_L1) {
-            prepareSubvolumes(*it);
+    for (Iterator it(*this); Device *volume = *it; it.next()) {
+        if (!volume->isVolume()) continue;
+        if (volume->finalFormat() != "btrfs"_L1) continue;
+        prepareSubvolumes(volume);
+        for (Device *subvol : volume->children) {
+            if (!subvol) continue;
+            if (subvol->usefor.isEmpty()) continue;
+            if (!subvol->usefor.startsWith('/')) continue;
+            changeBegin(subvol);
+            subvol->format = "PRESERVE"_L1;
+            changeEnd(false, false);
         }
     }
 }
