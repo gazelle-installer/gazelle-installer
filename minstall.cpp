@@ -209,6 +209,8 @@ void MInstall::startup()
         autopart = new AutoPart(proc, core, partman, gui, appConf, this);
         partman->autopart = autopart;
         replacer = new Replacer(proc, partman, gui, appConf);
+        //experimental tag
+        gui.radioReplace->setText(gui.radioReplace->text() + " (" + tr("Experimental","As In feature is not polished and may not work properly") + ")");
         connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
         gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
             + "<br/><img src=':/dialog-warning'/>"_L1 + tr("These actions cannot be undone. Do you want to continue?")
