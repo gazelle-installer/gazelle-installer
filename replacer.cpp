@@ -352,6 +352,13 @@ bool Replacer::preparePartMan() const noexcept
     };
     dedupeMounts();
 
+    for (const auto &mount : rbase.mounts) {
+        if (!mount.dir.startsWith(u"/"_s)) continue;
+        if (partman->findByMount(mount.dir)) continue;
+        if (PartMan::Device *dev = resolveFsDevice(mount.fsname, &mount)) {
+            setMount(dev, mount.dir, &mount);
+        }
+    }
     auto ensureMountFromFstab = [&](const QString &dir) {
         if (partman->findByMount(dir)) return;
         for (const auto &mount : rbase.mounts) {

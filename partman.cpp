@@ -863,11 +863,25 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
         return false;
     }
 
-    if (!rootdev->willFormat() && mounts.count(u"/home"_s)>0) {
-        msgbox.setText(tr("Cannot preserve /home inside root (/)"
-            " if a separate /home partition is also mounted."));
-        msgbox.exec();
-        return false;
+    if (!rootdev->willFormat() && mounts.count(u"/home"_s) > 0) {
+        bool allowSharedSubvol = false;
+        const auto homeIt = mounts.find(u"/home"_s);
+        if (homeIt != mounts.cend()) {
+            const Device *homeDev = homeIt->second;
+            if (homeDev && homeDev->type == Device::SUBVOLUME && rootdev->type == Device::SUBVOLUME) {
+                const Device *homeParent = homeDev->parent();
+                const Device *rootParent = rootdev->parent();
+                if (homeParent && rootParent && homeParent == rootParent) {
+                    allowSharedSubvol = true;
+                }
+            }
+        }
+        if (!allowSharedSubvol) {
+            msgbox.setText(tr("Cannot preserve /home inside root (/)"
+                " if a separate /home partition is also mounted."));
+            msgbox.exec();
+            return false;
+        }
     }
 
     // Confirmation page action list
