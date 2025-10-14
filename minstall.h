@@ -95,6 +95,7 @@ private:
 
     // info needed for Phase 2 of the process
     bool haveOldHome = false;
+    bool customUnlockPrompted = false;
 
     void startup();
     void splashSetThrobber(bool active) noexcept;

@@ -35,13 +35,13 @@ Replacer::Replacer(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui
     installFromRootDevice = appConf.getBoolean(u"InstallFromRootDevice"_s);
     appConf.setSection();
     connect(gui.pushReplaceScan, &QPushButton::clicked, this, [this](bool) noexcept {
-        scan(true);
+        scan(true, true);
     });
 
     ui.boxReplaceOptions->hide(); // TODO: Delete when implemented.
 }
 
-void Replacer::scan(bool full) noexcept
+void Replacer::scan(bool full, bool allowUnlock) noexcept
 {
         gui.tableExistInst->setEnabled(false);
     while (gui.tableExistInst->rowCount() > 0) {
@@ -55,6 +55,8 @@ void Replacer::scan(bool full) noexcept
         if (device->type == PartMan::Device::PARTITION && device->size >= minSpace
             && (!device->flags.bootRoot || installFromRootDevice)) {
             if (device->curFormat == "crypto_LUKS"_L1 && device->mapCount == 0) {
+                gui.radioReplace->setEnabled(true);
+                if (!allowUnlock) continue;
                 if (partman->promptUnlock(device)) {
                     rescan = true;
                     break;
@@ -78,9 +80,9 @@ void Replacer::scan(bool full) noexcept
         }
     }
 
-    gui.tableExistInst->setEnabled(bases.size() > 0);
+    gui.tableExistInst->setEnabled(!bases.empty());
     if (rescan) {
-        scan(full);
+        scan(full, allowUnlock);
         return;
     }
 

@@ -759,11 +759,31 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("There is no guarantee of this working successfully. Ensure you have a good working backup of all important data before continuing.") + "</p>"_L1);
 
         if(gui.tableExistInst->rowCount() <= 0) {
-            replacer->scan(true);
+            replacer->scan(true, true);
         }
         break;
 
     case Step::PARTITIONS:
+        if (!customUnlockPrompted && partman) {
+            customUnlockPrompted = true;
+            bool unlockedAny = false;
+            do {
+                unlockedAny = false;
+                for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+                    if (dev->type != PartMan::Device::PARTITION) continue;
+                    if (dev->curFormat != "crypto_LUKS"_L1 || dev->mapCount != 0) continue;
+                    if (partman->promptUnlock(dev)) {
+                        unlockedAny = true;
+                    }
+                    break;
+                }
+                if (unlockedAny) {
+                    partman->scan();
+                    if (autopart) autopart->scan();
+                    if (replacer) replacer->scan();
+                }
+            } while (unlockedAny);
+        }
         gui.textHelp->setText("<p><b>"_L1 + tr("Choose Partitions") + "</b><br/>"_L1
             + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"_L1
             "<p>"_L1 + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"_L1
