@@ -72,7 +72,7 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
                     gui.tableExistInst->setItem(newrow, 0, new QTableWidgetItem(rbase.devpath));
                     gui.tableExistInst->setItem(newrow, 1, new QTableWidgetItem(rbase.release));
                 } else {
-                    bases.erase(bases.end());
+                    bases.pop_back();
                 }
             } else {
                 break; // Not a full scan, so only need to check if there is any possible replacement.
@@ -343,34 +343,38 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
     physdev = device->path;
     if (devpath.isEmpty() || !QFile::exists(devpath)) return;
     if (proc.exec(u"findmnt"_s, {u"-AfncoTARGET"_s, u"--source"_s, devpath}, nullptr, true)) {
-        mountpoint = proc.readOut();
+        mountpoint = proc.readOut().trimmed();
         premounted = !mountpoint.isEmpty();
     }
+    bool mountedHere = false;
     if (!premounted) {
         mountpoint = "/mnt/temp"_L1;
-        ok = proc.exec(u"mount"_s, {u"-o"_s, u"ro"_s, devpath, u"-m"_s, mountpoint});
-        if (!ok) return;
+        if (!proc.exec(u"mount"_s, {u"-o"_s, u"ro"_s, devpath, u"-m"_s, mountpoint})) return;
+        mountedHere = true;
     }
 
     // Extract the release from lsb-release.
     MIni lsbrel(mountpoint + "/etc/lsb-release"_L1, MIni::OpenMode::ReadOnly);
     release = lsbrel.getString(u"PRETTY_NAME"_s);
 
-    if (!release.isEmpty()) {
-        // Parse fstab
-        const QString &fstname(mountpoint + "/etc/fstab"_L1);
-        FILE *fstab = setmntent(fstname.toUtf8().constData(), "r");
-        if (fstab) {
-            for (struct mntent *mntent = getmntent(fstab); mntent != nullptr; mntent = getmntent(fstab)) {
-                mounts.emplace_back(mntent);
-                if(strcmp(mntent->mnt_dir, "/home") == 0) {
-                    homeSeparate = true;
-                }
-                ok = true; // At least one mount point.
+    // Parse fstab
+    bool hasFstabEntry = false;
+    const QString fstname(mountpoint + "/etc/fstab"_L1);
+    FILE *fstab = setmntent(fstname.toUtf8().constData(), "r");
+    if (fstab) {
+        for (struct mntent *mntent = getmntent(fstab); mntent != nullptr; mntent = getmntent(fstab)) {
+            mounts.emplace_back(mntent);
+            if(strcmp(mntent->mnt_dir, "/home") == 0) {
+                homeSeparate = true;
             }
-            endmntent(fstab);
+            hasFstabEntry = true;
         }
+        endmntent(fstab);
     }
+    if (hasFstabEntry && release.isEmpty()) {
+        release = tr("Unknown release");
+    }
+    ok = hasFstabEntry;
 
     if (ok) {
         // Parse crypttab
@@ -389,9 +393,12 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
     }
 
     if (!mountpoint.isEmpty()) {
-        if (premounted) proc.exec(u"umount"_s, {mountpoint});
-        else if (!proc.exec(u"umount"_s, {mountpoint})) {
-            proc.exec(u"umount"_s, {u"-l"_s, mountpoint});
+        if (mountedHere) {
+            if (!proc.exec(u"umount"_s, {mountpoint})) {
+                proc.exec(u"umount"_s, {u"-l"_s, mountpoint});
+            }
+        } else if (premounted) {
+            proc.exec(u"umount"_s, {mountpoint});
         }
     }
 }
