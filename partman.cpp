@@ -1560,9 +1560,18 @@ void PartMan::clearWorkArea()
     // Unmount everything in /mnt/antiX which is only to be for working on the target system.
     if (QFileInfo::exists(u"/mnt/antiX"_s)) proc.exec(u"umount"_s, {u"-qR"_s, u"/mnt/antiX"_s});
     // Close encrypted containers that were opened by the installer.
+    QStringList closedMaps;
     for (Iterator it(*this); Device *device = *it; it.next()) {
-        if (device->encrypt && device->type != Device::VIRTUAL && QFile::exists(device->mappedDevice())) {
+        if (!device->map.isEmpty() && device->type != Device::VIRTUAL) {
+            if (closedMaps.contains(device->map)) continue;
+            const QString mapperPath = u"/dev/mapper/"_s + device->map;
+            if (!QFile::exists(mapperPath)) continue;
             proc.exec(u"cryptsetup"_s, {u"close"_s, device->map});
+            closedMaps.append(device->map);
+            device->mapCount = 0;
+            device->map.clear();
+            device->addToCrypttab = false;
+            notifyChange(device);
         }
     }
 }
