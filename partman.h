@@ -192,8 +192,8 @@ public:
         bool volCrypto : 1;
         bool sysEFI : 1;
     } flags = {};
-    QString model, name, path, uuid, map;
-    QString label, curLabel;
+    QString model, name, path, uuid, partuuid, map;
+    QString label, curLabel, partlabel;
     QString usefor;
     QString format, curFormat;
     QString options;

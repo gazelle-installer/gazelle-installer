@@ -119,7 +119,7 @@ void PartMan::scan(Device *drvstart)
 	}
 
     QStringList cargs({u"-T"_s, u"-bJo"_s,
-        u"TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,FSVER,LABEL,MODEL,PARTFLAGS"_s});
+        u"TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,FSVER,LABEL,MODEL,PARTFLAGS,PARTUUID,PARTLABEL"_s});
     if (drvstart) cargs.append(drvstart->path);
     proc.exec(u"lsblk"_s, cargs, nullptr, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
@@ -157,6 +157,9 @@ void PartMan::scan(Device *drvstart)
         drive->discgran = jsonDrive[u"disc-gran"_s].toInt();
         drive->size = jsonDrive[u"size"_s].toVariant().toLongLong();
         drive->physec = jsonDrive[u"phy-sec"_s].toInt();
+        drive->uuid = jsonDrive[u"uuid"_s].toString();
+        drive->partuuid = jsonDrive[u"partuuid"_s].toString();
+        drive->partlabel = jsonDrive[u"partlabel"_s].toString();
         drive->curLabel = jsonDrive[u"label"_s].toString();
         drive->model = jsonDrive[u"model"_s].toString();
         const QJsonArray &jsonParts = jsonDrive[u"children"_s].toArray();
@@ -171,6 +174,8 @@ void PartMan::scan(Device *drvstart)
             part->path = jsonPart[u"path"_s].toString();
             //qDebug() << "part path is " << part->path;
             part->uuid = jsonPart[u"uuid"_s].toString();
+            part->partuuid = jsonPart[u"partuuid"_s].toString();
+            part->partlabel = jsonPart[u"partlabel"_s].toString();
             part->order = order.indexOf(part->name);
             part->size = jsonPart[u"size"_s].toVariant().toLongLong();
             part->physec = jsonPart[u"phy-sec"_s].toInt();

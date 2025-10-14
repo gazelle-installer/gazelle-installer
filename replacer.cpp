@@ -188,11 +188,25 @@ bool Replacer::preparePartMan() const noexcept
             }
             return nullptr;
         }
+        if (fs.startsWith(u"PARTUUID="_s)) {
+            const QString partuuid = fs.mid(9);
+            for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+                if (dev->partuuid.compare(partuuid, Qt::CaseInsensitive) == 0) return dev;
+            }
+            return nullptr;
+        }
         if (fs.startsWith(u"LABEL="_s)) {
             const QString label = fs.mid(6);
             for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
                 if (dev->label.compare(label, Qt::CaseInsensitive) == 0
                     || dev->curLabel.compare(label, Qt::CaseInsensitive) == 0) return dev;
+            }
+            return nullptr;
+        }
+        if (fs.startsWith(u"PARTLABEL="_s)) {
+            const QString partlabel = fs.mid(10);
+            for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+                if (dev->partlabel.compare(partlabel, Qt::CaseInsensitive) == 0) return dev;
             }
             return nullptr;
         }
@@ -213,7 +227,11 @@ bool Replacer::preparePartMan() const noexcept
         PartMan::Device *dev = resolveFsDevice(mount.fsname);
         if (!dev) continue;
         setMount(dev, mount.dir);
-        if (mount.dir == "/"_L1 && !rbase.homeSeparate) markPreserve(dev);
+        if (mount.dir == "/"_L1) {
+            if (!rbase.homeSeparate) markPreserve(dev);
+        } else if (mount.dir.startsWith(u"/"_s)) {
+            markPreserve(dev);
+        }
     }
 
     auto dedupeMounts = [&]() {
@@ -256,6 +274,12 @@ bool Replacer::preparePartMan() const noexcept
         }
     }
     if (!partman->findByMount(u"/boot"_s)) {
+        auto hasBootLabel = [](const QString &label) -> bool {
+            return !label.isEmpty() && label.contains(u"boot"_s, Qt::CaseInsensitive);
+        };
+        auto looksLikeBoot = [&](PartMan::Device *dev) -> bool {
+            return hasBootLabel(dev->curLabel) || hasBootLabel(dev->label) || hasBootLabel(dev->partlabel);
+        };
         PartMan::Device *cand = nullptr;
         for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
             if (dev->type != PartMan::Device::PARTITION) continue;
@@ -263,11 +287,9 @@ bool Replacer::preparePartMan() const noexcept
             const QString fmt = dev->format.isEmpty() ? dev->curFormat : dev->format;
             if (!fmt.startsWith(u"ext"_s, Qt::CaseInsensitive)) continue;
             if (dev->flags.bootRoot) continue;
+            if (!looksLikeBoot(dev)) continue;
             cand = dev;
-            if (dev->curLabel.compare(u"boot"_s, Qt::CaseInsensitive) == 0
-                || dev->label.compare(u"boot"_s, Qt::CaseInsensitive) == 0) {
-                break;
-            }
+            break;
         }
         if (cand) setMount(cand, u"/boot"_s);
     }
