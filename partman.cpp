@@ -350,7 +350,7 @@ bool PartMan::loadConfig(MSettings &config) noexcept
             part->format = config.getString(u"Format"_s, part->format);
             part->chkbadblk = config.getBoolean(u"CheckBadBlocks"_s, part->chkbadblk);
             part->encrypt = config.getBoolean(u"Encrypt"_s, part->encrypt);
-            part->addToCrypttab = config.getBoolean(u"AddToCrypttab"_s, part->encrypt);
+            part->addToCrypttab = config.getBoolean(u"AddToCrypttab"_s, part->addToCrypttab);
             part->label = config.getString(u"Label"_s, part->label);
             part->options = config.getString(u"Options"_s, part->options);
             part->dump = config.getBoolean(u"Dump"_s, part->dump);
@@ -2279,6 +2279,7 @@ PartMan::Device *PartMan::Device::addPart(long long defaultSize, const QString &
     part->size = defaultSize;
     if (part->canEncrypt()) part->encrypt = crypto;
     part->autoFill();
+    part->addToCrypttab = part->encrypt;
     partman.notifyChange(part);
     return part;
 }

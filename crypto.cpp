@@ -17,6 +17,7 @@
  * This file is part of the gazelle-installer.
 \***************************************************************************/
 #include <QFileInfo>
+#include <QList>
 #include "mprocess.h"
 #include "msettings.h"
 #include "partman.h"
@@ -81,18 +82,43 @@ void Crypto::open(PartMan::Device *part, const QByteArray &password)
 // write out crypttab if encrypting for auto-opening
 bool Crypto::makeCrypttab(const PartMan &partman) noexcept
 {
-    // Count the number of crypttab entries.
-    int cryptcount = 0;
+    QList<const PartMan::Device *> cryptDevices;
     for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
-        if (device->addToCrypttab) ++cryptcount;
+        if (device->type != PartMan::Device::PARTITION) continue;
+        const bool required = device->addToCrypttab || device->encrypt || !device->map.isEmpty();
+        if (!required) continue;
+        QString mapName = device->map;
+        QString luksUuid;
+        if (mapName.startsWith(u"luks-"_s, Qt::CaseInsensitive)) {
+            luksUuid = mapName.mid(5);
+        }
+        if (mapName.isEmpty() && (device->encrypt || device->addToCrypttab)) {
+            if (proc.exec(u"cryptsetup"_s, {u"luksUUID"_s, device->path}, nullptr, true)) {
+                luksUuid = proc.readOut(true).trimmed();
+                if (!luksUuid.isEmpty()) mapName = u"luks-"_s + luksUuid;
+            }
+        }
+        if (mapName.isEmpty()) continue;
+        device->map = mapName;
+        if (device->uuid.isEmpty() && !luksUuid.isEmpty()) device->uuid = luksUuid;
+        cryptDevices.append(device);
     }
+    if (cryptDevices.isEmpty()) {
+        QFile file(u"/mnt/antiX/etc/crypttab"_s);
+        file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+        return true;
+    }
+    const int cryptcount = cryptDevices.size();
     // Add devices to crypttab.
     QFile file(u"/mnt/antiX/etc/crypttab"_s);
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
-    for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
-        if (!device->addToCrypttab) continue;
-        out << device->map << " UUID=" << device->uuid << " none luks";
+    for (const PartMan::Device *device : std::as_const(cryptDevices)) {
+        QString entryUuid = device->uuid;
+        if (entryUuid.isEmpty() && device->map.startsWith(u"luks-"_s, Qt::CaseInsensitive)) {
+            entryUuid = device->map.mid(5);
+        }
+        out << device->map << " UUID=" << entryUuid << " none luks";
         if (cryptcount > 1) out << ",keyscript=decrypt_keyctl";
         if (!device->flags.rotational) out << ",no-read-workqueue,no-write-workqueue";
         if (device->discgran) out << ",discard";
