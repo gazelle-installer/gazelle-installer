@@ -446,18 +446,42 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
 
     QString mountpoint;
+    QString subvolumeBase;
     bool premounted = false;
     devpath = device->mappedDevice();
     physdev = device->path;
     if (devpath.isEmpty() || !QFile::exists(devpath)) return;
-    if (proc.exec(u"findmnt"_s, {u"-AfncoTARGET"_s, u"--source"_s, devpath}, nullptr, true)) {
-        mountpoint = proc.readOut().trimmed();
-        premounted = !mountpoint.isEmpty();
+    if (proc.exec(u"findmnt"_s, {u"-AfnCoTARGET"_s, u"--source"_s, devpath}, nullptr, true)) {
+        const QString output = proc.readOut(true).trimmed();
+        if (!output.isEmpty()) {
+            const QStringList fields = output.split(' ');
+            if (!fields.isEmpty()) {
+                mountpoint = fields.at(0).trimmed();
+                premounted = !mountpoint.isEmpty();
+            }
+            for (const QString &field : fields) {
+                if (field.startsWith(u"subvol="_s, Qt::CaseInsensitive)) {
+                    subvolumeBase = field.mid(field.indexOf('=') + 1).trimmed();
+                    if (subvolumeBase.startsWith(u"/"_s)) subvolumeBase.remove(0, 1);
+                    break;
+                }
+            }
+        }
     }
     bool mountedHere = false;
     if (!premounted) {
         mountpoint = "/mnt/temp"_L1;
-        if (!proc.exec(u"mount"_s, {u"-o"_s, u"ro"_s, devpath, u"-m"_s, mountpoint})) return;
+        QStringList mountArgs = {u"-o"_s, u"ro"_s};
+        const QString deviceFormat = device->format.isEmpty() ? device->curFormat : device->format;
+        const bool btrfsVolume = deviceFormat.compare(u"btrfs"_s, Qt::CaseInsensitive) == 0;
+        if (btrfsVolume) {
+            if (!subvolumeBase.isEmpty()) {
+                mountArgs = {u"-o"_s, QStringLiteral("ro,subvol=%1").arg(subvolumeBase)};
+            } else {
+                mountArgs = {u"-o"_s, u"ro,subvolid=5"_s};
+            }
+        }
+        if (!proc.exec(u"mount"_s, mountArgs << devpath << u"-m"_s << mountpoint)) return;
         mountedHere = true;
     }
     QString rootBase = mountpoint;
@@ -465,7 +489,7 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
     QHash<QString, QString> subvolById;
     QString defaultSubvolume;
     const QString deviceFormat = device->format.isEmpty() ? device->curFormat : device->format;
-    const bool btrfsVolume = deviceFormat.compare(u"btrfs"_s, Qt::CaseInsensitive) == 0;
+    bool btrfsVolume = deviceFormat.compare(u"btrfs"_s, Qt::CaseInsensitive) == 0;
 
     auto normalizeSubvolPath = [](QString path) -> QString {
         path = path.trimmed();
@@ -473,10 +497,10 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
         return path;
     };
 
-    auto collectBtrfsSubvolumes = [&]() {
+    auto collectBtrfsSubvolumes = [&]() -> bool {
         if (!proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, mountpoint}, nullptr, true)) {
             proc.readOut(true);
-            return;
+            return false;
         }
         const QStringList lines = proc.readOutLines();
         const QRegularExpression matcher(u"ID\\s+(\\d+)\\s+.*\\spath\\s+(.+)$"_s);
@@ -487,26 +511,31 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
             QString path = normalizeSubvolPath(match.captured(2));
             if (!id.isEmpty() && !path.isEmpty()) subvolById.insert(id, path);
         }
+        return true;
     };
 
-    auto fetchDefaultSubvolume = [&]() {
+    auto fetchDefaultSubvolume = [&]() -> bool {
         if (!proc.exec(u"btrfs"_s, {u"subvolume"_s, u"get-default"_s, mountpoint}, nullptr, true)) {
             proc.readOut(true);
-            return;
+            return false;
         }
         const QString output = proc.readOut();
         QRegularExpression pathRe(u"path\\s+(.+)$"_s);
         const QRegularExpressionMatch pathMatch = pathRe.match(output);
         if (pathMatch.hasMatch()) {
             defaultSubvolume = normalizeSubvolPath(pathMatch.captured(1));
-        } else {
-            QRegularExpression idRe(u"ID\\s+(\\d+)"_s);
-            const QRegularExpressionMatch idMatch = idRe.match(output);
-            if (idMatch.hasMatch()) {
-                const QString mapped = subvolById.value(idMatch.captured(1).trimmed());
-                if (!mapped.isEmpty()) defaultSubvolume = mapped;
+            return true;
+        }
+        QRegularExpression idRe(u"ID\\s+(\\d+)"_s);
+        const QRegularExpressionMatch idMatch = idRe.match(output);
+        if (idMatch.hasMatch()) {
+            const QString mapped = subvolById.value(idMatch.captured(1).trimmed());
+            if (!mapped.isEmpty()) {
+                defaultSubvolume = mapped;
+                return true;
             }
         }
+        return false;
     };
 
     auto trySetRootFrom = [&](const QString &path) -> bool {
@@ -521,8 +550,8 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
         return false;
     };
 
-    if (btrfsVolume) {
-        collectBtrfsSubvolumes();
+    if (collectBtrfsSubvolumes()) {
+        btrfsVolume = true;
         fetchDefaultSubvolume();
         if (!trySetRootFrom(defaultSubvolume)) {
             for (auto it = subvolById.cbegin(); it != subvolById.cend(); ++it) {
@@ -601,12 +630,14 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
     }
 
     if (!mountpoint.isEmpty()) {
+        auto doUmount = [&](const QString &point) {
+            if (proc.exec(u"umount"_s, {point})) return true;
+            return proc.exec(u"umount"_s, {u"-l"_s, point});
+        };
         if (mountedHere) {
-            if (!proc.exec(u"umount"_s, {mountpoint})) {
-                proc.exec(u"umount"_s, {u"-l"_s, mountpoint});
-            }
+            doUmount(mountpoint);
         } else if (premounted) {
-            proc.exec(u"umount"_s, {mountpoint});
+            doUmount(mountpoint);
         }
     }
 }
