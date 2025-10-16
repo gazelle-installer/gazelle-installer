@@ -591,6 +591,9 @@ QSlider::handle:horizontal:disabled {
              <layout class="QGridLayout">
               <item row="0" column="0" colspan="2">
                <widget class="QTableWidget" name="tableExistInst">
+                <property name="editTriggers">
+                 <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+                </property>
                 <property name="selectionMode">
                  <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
                 </property>
@@ -843,8 +846,11 @@ QSlider::handle:horizontal:disabled {
            </item>
            <item>
             <widget class="QTreeWidget" name="treeConfirm">
+             <property name="editTriggers">
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+             </property>
              <property name="selectionMode">
-              <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+              <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
              </property>
              <attribute name="headerVisible">
               <bool>false</bool>
