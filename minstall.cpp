@@ -595,6 +595,18 @@ int MInstall::showPage(int curr, int next) noexcept
             nextFocus = gui.tableExistInst;
             return curr;
         }
+        if (!replacer->preparePartMan()) {
+            return curr;
+        }
+        if (!pretend && !(base && base->saveHomeBasic())) {
+            QMessageBox msgbox(this);
+            msgbox.setIcon(QMessageBox::Critical);
+            msgbox.setText(tr("The data in /home cannot be preserved because"
+                " the required information could not be obtained."));
+            msgbox.exec();
+            return curr;
+        }
+        replacer->buildDetailedConfirmation();
         return Step::CONFIRM;
     } else if (curr == Step::PARTITIONS) {
         if (next > curr) {
@@ -638,23 +650,7 @@ int MInstall::showPage(int curr, int next) noexcept
                 }
                 autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
                 next = (advanced ? Step::BOOT : Step::SWAP);
-            } else if (gui.radioReplace->isChecked()) {
-                if (!replacer->preparePartMan()) {
-                    gui.labelSplash->setText(tr("Unable to prepare for replacement."));
-                    abortEndUI(false);
-                    return Step::SPLASH;
-                }
-                // Check if /home can be preserved for old home detection
-                if (!pretend && !(base && base->saveHomeBasic())) {
-                    QMessageBox msgbox(this);
-                    msgbox.setIcon(QMessageBox::Critical);
-                    msgbox.setText(tr("The data in /home cannot be preserved because"
-                        " the required information could not be obtained."));
-                    msgbox.exec();
-                    abortEndUI(false);
-                    return Step::SPLASH;
-                }
-            } else {
+            } else if (!gui.radioReplace->isChecked()) {
                 advanced = true;
             }
             bootman->buildBootLists();

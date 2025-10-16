@@ -34,6 +34,7 @@ public:
     void scan(bool full = false, bool allowUnlock = false) noexcept;
     bool validate(bool automatic) const noexcept;
     bool preparePartMan() const noexcept;
+    void buildDetailedConfirmation() const noexcept;
 private:
     std::vector<RootBase> bases;
     class MProcess &proc;
