@@ -2207,6 +2207,7 @@ QStringList PartMan::Device::allowedFormats() const noexcept
         if (usefor != "FORMAT"_L1) {
             allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
             if (!allowPreserve && curFormat == "crypto_LUKS"_L1) allowPreserve = true;
+            if (!allowPreserve && flags.oldLayout && !curFormat.isEmpty()) allowPreserve = true;
         }
         }
     } else if (type == SUBVOLUME) {
