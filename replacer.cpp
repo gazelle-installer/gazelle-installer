@@ -58,7 +58,7 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
             if (device->curFormat == "crypto_LUKS"_L1 && device->mapCount == 0) {
                 gui.radioReplace->setEnabled(true);
                 if (!allowUnlock) continue;
-                if (partman->promptUnlock(device)) {
+                if (partman->promptUnlock(device, true)) {
                     rescan = true;
                     break;
                 }
@@ -149,7 +149,7 @@ bool Replacer::preparePartMan() const noexcept
     for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
         if (dev->type == PartMan::Device::PARTITION && dev->curFormat == "crypto_LUKS"_L1
             && dev->mapCount == 0) {
-            if (!partman->promptUnlock(dev)) return false;
+            if (!partman->promptUnlock(dev, true)) return false;
             partman->scan(dev);
         }
     }

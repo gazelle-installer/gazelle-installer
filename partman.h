@@ -104,7 +104,8 @@ public:
     Device *findByPath(const QString &devpath) const noexcept;
     Device *findByMount(const QString &mount) const noexcept;
     Device *findHostDev(const QString &path) const noexcept;
-    bool promptUnlock(Device *part) noexcept;
+    bool promptUnlock(Device *part, bool temporary = false) noexcept;
+    void closeTemporaryUnlocks() noexcept;
     void clearReadOnly(class Device *device) noexcept;
     struct VolumeSpec volSpecTotal(const QString &path, const QStringList &vols) const noexcept;
     struct VolumeSpec volSpecTotal(const QString &path) const noexcept;
@@ -191,6 +192,7 @@ public:
         bool curESP : 1;
         bool volCrypto : 1;
         bool sysEFI : 1;
+        bool tempUnlock : 1;
     } flags = {};
     QString model, name, path, uuid, partuuid, map;
     QString label, curLabel, partlabel;

@@ -608,6 +608,8 @@ int MInstall::showPage(int curr, int next) noexcept
         }
         replacer->buildDetailedConfirmation();
         return Step::CONFIRM;
+    } else if (curr == Step::REPLACE && next < curr) {
+        if (partman) partman->closeTemporaryUnlocks();
     } else if (curr == Step::PARTITIONS) {
         if (next > curr) {
             gui.treeConfirm->clear();
@@ -772,6 +774,7 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::PARTITIONS:
+        if (partman) partman->closeTemporaryUnlocks();
         if (!customUnlockPrompted && partman) {
             customUnlockPrompted = true;
             bool unlockedAny = false;

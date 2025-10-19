@@ -42,6 +42,7 @@
 #include <QFormLayout>
 #include <QDialogButtonBox>
 #include <QStandardPaths>
+#include <QList>
 
 #include "core.h"
 #include "mprocess.h"
@@ -658,7 +659,7 @@ void PartMan::partManRunClick()
 }
 
 // Partition menu items
-bool PartMan::promptUnlock(Device *part) noexcept
+bool PartMan::promptUnlock(Device *part, bool temporary) noexcept
 {
     if (!part) return false;
 
@@ -688,6 +689,7 @@ bool PartMan::promptUnlock(Device *part) noexcept
             part->usefor.clear();
             part->addToCrypttab = checkCrypttab->isChecked();
             part->mapCount++;
+            if (temporary) part->flags.tempUnlock = true;
             notifyChange(part);
             scanVirtualDevices(true);
             treeSelChange();
@@ -762,6 +764,46 @@ void PartMan::partMenuLock(Device *volume)
         QMessageBox msgbox(gui.boxMain);
         msgbox.setIcon(QMessageBox::Critical);
         msgbox.setText(tr("Failed to close %1").arg(volume->name));
+        msgbox.exec();
+    }
+}
+
+void PartMan::closeTemporaryUnlocks() noexcept
+{
+    QList<Device *> toClose;
+    for (Iterator it(*this); Device *part = *it; it.next()) {
+        if (part->type != Device::PARTITION) continue;
+        if (!part->flags.tempUnlock) continue;
+        toClose.append(part);
+    }
+    if (toClose.isEmpty()) return;
+
+    qApp->setOverrideCursor(Qt::WaitCursor);
+    gui.boxMain->setEnabled(false);
+    QStringList failed;
+    for (Device *part : std::as_const(toClose)) {
+        const QString mapName = part->map;
+        if (mapName.isEmpty()) {
+            part->flags.tempUnlock = false;
+            continue;
+        }
+        if (proc.exec(u"cryptsetup"_s, {u"close"_s, mapName})) {
+            part->flags.tempUnlock = false;
+            if (part->mapCount > 0) part->mapCount--;
+            part->map.clear();
+            notifyChange(part);
+        } else {
+            failed.append(mapName);
+        }
+    }
+    scanVirtualDevices(true);
+    gui.boxMain->setEnabled(true);
+    qApp->restoreOverrideCursor();
+
+    if (!failed.isEmpty()) {
+        QMessageBox msgbox(gui.boxMain);
+        msgbox.setIcon(QMessageBox::Warning);
+        msgbox.setText(tr("Could not re-lock encrypted device(s): %1").arg(failed.join(u", "_s)));
         msgbox.exec();
     }
 }
