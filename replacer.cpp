@@ -353,6 +353,9 @@ bool Replacer::preparePartMan() const noexcept
             if (!rbase.homeSeparate) markPreserve(dev);
         } else if (mount.dir.startsWith(u"/"_s)) {
             markPreserve(dev);
+        } else if (mount.type.compare(u"swap"_s, Qt::CaseInsensitive) == 0
+                   || mount.dir.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
+            markPreserve(dev);
         }
     }
 
