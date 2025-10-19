@@ -219,12 +219,21 @@ bool Replacer::preparePartMan() const noexcept
         if (device->type == PartMan::Device::VIRTUAL && device->origin) volume = device->origin;
         if (!volume) return;
         const bool isBtrfsSubvolume = mountInfo && mountInfo->isBtrfs && device->type == PartMan::Device::SUBVOLUME;
+        QString usefor = dir;
+        if (mountInfo && mountInfo->type.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
+            usefor = u"SWAP"_s;
+        } else if (usefor.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
+            usefor = u"SWAP"_s;
+        } else if (mountInfo && mountInfo->type.compare(u"none"_s, Qt::CaseInsensitive) == 0
+                   && mountInfo->fsname.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
+            usefor = u"SWAP"_s;
+        }
         auto assignUsefor = [&](PartMan::Device *target, const QString &fmt, bool applyProps, bool canSetUse) {
             if (!target) return;
             partman->changeBegin(target);
             if (canSetUse) {
-                target->usefor = dir;
-            } else if (target->usefor == dir) {
+                target->usefor = usefor;
+            } else if (target->usefor == usefor) {
                 target->usefor.clear();
             }
             if (!dir.isEmpty() && !fmt.isEmpty()) target->format = fmt;
@@ -250,10 +259,10 @@ bool Replacer::preparePartMan() const noexcept
             partman->changeEnd();
         };
 
-        if (!dir.isEmpty()) {
+        if (!usefor.isEmpty()) {
             for (PartMan::Iterator it(*partman); PartMan::Device *other = *it; it.next()) {
                 if (other == volume) continue;
-                if (other->usefor == dir) {
+                if (other->usefor == usefor) {
                     partman->changeBegin(other);
                     other->usefor.clear();
                     partman->changeEnd();
