@@ -162,7 +162,7 @@ void BootMan::install(const QStringList &cmdextra)
 
             sect.setRoot("/mnt/antiX");
 
-            QStringList grubinstargs({u"--no-nvram"_s, u"--force-extra-removable"_s,
+            QStringList grubinstargs({u"--force-extra-removable"_s,
                 (efisize==32 ? u"--target=i386-efi"_s : u"--target=x86_64-efi"_s),
                 "--bootloader-id="_L1 + loaderID, u"--recheck"_s});
             const PartMan::Device *espdev = partman.findByMount(u"/boot/efi"_s);
@@ -176,9 +176,20 @@ void BootMan::install(const QStringList &cmdextra)
                 else efiDir = u"/boot"_s;
             }
             grubinstargs << "--efi-directory="_L1 + efiDir;
-            proc.exec(u"grub-install"_s, grubinstargs);
+            const bool wasStrict = sect.strict();
+            sect.setExceptionStrict(false);
+            const bool grubInstallOk = proc.exec(u"grub-install"_s, grubinstargs);
+            sect.setExceptionStrict(wasStrict);
+            bool usedNoNvram = false;
+            if (!grubInstallOk) {
+                proc.log(u"grub-install failed; retrying with --no-nvram"_s, MProcess::LOG_STATUS);
+                QStringList grubinstargsNoNvram(grubinstargs);
+                grubinstargsNoNvram.prepend(u"--no-nvram"_s);
+                proc.exec(u"grub-install"_s, grubinstargsNoNvram);
+                usedNoNvram = true;
+            }
 
-            // Copy fallback files (not copied above because of --no-nvram switch).
+            // Copy fallback files to ensure removable media boot entries exist.
             if (espdev != nullptr) {
                 const QString &espdst = espdev->mountPoint() + "/EFI/"_L1;
                 const QString &espsrc = espdst + loaderID;
@@ -188,37 +199,40 @@ void BootMan::install(const QStringList &cmdextra)
             }
 
             // Update the boot NVRAM variables. Non-critial step so no need to fail.
-            sect.setExceptionStrict(false);
-            // Remove old boot variables of the same label.
-            proc.exec(u"efibootmgr"_s, {}, nullptr, true);
-            const QStringList &existing = proc.readOutLines();
-            static const QRegularExpression regex(u"^Boot([0-9A-F]{4})\\*?\\s(.*)$"_s);
-            for (const QString &entry : existing) {
-                const QRegularExpressionMatch &match = regex.match(entry);
-                if (match.hasMatch() && match.captured(2) == loaderLabel) {
-                    proc.exec(u"efibootmgr"_s, {u"-qBb"_s, match.captured(1)});
-                }
-            }
-            // Add a new NVRAM boot variable.
-            if (espdev != nullptr) {
-                const PartMan::NameParts &bs = PartMan::splitName(espdev->name);
-                //efi size & secureboot
-                //if 32, don't bother with secure boot
-                //if 64, check for secure boot shimx64.efi
-                QString efitype;
-                if (efisize==32){
-                    efitype="/grubia32.efi";
-                } else {
-                    efitype="/grubx64.efi";
-                    if (QFile("/usr/lib/shim/shimx64.efi").exists()){
-                        efitype="/shimx64.efi";
+            if (usedNoNvram) {
+                const bool wasStrictNvram = sect.strict();
+                sect.setExceptionStrict(false);
+                // Remove old boot variables of the same label.
+                proc.exec(u"efibootmgr"_s, {}, nullptr, true);
+                const QStringList &existing = proc.readOutLines();
+                static const QRegularExpression regex(u"^Boot([0-9A-F]{4})\\*?\\s(.*)$"_s);
+                for (const QString &entry : existing) {
+                    const QRegularExpressionMatch &match = regex.match(entry);
+                    if (match.hasMatch() && match.captured(2) == loaderLabel) {
+                        proc.exec(u"efibootmgr"_s, {u"-qBb"_s, match.captured(1)});
                     }
                 }
+                // Add a new NVRAM boot variable.
+                if (espdev != nullptr) {
+                    const PartMan::NameParts &bs = PartMan::splitName(espdev->name);
+                    //efi size & secureboot
+                    //if 32, don't bother with secure boot
+                    //if 64, check for secure boot shimx64.efi
+                    QString efitype;
+                    if (efisize==32){
+                        efitype="/grubia32.efi";
+                    } else {
+                        efitype="/grubx64.efi";
+                        if (QFile("/usr/lib/shim/shimx64.efi").exists()){
+                            efitype="/shimx64.efi";
+                        }
+                    }
 
-                proc.exec(u"efibootmgr"_s, {u"-qcL"_s, loaderLabel, u"-d"_s, "/dev/"_L1 + bs.drive,
-                    u"-p"_s, bs.partition, u"-l"_s, "/EFI/"_L1 + loaderID + efitype});
+                    proc.exec(u"efibootmgr"_s, {u"-qcL"_s, loaderLabel, u"-d"_s, "/dev/"_L1 + bs.drive,
+                        u"-p"_s, bs.partition, u"-l"_s, "/EFI/"_L1 + loaderID + efitype});
+                }
+                sect.setExceptionStrict(wasStrictNvram);
             }
-            sect.setExceptionStrict(true);
             sect.setRoot(nullptr);
         }
 
