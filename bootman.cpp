@@ -162,7 +162,7 @@ void BootMan::install(const QStringList &cmdextra)
 
             sect.setRoot("/mnt/antiX");
 
-            QStringList grubinstargs({u"--force-extra-removable"_s,
+            QStringList grubinstargs({u"--no-nvram"_s, u"--force-extra-removable"_s,
                 (efisize==32 ? u"--target=i386-efi"_s : u"--target=x86_64-efi"_s),
                 "--bootloader-id="_L1 + loaderID, u"--recheck"_s});
             const PartMan::Device *espdev = partman.findByMount(u"/boot/efi"_s);
@@ -176,18 +176,7 @@ void BootMan::install(const QStringList &cmdextra)
                 else efiDir = u"/boot"_s;
             }
             grubinstargs << "--efi-directory="_L1 + efiDir;
-            const bool wasStrict = sect.strict();
-            sect.setExceptionStrict(false);
-            const bool grubInstallOk = proc.exec(u"grub-install"_s, grubinstargs);
-            sect.setExceptionStrict(wasStrict);
-            bool usedNoNvram = false;
-            if (!grubInstallOk) {
-                proc.log(u"grub-install failed; retrying with --no-nvram"_s, MProcess::LOG_STATUS);
-                QStringList grubinstargsNoNvram(grubinstargs);
-                grubinstargsNoNvram.prepend(u"--no-nvram"_s);
-                proc.exec(u"grub-install"_s, grubinstargsNoNvram);
-                usedNoNvram = true;
-            }
+            proc.exec(u"grub-install"_s, grubinstargs);
 
             // Copy fallback files to ensure removable media boot entries exist.
             if (espdev != nullptr) {
@@ -226,20 +215,17 @@ void BootMan::install(const QStringList &cmdextra)
                 }
                 return created;
             };
-            auto manageFirmwareEntries = [&](bool forceRecreateLabel) {
+            auto manageFirmwareEntries = [&]() {
                 const bool listOk = proc.exec(u"efibootmgr"_s, {}, nullptr, true);
                 if (!listOk) {
-                    const QString msg = forceRecreateLabel
-                        ? u"efibootmgr listing failed; unable to clean duplicate entries."_s
-                        : u"efibootmgr listing failed; EFI label may remain as "_s + loaderID;
-                    proc.log(msg, MProcess::LOG_FAIL);
+                    proc.log(u"efibootmgr listing failed; EFI label may remain as "_s + loaderLabel,
+                        MProcess::LOG_FAIL);
                     return;
                 }
                 const QStringList entries = proc.readOutLines();
                 static const QRegularExpression entryRegex(
                     u"^Boot([0-9A-F]{4})\\*?\\s+(.*?)\\s*(?:$|\\t)"_s);
                 bool hasLoaderLabel = false;
-                bool removedLoaderId = false;
                 for (const QString &entry : entries) {
                     const QRegularExpressionMatch &match = entryRegex.match(entry);
                     if (!match.hasMatch()) continue;
@@ -247,32 +233,17 @@ void BootMan::install(const QStringList &cmdextra)
                     const QString currentLabel = match.captured(2).trimmed();
                     proc.log(u"EFI entry "_s + bootnum + u" label "_s + currentLabel,
                         MProcess::LOG_LOG);
-                    if (currentLabel == loaderLabel) {
-                        hasLoaderLabel = true;
-                        if (forceRecreateLabel) {
-                            proc.exec(u"efibootmgr"_s, {u"-qBb"_s, bootnum});
-                            hasLoaderLabel = false;
-                        }
-                    } else if (currentLabel == loaderID) {
-                        removedLoaderId = true;
-                        proc.exec(u"efibootmgr"_s, {u"-qBb"_s, bootnum});
-                    }
+                    if (currentLabel == loaderLabel) hasLoaderLabel = true;
                 }
-                if (forceRecreateLabel || !hasLoaderLabel) {
-                    const QString reason = forceRecreateLabel
-                        ? u" (forced refresh)"_s
-                        : u" (missing)"_s;
-                    proc.log(u"Creating EFI boot entry "_s + loaderLabel + reason,
+                if (!hasLoaderLabel) {
+                    proc.log(u"Creating EFI boot entry "_s + loaderLabel + u" (missing)"_s,
                         MProcess::LOG_STATUS);
                     createFirmwareEntry();
-                } else if (removedLoaderId) {
-                    proc.log(u"Removed short EFI entry, kept existing "_s + loaderLabel,
-                        MProcess::LOG_STATUS);
                 }
             };
             const bool wasStrictNvram = sect.strict();
             sect.setExceptionStrict(false);
-            manageFirmwareEntries(usedNoNvram);
+            manageFirmwareEntries();
             sect.setExceptionStrict(wasStrictNvram);
             sect.setRoot(nullptr);
         }
