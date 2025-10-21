@@ -199,40 +199,81 @@ void BootMan::install(const QStringList &cmdextra)
             }
 
             // Update the boot NVRAM variables. Non-critial step so no need to fail.
-            if (usedNoNvram) {
-                const bool wasStrictNvram = sect.strict();
-                sect.setExceptionStrict(false);
-                // Remove old boot variables of the same label.
-                proc.exec(u"efibootmgr"_s, {}, nullptr, true);
-                const QStringList &existing = proc.readOutLines();
-                static const QRegularExpression regex(u"^Boot([0-9A-F]{4})\\*?\\s(.*)$"_s);
-                for (const QString &entry : existing) {
-                    const QRegularExpressionMatch &match = regex.match(entry);
-                    if (match.hasMatch() && match.captured(2) == loaderLabel) {
-                        proc.exec(u"efibootmgr"_s, {u"-qBb"_s, match.captured(1)});
-                    }
+            const auto determineEfitype = [&]() -> QString {
+                if (efisize == 32) {
+                    return "/grubia32.efi"_L1;
                 }
-                // Add a new NVRAM boot variable.
-                if (espdev != nullptr) {
-                    const PartMan::NameParts &bs = PartMan::splitName(espdev->name);
-                    //efi size & secureboot
-                    //if 32, don't bother with secure boot
-                    //if 64, check for secure boot shimx64.efi
-                    QString efitype;
-                    if (efisize==32){
-                        efitype="/grubia32.efi";
-                    } else {
-                        efitype="/grubx64.efi";
-                        if (QFile("/usr/lib/shim/shimx64.efi").exists()){
-                            efitype="/shimx64.efi";
+                QString efitype = "/grubx64.efi"_L1;
+                if (QFile("/usr/lib/shim/shimx64.efi").exists()) {
+                    efitype = "/shimx64.efi"_L1;
+                }
+                return efitype;
+            };
+            auto createFirmwareEntry = [&]() -> bool {
+                if (espdev == nullptr) {
+                    proc.log(u"No ESP device available; cannot create EFI boot entry."_s,
+                        MProcess::LOG_FAIL);
+                    return false;
+                }
+                const PartMan::NameParts &bs = PartMan::splitName(espdev->name);
+                const QString efitype = determineEfitype();
+                const bool created = proc.exec(u"efibootmgr"_s, {u"-qcL"_s, loaderLabel,
+                    u"-d"_s, "/dev/"_L1 + bs.drive, u"-p"_s, bs.partition,
+                    u"-l"_s, "/EFI/"_L1 + loaderID + efitype});
+                if (!created) {
+                    proc.log(u"Failed to create EFI boot entry for "_s + loaderLabel,
+                        MProcess::LOG_FAIL);
+                }
+                return created;
+            };
+            auto manageFirmwareEntries = [&](bool forceRecreateLabel) {
+                const bool listOk = proc.exec(u"efibootmgr"_s, {}, nullptr, true);
+                if (!listOk) {
+                    const QString msg = forceRecreateLabel
+                        ? u"efibootmgr listing failed; unable to clean duplicate entries."_s
+                        : u"efibootmgr listing failed; EFI label may remain as "_s + loaderID;
+                    proc.log(msg, MProcess::LOG_FAIL);
+                    return;
+                }
+                const QStringList entries = proc.readOutLines();
+                static const QRegularExpression entryRegex(
+                    u"^Boot([0-9A-F]{4})\\*?\\s+(.*?)\\s*(?:$|\\t)"_s);
+                bool hasLoaderLabel = false;
+                bool removedLoaderId = false;
+                for (const QString &entry : entries) {
+                    const QRegularExpressionMatch &match = entryRegex.match(entry);
+                    if (!match.hasMatch()) continue;
+                    const QString bootnum = match.captured(1);
+                    const QString currentLabel = match.captured(2).trimmed();
+                    proc.log(u"EFI entry "_s + bootnum + u" label "_s + currentLabel,
+                        MProcess::LOG_LOG);
+                    if (currentLabel == loaderLabel) {
+                        hasLoaderLabel = true;
+                        if (forceRecreateLabel) {
+                            proc.exec(u"efibootmgr"_s, {u"-qBb"_s, bootnum});
+                            hasLoaderLabel = false;
                         }
+                    } else if (currentLabel == loaderID) {
+                        removedLoaderId = true;
+                        proc.exec(u"efibootmgr"_s, {u"-qBb"_s, bootnum});
                     }
-
-                    proc.exec(u"efibootmgr"_s, {u"-qcL"_s, loaderLabel, u"-d"_s, "/dev/"_L1 + bs.drive,
-                        u"-p"_s, bs.partition, u"-l"_s, "/EFI/"_L1 + loaderID + efitype});
                 }
-                sect.setExceptionStrict(wasStrictNvram);
-            }
+                if (forceRecreateLabel || !hasLoaderLabel) {
+                    const QString reason = forceRecreateLabel
+                        ? u" (forced refresh)"_s
+                        : u" (missing)"_s;
+                    proc.log(u"Creating EFI boot entry "_s + loaderLabel + reason,
+                        MProcess::LOG_STATUS);
+                    createFirmwareEntry();
+                } else if (removedLoaderId) {
+                    proc.log(u"Removed short EFI entry, kept existing "_s + loaderLabel,
+                        MProcess::LOG_STATUS);
+                }
+            };
+            const bool wasStrictNvram = sect.strict();
+            sect.setExceptionStrict(false);
+            manageFirmwareEntries(usedNoNvram);
+            sect.setExceptionStrict(wasStrictNvram);
             sect.setRoot(nullptr);
         }
 
