@@ -226,6 +226,7 @@ void BootMan::install(const QStringList &cmdextra)
                 static const QRegularExpression entryRegex(
                     u"^Boot([0-9A-F]{4})\\*?\\s+(.*?)\\s*(?:$|\\t)"_s);
                 bool hasLoaderLabel = false;
+                bool hasExactMatch = false;
                 for (const QString &entry : entries) {
                     const QRegularExpressionMatch &match = entryRegex.match(entry);
                     if (!match.hasMatch()) continue;
@@ -233,9 +234,29 @@ void BootMan::install(const QStringList &cmdextra)
                     const QString currentLabel = match.captured(2).trimmed();
                     proc.log(u"EFI entry "_s + bootnum + u" label "_s + currentLabel,
                         MProcess::LOG_LOG);
-                    if (currentLabel == loaderLabel) hasLoaderLabel = true;
+                    if (currentLabel != loaderLabel) continue;
+                    hasLoaderLabel = true;
+                    if (hasExactMatch) continue;
+                    if (!proc.exec(u"efibootmgr"_s, {u"-v"_s}, nullptr, true)) {
+                        proc.log(u"Failed to query EFI entry details for "_s + loaderLabel,
+                            MProcess::LOG_FAIL);
+                        continue;
+                    }
+                    const QStringList details = proc.readOutLines();
+                    const QString pattern = QString::fromLatin1(
+                        "^Boot%1\\*?\\s+%2\\s+HD\\(.*\\\\EFI\\\\%3\\\\(shimx64|grubx64|grubia32|fbx64)\\.efi.*$")
+                        .arg(bootnum,
+                            QRegularExpression::escape(loaderLabel),
+                            QRegularExpression::escape(loaderID));
+                    const QRegularExpression detailRegex(pattern);
+                    for (const QString &line : details) {
+                        if (detailRegex.match(line).hasMatch()) {
+                            hasExactMatch = true;
+                            break;
+                        }
+                    }
                 }
-                if (!hasLoaderLabel) {
+                if (!hasLoaderLabel || !hasExactMatch) {
                     proc.log(u"Creating EFI boot entry "_s + loaderLabel + u" (missing)"_s,
                         MProcess::LOG_STATUS);
                     createFirmwareEntry();
