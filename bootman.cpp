@@ -216,50 +216,104 @@ void BootMan::install(const QStringList &cmdextra)
                 return created;
             };
             auto manageFirmwareEntries = [&]() {
-                const bool listOk = proc.exec(u"efibootmgr"_s, {}, nullptr, true);
-                if (!listOk) {
-                    proc.log(u"efibootmgr listing failed; EFI label may remain as "_s + loaderLabel,
-                        MProcess::LOG_FAIL);
-                    return;
-                }
-                const QStringList entries = proc.readOutLines();
                 static const QRegularExpression entryRegex(
                     u"^Boot([0-9A-F]{4})\\*?\\s+(.*?)\\s*(?:$|\\t)"_s);
-                bool hasLoaderLabel = false;
-                bool hasExactMatch = false;
-                for (const QString &entry : entries) {
-                    const QRegularExpressionMatch &match = entryRegex.match(entry);
+                auto parseBootOrderLine = [](const QString &line) -> QStringList {
+                    QStringList order;
+                    if (line.isEmpty()) return order;
+                    const int colon = line.indexOf(':');
+                    const QString payload = colon >= 0 ? line.mid(colon + 1) : line;
+                    const QStringList parts = payload.split(',', Qt::SkipEmptyParts);
+                    for (QString part : parts) {
+                        part = part.trimmed().toUpper();
+                        if (!part.isEmpty()) order << part;
+                    }
+                    return order;
+                };
+                auto listEntries = [&]() -> QStringList {
+                    if (!proc.exec(u"efibootmgr"_s, {}, nullptr, true)) {
+                        proc.log(u"efibootmgr listing failed; EFI label may remain as "_s + loaderLabel,
+                            MProcess::LOG_FAIL);
+                        return {};
+                    }
+                    return proc.readOutLines();
+                };
+
+                QStringList entries = listEntries();
+                if (entries.isEmpty()) return;
+
+                QString bootOrderLine;
+                QStringList bootEntryOrder;
+                QString targetBootnum;
+                for (const QString &line : entries) {
+                    if (line.startsWith(u"BootOrder:"_s)) {
+                        bootOrderLine = line;
+                        continue;
+                    }
+                    const QRegularExpressionMatch match = entryRegex.match(line);
                     if (!match.hasMatch()) continue;
-                    const QString bootnum = match.captured(1);
+                    const QString bootnum = match.captured(1).toUpper();
                     const QString currentLabel = match.captured(2).trimmed();
                     proc.log(u"EFI entry "_s + bootnum + u" label "_s + currentLabel,
                         MProcess::LOG_LOG);
-                    if (currentLabel != loaderLabel) continue;
-                    hasLoaderLabel = true;
-                    if (hasExactMatch) continue;
-                    if (!proc.exec(u"efibootmgr"_s, {u"-v"_s}, nullptr, true)) {
-                        proc.log(u"Failed to query EFI entry details for "_s + loaderLabel,
-                            MProcess::LOG_FAIL);
-                        continue;
+                    bootEntryOrder << bootnum;
+                    if (currentLabel == loaderLabel && targetBootnum.isEmpty()) {
+                        targetBootnum = bootnum;
                     }
-                    const QStringList details = proc.readOutLines();
-                    const QString pattern = QString::fromLatin1(
-                        "^Boot%1\\*?\\s+%2\\s+HD\\(.*\\\\EFI\\\\%3\\\\(shimx64|grubx64|grubia32|fbx64)\\.efi.*$")
-                        .arg(bootnum,
-                            QRegularExpression::escape(loaderLabel),
-                            QRegularExpression::escape(loaderID));
-                    const QRegularExpression detailRegex(pattern);
-                    for (const QString &line : details) {
-                        if (detailRegex.match(line).hasMatch()) {
-                            hasExactMatch = true;
+                }
+
+                if (targetBootnum.isEmpty()) {
+                    proc.log(u"Creating EFI boot entry "_s + loaderLabel + u" (missing)"_s,
+                        MProcess::LOG_STATUS);
+                    if (!createFirmwareEntry()) return;
+                    entries = listEntries();
+                    if (entries.isEmpty()) return;
+                    bootOrderLine.clear();
+                    bootEntryOrder.clear();
+                    for (const QString &line : entries) {
+                        if (line.startsWith(u"BootOrder:"_s)) {
+                            bootOrderLine = line;
+                            continue;
+                        }
+                        const QRegularExpressionMatch match = entryRegex.match(line);
+                        if (!match.hasMatch()) continue;
+                        const QString bootnum = match.captured(1).toUpper();
+                        const QString currentLabel = match.captured(2).trimmed();
+                        if (currentLabel == loaderLabel) {
+                            targetBootnum = bootnum;
                             break;
                         }
                     }
+                    if (targetBootnum.isEmpty()) {
+                        proc.log(u"Failed to locate EFI entry for "_s + loaderLabel
+                            + u" after creation"_s, MProcess::LOG_FAIL);
+                        return;
+                    }
                 }
-                if (!hasLoaderLabel || !hasExactMatch) {
-                    proc.log(u"Creating EFI boot entry "_s + loaderLabel + u" (missing)"_s,
-                        MProcess::LOG_STATUS);
-                    createFirmwareEntry();
+                if (bootEntryOrder.isEmpty()) bootEntryOrder << targetBootnum;
+
+                QStringList bootOrder = parseBootOrderLine(bootOrderLine);
+                if (bootOrder.isEmpty()) bootOrder = bootEntryOrder;
+
+                if (!bootOrder.isEmpty() && bootOrder.first() == targetBootnum) {
+                    proc.log(u"EFI boot order already prioritizes "_s + loaderLabel,
+                        MProcess::LOG_LOG);
+                    return;
+                }
+
+                QStringList newOrder;
+                newOrder << targetBootnum;
+                for (const QString &entry : bootOrder) {
+                    const QString upperEntry = entry.toUpper();
+                    if (upperEntry.isEmpty() || upperEntry == targetBootnum) continue;
+                    if (!newOrder.contains(upperEntry)) newOrder << upperEntry;
+                }
+                const QString desired = newOrder.join(","_L1);
+                proc.log(u"Setting EFI boot order to "_s + desired + u" (prefers "_s + loaderLabel + u")"_s,
+                    MProcess::LOG_STATUS);
+                if (!proc.exec(u"efibootmgr"_s, {u"-o"_s, desired})) {
+                    proc.log(u"Failed to set EFI boot order to prefer "_s + loaderLabel,
+                        MProcess::LOG_FAIL);
                 }
             };
             const bool wasStrictNvram = sect.strict();
