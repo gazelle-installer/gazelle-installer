@@ -335,7 +335,7 @@ bool Replacer::preparePartMan() const noexcept
         PartMan::Device *dev = resolveFsDevice(mount.fsname, &mount);
         if (!dev) continue;
         setMount(dev, mount.dir, &mount);
-        if ((mount.dir.startsWith(u"/"_s) && (mount.dir != "/" && rbase.homeSeparate))
+        if (mount.dir.startsWith(u"/"_s)
             || mount.type.compare(u"swap"_s, Qt::CaseInsensitive) == 0
             || mount.dir.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
             auto preserve = [&](PartMan::Device *target) {
