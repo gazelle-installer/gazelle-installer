@@ -548,7 +548,7 @@ void PartMan::treeMenu(const QPoint &)
         actClear->setDisabled(locked);
         actReset->setDisabled(locked);
 
-        const long long minSpace = brave ? 0 : volSpecTotal(u"/"_s, QStringList()).minimum;
+        const long long minSpace = brave ? 0 : volSpecTotal(u"/"_s, false).minimum;
         actBuilder->setEnabled(!locked && autopart && seldev->size >= minSpace);
 
         QAction *action = menu.exec(QCursor::pos());
@@ -1000,22 +1000,22 @@ bool PartMan::confirmSpace() const noexcept
     msgbox.setDefaultButton(QMessageBox::No);
 
     // Isolate used points from each other in total calculations
-    QStringList vols;
+    QStringList excludes;
     for (Iterator it(*this); *it; it.next()) {
         const QString &use = (*it)->usefor;
-        if (!use.isEmpty()) vols.append(use);
+        if (!use.isEmpty()) excludes.append(use);
     }
 
     QStringList toosmall;
     for (const Device *drive : std::as_const(root->children)) {
         for (const Device *part : std::as_const(drive->children)) {
             bool isused = !part->usefor.isEmpty();
-            long long minsize = isused ? volSpecTotal(part->usefor, vols).minimum : 0;
+            long long minsize = isused ? volSpecTotal(part->usefor, excludes).minimum : 0;
 
             // First pass = get the total minimum required for all subvolumes.
             for (const Device *subvol : std::as_const(part->children)) {
                 if(!subvol->usefor.isEmpty()) {
-                    minsize += volSpecTotal(subvol->usefor, vols).minimum;
+                    minsize += volSpecTotal(subvol->usefor, excludes).minimum;
                     isused = true;
                 }
             }
@@ -1030,7 +1030,7 @@ bool PartMan::confirmSpace() const noexcept
                 for (const Device *subvol : std::as_const(part->children)) {
                     if (subvol->usefor.isEmpty()) continue;
 
-                    const long long svmin = volSpecTotal(subvol->usefor, vols).minimum;
+                    const long long svmin = volSpecTotal(subvol->usefor, excludes).minimum;
                     if (svmin > 0) {
                         svsmall << msgsz.arg(subvol->usefor, subvol->shownDevice(),
                             QLocale::system().formattedDataSize(svmin, 1, QLocale::DataSizeTraditionalFormat));
@@ -1169,7 +1169,7 @@ bool PartMan::checkTargetDrivesOK() const
 
 PartMan::Device *PartMan::selectedDriveAuto() noexcept
 {
-    QString drv(gui.comboDisk->currentData().toString());
+    QString drv(gui.comboDiskRoot->currentData().toString());
     if (!findByPath("/dev/"_L1 + drv)) return nullptr;
     for (Device *drive : root->children) {
         if (drive->name == drv) return drive;
@@ -1665,14 +1665,14 @@ PartMan::Device *PartMan::findHostDev(const QString &path) const noexcept
     return device;
 }
 
-struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStringList &vols) const noexcept
+struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStringList &excludes) const noexcept
 {
     struct VolumeSpec vspec = {0};
     const auto fit = volSpecs.find(path);
     if (fit != volSpecs.cend()) vspec = fit->second;
     const QString &spath = (path!='/' ? path+'/' : path);
     for (const auto &it : volSpecs) {
-        if (it.first.size() > 1 && it.first.startsWith(spath) && !vols.contains(it.first)) {
+        if (it.first.size() > 1 && it.first.startsWith(spath) && !excludes.contains(it.first)) {
             vspec.image += it.second.image;
             vspec.minimum += it.second.minimum;
             vspec.preferred += it.second.preferred;
@@ -1680,15 +1680,17 @@ struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStr
     }
     return vspec;
 }
-struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path) const noexcept
+struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, bool excludeChildMounts) const noexcept
 {
-    QStringList vols;
-    for (Iterator it(*this); *it; it.next()) {
-        if ((*it)->canMount()) {
-            vols.append((*it)->mountPoint());
+    QStringList excludes;
+    if (excludeChildMounts) {
+        for (Iterator it(*this); *it; it.next()) {
+            if ((*it)->canMount()) {
+                excludes.append((*it)->mountPoint());
+            }
         }
     }
-    return volSpecTotal(path, vols);
+    return volSpecTotal(path, excludes);
 }
 
 /*************************\

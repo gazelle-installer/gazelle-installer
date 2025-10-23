@@ -35,7 +35,8 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     Ui::MeInstall &ui, MIni &appConf, QObject *parent) noexcept
     : QObject(parent), proc(mproc), core(mcore), gui(ui), partman(pman)
 {
-    connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
+    connect(gui.checkDoubleDisk, &QCheckBox::toggled, this, &AutoPart::checkDoubleDiskToggled);
+    connect(gui.comboDiskRoot, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
     connect(gui.checkEncryptAuto, &QCheckBox::toggled, this, &AutoPart::toggleEncrypt);
     connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
         [this](bool checked){ setParams(true, gui.checkEncryptAuto->isChecked(), checked, true); });
@@ -64,37 +65,58 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     installFromRootDevice = appConf.getBoolean(u"InstallFromRootDevice"_s);
     appConf.setSection();
     refresh();
+    // Ensure the displayed auto partition controls are appropriate.
+    checkDoubleDiskToggled(gui.checkDoubleDisk->isChecked());
 }
 
 void AutoPart::manageConfig(MSettings &config) noexcept
 {
     config.setSection(u"Storage"_s, gui.pageDisk);
-    config.manageComboBox(u"Drive"_s, gui.comboDisk, true);
+    config.manageComboBox(u"DriveRoot"_s, gui.comboDiskRoot, true);
+    config.manageComboBox(u"DriveHome"_s, gui.comboDiskHome, true);
     config.manageCheckBox(u"DriveEncrypt"_s, gui.checkEncryptAuto);
-    if (config.isSave()) {
-        config.setInteger(u"RootPortion"_s, gui.sliderPart->value());
-    } else if (config.contains(u"RootPortion"_s)) {
-         const int portion = config.getInteger(u"RootPortion"_s);
-         gui.sliderPart->setSliderPosition(portion);
-         if (gui.sliderPart->value() != portion) {
-             config.markBadWidget(gui.boxSliderPart);
-         }
+    if (gui.comboDiskRoot->currentData() == gui.comboDiskHome->currentData()) {
+        gui.checkDoubleDisk->setChecked(false);
+    } else {
+        gui.checkDoubleDisk->setChecked(true);
+        if (config.isSave()) {
+            config.setInteger(u"RootPortion"_s, gui.sliderPart->value());
+        } else if (config.contains(u"RootPortion"_s)) {
+             const int portion = config.getInteger(u"RootPortion"_s);
+             gui.sliderPart->setSliderPosition(portion);
+             if (gui.sliderPart->value() != portion) {
+                 config.markBadWidget(gui.boxSliderPart);
+             }
+        }
     }
 }
 
 void AutoPart::scan() noexcept
 {
-    long long minSpace = partman->volSpecTotal(u"/"_s, QStringList()).minimum;
-    gui.comboDisk->blockSignals(true);
-    gui.comboDisk->clear();
+    long long minSpace = partman->volSpecTotal(u"/"_s, false).minimum;
+    gui.comboDiskRoot->blockSignals(true);
+    gui.comboDiskHome->blockSignals(true);
+    gui.comboDiskRoot->clear();
+    gui.comboDiskHome->clear();
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::DRIVE && (!device->flags.bootRoot || installFromRootDevice)) {
             if (buildLayout(device, LLONG_MAX, false, false) >= minSpace) {
-                device->addToCombo(gui.comboDisk);
+                device->addToCombo(gui.comboDiskRoot);
+            }
+            if (device->size >= minHome) {
+                device->addToCombo(gui.comboDiskHome);
             }
         }
     }
-    gui.comboDisk->blockSignals(false);
+    if (gui.comboDiskHome->count() < 1) {
+        gui.checkDoubleDisk->setChecked(false);
+        gui.checkDoubleDisk->setEnabled(false);
+    } else if (gui.comboDiskHome->count() == 1 && gui.comboDiskRoot->count() == 1) {
+        gui.checkDoubleDisk->setChecked(gui.comboDiskHome->itemData(0) != gui.comboDiskRoot->itemData(0));
+        gui.checkDoubleDisk->setEnabled(false);
+    }
+    gui.comboDiskHome->blockSignals(false);
+    gui.comboDiskRoot->blockSignals(false);
     diskChanged();
     refresh();
 }
@@ -186,7 +208,7 @@ long long AutoPart::partSize(Part part) const noexcept
 
 PartMan::Device *AutoPart::selectedDrive() const noexcept
 {
-    return partman->findByPath("/dev/"_L1 + gui.comboDisk->currentData().toString());
+    return partman->findByPath("/dev/"_L1 + gui.comboDiskRoot->currentData().toString());
 }
 
 // Layout Builder
@@ -321,6 +343,13 @@ QString AutoPart::sizeString(long long size) noexcept
 
 // Slots
 
+void AutoPart::checkDoubleDiskToggled(bool checked) noexcept
+{
+    gui.labelDiskRoot->setText(checked ? tr("Root disk:") : tr("Use disk:"));
+    gui.labelDiskHome->setVisible(checked);
+    gui.comboDiskHome->setVisible(checked);
+    gui.boxSliderPart->setHidden(checked);
+}
 void AutoPart::diskChanged() noexcept
 {
     PartMan::Device *drive = selectedDrive();

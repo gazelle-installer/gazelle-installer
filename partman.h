@@ -107,8 +107,8 @@ public:
     bool promptUnlock(Device *part, bool temporary = false) noexcept;
     void closeTemporaryUnlocks() noexcept;
     void clearReadOnly(class Device *device) noexcept;
-    struct VolumeSpec volSpecTotal(const QString &path, const QStringList &vols) const noexcept;
-    struct VolumeSpec volSpecTotal(const QString &path) const noexcept;
+    struct VolumeSpec volSpecTotal(const QString &path, const QStringList &excludes) const noexcept;
+    struct VolumeSpec volSpecTotal(const QString &path, bool excludeChildMounts = true) const noexcept;
     /* Convenience */
     struct NameParts {
         QString drive;

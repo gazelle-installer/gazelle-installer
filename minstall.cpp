@@ -211,6 +211,7 @@ void MInstall::startup()
         replacer = new Replacer(proc, partman, gui, appConf);
         //experimental tag
         gui.radioReplace->setText(gui.radioReplace->text() + " (" + tr("Experimental","As In feature is not polished and may not work properly") + ")");
+        connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.checkDoubleDisk, &QCheckBox::setEnabled);
         connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
         gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
             + "<br/><img src=':/dialog-warning'/>"_L1 + tr("These actions cannot be undone. Do you want to continue?")
@@ -242,8 +243,8 @@ void MInstall::startup()
         partman->scan();
         autopart->scan();
         replacer->scan();
-        if (gui.comboDisk->count() > 0) {
-            gui.comboDisk->setCurrentIndex(0);
+        if (gui.comboDiskRoot->count() > 0) {
+            gui.comboDiskRoot->setCurrentIndex(0);
             gui.radioEntireDisk->setChecked(true);
             for (PartMan::Iterator it(*partman); *it; it.next()) {
                 if ((*it)->isVolume()) {
@@ -254,6 +255,7 @@ void MInstall::startup()
             }
         } else {
             gui.radioEntireDisk->setEnabled(false);
+            gui.checkDoubleDisk->setEnabled(false);
             gui.boxAutoPart->setEnabled(false);
             gui.radioCustomPart->setChecked(true);
         }
@@ -502,7 +504,7 @@ void MInstall::loadConfig(int stage) noexcept
     if (stage == 1) {
         // Automatic or Manual partitioning
         config.setSection(u"Storage"_s, gui.pageDisk);
-        static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
+        static constexpr const char *diskChoices[] = {"Drives", "Partitions"};
         QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
         config.manageRadios(u"Target"_s, 2, diskChoices, diskRadios);
 
@@ -539,7 +541,7 @@ void MInstall::saveConfig() noexcept
 
     // Automatic or Manual partitioning
     config.setSection(u"Storage"_s, gui.pageDisk);
-    static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
+    static constexpr const char *diskChoices[] = {"Drives", "Partitions"};
     QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
     config.manageRadios(u"Target"_s, 2, diskChoices, diskRadios);
 

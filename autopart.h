@@ -42,6 +42,7 @@ class AutoPart : public QObject
     class QCheckBox *checkSnapshot = nullptr;
     bool inBuilder = false;
     // Slots
+    void checkDoubleDiskToggled(bool checked) noexcept;
     void diskChanged() noexcept;
     void toggleEncrypt(bool checked) noexcept;
     void sliderPressed() noexcept;

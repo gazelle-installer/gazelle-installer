@@ -341,21 +341,48 @@
               <string>Select type of installation</string>
              </property>
              <layout class="QGridLayout">
-              <item row="1" column="0" colspan="3">
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="radioEntireDisk">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Regular install using the entire disk</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="checkDoubleDisk">
+                <property name="text">
+                 <string>Use two disks</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
                <widget class="QGroupBox" name="boxAutoPart">
                 <layout class="QFormLayout">
-                 <item row="1" column="1">
-                  <widget class="QComboBox" name="comboDisk"/>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="labelDisk">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="labelDiskRoot">
                    <property name="text">
-                    <string>Use disk:</string>
-                   </property>
-                   <property name="wordWrap">
-                    <bool>false</bool>
+                    <string>Root disk:</string>
                    </property>
                   </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="comboDiskRoot"/>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="labelDiskHome">
+                   <property name="text">
+                    <string>Home disk:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QComboBox" name="comboDiskHome"/>
                  </item>
                  <item row="2" column="0" colspan="2">
                   <widget class="QFrame" name="boxSliderPart">
@@ -518,27 +545,8 @@ QSlider::handle:horizontal:disabled {
                 </layout>
                </widget>
               </item>
-              <item row="0" column="0" colspan="3">
-               <widget class="QRadioButton" name="radioEntireDisk">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Regular install using the entire disk</string>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="0" colspan="2">
                <widget class="QRadioButton" name="radioCustomPart">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
                 <property name="text">
                  <string>Customize the disk layout</string>
                 </property>
@@ -2010,7 +2018,9 @@ QSlider::handle:horizontal:disabled {
   <tabstop>pushBack</tabstop>
   <tabstop>pushNext</tabstop>
   <tabstop>radioEntireDisk</tabstop>
-  <tabstop>comboDisk</tabstop>
+  <tabstop>checkDoubleDisk</tabstop>
+  <tabstop>comboDiskRoot</tabstop>
+  <tabstop>comboDiskHome</tabstop>
   <tabstop>sliderPart</tabstop>
   <tabstop>radioCustomPart</tabstop>
   <tabstop>radioReplace</tabstop>

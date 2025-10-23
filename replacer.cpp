@@ -49,7 +49,7 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
         gui.tableExistInst->removeRow(0);
     }
 
-    long long minSpace = partman->volSpecTotal(u"/"_s, QStringList()).minimum;
+    long long minSpace = partman->volSpecTotal(u"/"_s, false).minimum;
     bases.clear();
     bool rescan = false;
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
