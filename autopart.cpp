@@ -72,42 +72,56 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
 void AutoPart::manageConfig(MSettings &config) noexcept
 {
     config.setSection(u"Storage"_s, gui.pageDisk);
-    config.manageComboBox(u"DriveRoot"_s, gui.comboDiskRoot, true);
-    config.manageComboBox(u"DriveHome"_s, gui.comboDiskHome, true);
-    config.manageCheckBox(u"DriveEncrypt"_s, gui.checkEncryptAuto);
+    config.manageComboBox(u"Root"_s, gui.comboDiskRoot, true);
+    config.manageComboBox(u"Home"_s, gui.comboDiskHome, true);
+    config.manageCheckBox(u"Encrypt"_s, gui.checkEncryptAuto);
     if (gui.comboDiskRoot->currentData() == gui.comboDiskHome->currentData()) {
         gui.checkDoubleDisk->setChecked(false);
-    } else {
-        gui.checkDoubleDisk->setChecked(true);
         if (config.isSave()) {
             config.setInteger(u"RootPortion"_s, gui.sliderPart->value());
         } else if (config.contains(u"RootPortion"_s)) {
-             const int portion = config.getInteger(u"RootPortion"_s);
-             gui.sliderPart->setSliderPosition(portion);
-             if (gui.sliderPart->value() != portion) {
-                 config.markBadWidget(gui.boxSliderPart);
-             }
+            const int portion = config.getInteger(u"RootPortion"_s);
+            gui.sliderPart->setSliderPosition(portion);
+            if (gui.sliderPart->value() != portion) {
+                config.markBadWidget(gui.boxSliderPart);
+            }
         }
+    } else {
+        gui.checkDoubleDisk->setChecked(true);
     }
 }
 
 void AutoPart::scan() noexcept
 {
-    long long minSpace = partman->volSpecTotal(u"/"_s, false).minimum;
     gui.comboDiskRoot->blockSignals(true);
     gui.comboDiskHome->blockSignals(true);
     gui.comboDiskRoot->clear();
     gui.comboDiskHome->clear();
+    long long largestHome = 0;
+    const bool doubleDisk = gui.checkDoubleDisk->isChecked();
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::DRIVE && (!device->flags.bootRoot || installFromRootDevice)) {
-            if (buildLayout(device, LLONG_MAX, false, false) >= minSpace) {
+            QStringList excludes;
+            const long long sizeHead = layoutHead(device, false, false, &excludes);
+            if (doubleDisk) {
+                excludes.append(u"/home"_s); // Home on a separate disk.
+            }
+            const long long minSize = partman->volSpecTotal(u"/"_s, excludes).minimum;
+
+            if ((device->size - sizeHead) >= minSize) {
                 device->addToCombo(gui.comboDiskRoot);
             }
             if (device->size >= minHome) {
                 device->addToCombo(gui.comboDiskHome);
+                // Select the largest drive for home that is not already chosen for root.
+                if (doubleDisk && device->size > largestHome && device->name != gui.comboDiskRoot->currentData()) {
+                    largestHome = device->size;
+                    gui.comboDiskHome->setCurrentIndex(gui.comboDiskHome->count() - 1);
+                }
             }
         }
     }
+
     if (gui.comboDiskHome->count() < 1) {
         gui.checkDoubleDisk->setChecked(false);
         gui.checkDoubleDisk->setEnabled(false);
@@ -174,7 +188,7 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
     QStringList volumes;
     PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
     if (!drive) return;
-    available = buildLayout(drive, -1, encrypt, false, &volumes);
+    available = drive->size - layoutHead(drive, encrypt, false, &volumes);
     volumes.append(u"/home"_s);
     const PartMan::VolumeSpec &vspecRoot = partman->volSpecTotal(u"/"_s, volumes);
     if (available <= vspecRoot.minimum) return;
@@ -259,12 +273,15 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
     layout.addRow(u"Allow for one standard snapshot"_s, checkSnapshot);
 
     // Is encryption possible?
-    const bool canEncrypt = (buildLayout(drive, -1, true, false) >= minRoot);
-    checkEncrypt->setEnabled(canEncrypt);
-    if (!canEncrypt) checkEncrypt->setChecked(false);
+    if ((drive->size - layoutHead(drive, true, false)) >= minRoot) {
+        checkEncrypt->setEnabled(true);
+    } else {
+        checkEncrypt->setEnabled(false);
+        checkEncrypt->setChecked(false);
+    }
 
     auto updateUI = [&]() {
-        available = buildLayout(drive, -1, checkEncrypt->isChecked(), false);
+        available = drive->size - layoutHead(drive, checkEncrypt->isChecked(), false);
         // Is hibernation possible?
         bool canHibernate = checkSwapFile->isChecked() && (available >= (minRoot + swapHiber));
         checkHibernation->setEnabled(canHibernate);
@@ -288,7 +305,19 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
     connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     if (dialog.exec() == QDialog::Accepted) {
-        buildLayout(drive, sizeRoot, checkEncrypt->isChecked());
+        drive->clear();
+        long long remain = drive->size;
+        const bool crypto = checkEncrypt->isChecked();
+
+        remain -= layoutHead(drive, crypto, true);
+        drive->addPart(sizeRoot, u"/"_s, crypto);
+        remain -= sizeRoot;
+        if (remain > 0) {
+            drive->addPart(remain, u"/home"_s, crypto);
+        }
+        drive->labelParts();
+        drive->driveAutoSetActive();
+
         gui.boxSwapFile->setChecked(checkSwapFile->isChecked());
         gui.checkHibernation->setChecked(checkHibernation->isChecked());
     }
@@ -304,44 +333,63 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
     inBuilder = false;
 }
 
-long long AutoPart::buildLayout(PartMan::Device *drive, long long rootFormatSize,
-    bool crypto, bool updateTree, QStringList *volList) noexcept
+bool AutoPart::buildLayout() noexcept
 {
-    if (updateTree) drive->clear();
-    if (rootFormatSize < 0) rootFormatSize = LLONG_MAX;
-    long long remaining = drive->size - PARTMAN_SAFETY;
+    partman->scan();
+    const bool crypto = gui.checkEncryptAuto->isChecked();
+    PartMan::Device *drvroot = selectedDrive(gui.comboDiskRoot);
+    PartMan::Device *drvhome = selectedDrive(gui.comboDiskHome);
+    if (!drvroot || !drvhome) return false;
 
-    // Boot partitions.
-    if (core.detectEFI()) {
-        if (updateTree) drive->addPart(256*MB, u"ESP"_s, crypto);
-        if (volList) volList->append(u"ESP"_s);
-        remaining -= 256*MB;
-    } else if (drive->format == "GPT"_L1) {
-        if (updateTree) drive->addPart(1*MB, u"BIOS-GRUB"_s, crypto);
-        if (volList) volList->append(u"BIOS-GRUB"_s);
-        remaining -= 1*MB;
+    drvroot->clear();
+
+    long long rootSize = drvroot->size - layoutHead(drvroot, crypto, true);
+    long long homeSize = drvhome->size - PARTMAN_SAFETY;
+    if (gui.checkDoubleDisk->isChecked()) {
+        drvhome->clear();
+    } else {
+        drvhome = drvroot;
+        rootSize = partSize(Root);
+        homeSize = partSize(Home);
     }
+
+    drvroot->addPart(rootSize, u"/"_s, crypto);
+    if (homeSize > 0) {
+        drvhome->addPart(homeSize, u"/home"_s, crypto);
+    }
+
+    drvroot->labelParts();
+    drvroot->driveAutoSetActive();
+    if (drvhome != drvroot) {
+        drvhome->labelParts();
+        drvhome->driveAutoSetActive();
+    }
+    return true;
+}
+
+long long AutoPart::layoutHead(PartMan::Device *drive, bool crypto,
+    bool addToTree, QStringList *volList) noexcept
+{
+    long long total = PARTMAN_SAFETY;
+
+    if (core.detectEFI()) {
+        if (addToTree) drive->addPart(256*MB, u"ESP"_s, crypto);
+        if (volList) volList->append(u"ESP"_s);
+        total += 256*MB;
+    } else if (drive->format == "GPT"_L1) {
+        if (addToTree) drive->addPart(1*MB, u"BIOS-GRUB"_s, crypto);
+        if (volList) volList->append(u"BIOS-GRUB"_s);
+        total += 1*MB;
+    }
+
     if (crypto) {
         const long long bootFormatSize = partman->volSpecs[u"/boot"_s].preferred;
-        if (updateTree) drive->addPart(bootFormatSize, u"/boot"_s, crypto);
+        if (addToTree) drive->addPart(bootFormatSize, u"/boot"_s, crypto);
         if (volList) volList->append(u"/boot"_s);
-        remaining -= bootFormatSize;
+        total += bootFormatSize;
     }
 
-    // Root and Home
-    if (rootFormatSize > remaining) rootFormatSize = remaining;
-    remaining -= rootFormatSize;
-    if (volList) {
-        volList->append(u"/"_s);
-        if (remaining > 0) volList->append(u"/home"_s);
-    }
-    if (updateTree) {
-        drive->addPart(rootFormatSize, u"/"_s, crypto);
-        if (remaining > 0) drive->addPart(remaining, u"/home"_s, crypto);
-        drive->labelParts();
-        drive->driveAutoSetActive();
-    }
-    return rootFormatSize;
+    return total;
 }
 
 // Helpers
@@ -363,6 +411,7 @@ void AutoPart::checkDoubleDiskToggled(bool checked) noexcept
     gui.labelDiskHome->setVisible(checked);
     gui.comboDiskHome->setVisible(checked);
     gui.boxSliderPart->setHidden(checked);
+    scan();
 }
 void AutoPart::diskChanged() noexcept
 {
@@ -370,9 +419,12 @@ void AutoPart::diskChanged() noexcept
     if (!drive) return;
 
     // Is encryption possible?
-    const bool canEncrypt = (buildLayout(drive, -1, true, false) >= minRoot);
-    gui.checkEncryptAuto->setEnabled(canEncrypt);
-    if (!canEncrypt) gui.checkEncryptAuto->setChecked(false);
+    if ((drive->size - layoutHead(drive, true, false)) >= minRoot) {
+        gui.checkEncryptAuto->setEnabled(true);
+    } else {
+        gui.checkEncryptAuto->setEnabled(false);
+        gui.checkEncryptAuto->setChecked(false);
+    }
 
     // Refresh encrypt/hibernate capabilities and cascade to set parameters.
     toggleEncrypt(gui.checkEncryptAuto->isChecked());
@@ -381,10 +433,14 @@ void AutoPart::toggleEncrypt(bool checked) noexcept
 {
     PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
     if (!drive) return;
+
     // Is hibernation possible?
-    const bool canHibernate = (buildLayout(drive, -1, checked, false) >= (minRoot + SwapMan::recommended(true)));
-    gui.checkHibernationReg->setEnabled(canHibernate);
-    if (!canHibernate) gui.checkHibernationReg->setChecked(false);
+    if ((drive->size - layoutHead(drive, checked, false)) >= (minRoot + SwapMan::recommended(true))) {
+        gui.checkHibernationReg->setEnabled(true);
+    } else {
+        gui.checkHibernationReg->setEnabled(false);
+        gui.checkHibernationReg->setChecked(false);
+    }
 
     setParams(true, checked, gui.checkHibernationReg->isChecked(), true);
 }

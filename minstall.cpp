@@ -586,10 +586,10 @@ int MInstall::showPage(int curr, int next) noexcept
             if (!autopart->validate(automatic, PROJECTNAME)) {
                 return curr;
             }
+            gui.treeConfirm->expandAll();
             if (gui.checkEncryptAuto->isChecked()) {
                 return Step::ENCRYPTION;
             }
-            gui.treeConfirm->expandAll();
             return Step::CONFIRM;
         } else if (gui.radioCustomPart->isChecked()) {
             return Step::PARTITIONS;
@@ -647,14 +647,11 @@ int MInstall::showPage(int curr, int next) noexcept
         if (next > curr) {
             if (gui.radioEntireDisk->isChecked()) {
                 gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
-                partman->scan();
-                PartMan::Device *drive = autopart->selectedDrive(gui.comboDiskRoot);
-                if (!drive) {
+                if (!autopart->buildLayout()) {
                     gui.labelSplash->setText(tr("Cannot find selected drive."));
                     abortEndUI(false);
                     return Step::SPLASH;
                 }
-                autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
                 next = (advanced ? Step::BOOT : Step::SWAP);
             } else if (!gui.radioReplace->isChecked()) {
                 advanced = true;

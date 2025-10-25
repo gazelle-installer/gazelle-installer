@@ -64,8 +64,9 @@ public:
     class PartMan::Device *selectedDrive(const class QComboBox *combo) const noexcept;
     // Layout Builder
     void builderGUI(class PartMan::Device *drive) noexcept;
-    long long buildLayout(class PartMan::Device *drive, long long rootFormatSize,
-        bool crypto, bool updateTree=true, QStringList *volList=nullptr) noexcept;
+    bool buildLayout() noexcept;
+    long long layoutHead(PartMan::Device *drive, bool crypto,
+        bool addToTree, QStringList *volList = nullptr) noexcept;
     // Helpers
     static QString sizeString(long long size) noexcept;
 };
