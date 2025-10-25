@@ -35,9 +35,9 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     Ui::MeInstall &ui, MIni &appConf, QObject *parent) noexcept
     : QObject(parent), proc(mproc), core(mcore), gui(ui), partman(pman)
 {
-    connect(gui.checkDualDisk, &QCheckBox::toggled, this, &AutoPart::checkDualDisk_toggled);
-    connect(gui.comboDiskRoot, QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this, &AutoPart::comboDiskRoot_currentIndexChanged);
+    connect(gui.checkDualDrive, &QCheckBox::toggled, this, &AutoPart::checkDualDrive_toggled);
+    connect(gui.comboDriveSystem, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this, &AutoPart::comboDriveSystem_currentIndexChanged);
     connect(gui.checkEncryptAuto, &QCheckBox::toggled, this, &AutoPart::checkEncryptAuto_toggled);
     connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
         [this](bool checked){ setParams(true, gui.checkEncryptAuto->isChecked(), checked, true); });
@@ -67,17 +67,17 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     appConf.setSection();
     refresh();
     // Ensure the displayed auto partition controls are appropriate.
-    checkDualDisk_toggled(gui.checkDualDisk->isChecked());
+    checkDualDrive_toggled(gui.checkDualDrive->isChecked());
 }
 
 void AutoPart::manageConfig(MSettings &config) noexcept
 {
-    config.setSection(u"Storage"_s, gui.pageDisk);
-    config.manageComboBox(u"Root"_s, gui.comboDiskRoot, true);
-    config.manageComboBox(u"Home"_s, gui.comboDiskHome, true);
+    config.setSection(u"Storage"_s, gui.pageInstallation);
+    config.manageComboBox(u"System"_s, gui.comboDriveSystem, true);
+    config.manageComboBox(u"Home"_s, gui.comboDriveHome, true);
     config.manageCheckBox(u"Encrypt"_s, gui.checkEncryptAuto);
-    if (gui.comboDiskRoot->currentData() == gui.comboDiskHome->currentData()) {
-        gui.checkDualDisk->setChecked(false);
+    if (gui.comboDriveSystem->currentData() == gui.comboDriveHome->currentData()) {
+        gui.checkDualDrive->setChecked(false);
         if (config.isSave()) {
             config.setInteger(u"RootPortion"_s, gui.sliderPart->value());
         } else if (config.contains(u"RootPortion"_s)) {
@@ -88,51 +88,51 @@ void AutoPart::manageConfig(MSettings &config) noexcept
             }
         }
     } else {
-        gui.checkDualDisk->setChecked(true);
+        gui.checkDualDrive->setChecked(true);
     }
 }
 
 void AutoPart::scan() noexcept
 {
-    gui.comboDiskRoot->blockSignals(true);
-    gui.comboDiskHome->blockSignals(true);
-    gui.comboDiskRoot->clear();
-    gui.comboDiskHome->clear();
+    gui.comboDriveSystem->blockSignals(true);
+    gui.comboDriveHome->blockSignals(true);
+    gui.comboDriveSystem->clear();
+    gui.comboDriveHome->clear();
     long long largestHome = 0;
-    const bool dualDisk = gui.checkDualDisk->isChecked();
+    const bool dualDrive = gui.checkDualDrive->isChecked();
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::DRIVE && (!device->flags.bootRoot || installFromRootDevice)) {
             QStringList excludes;
             const long long sizeHead = layoutHead(device, false, false, &excludes);
-            if (dualDisk) {
-                excludes.append(u"/home"_s); // Home on a separate disk.
+            if (dualDrive) {
+                excludes.append(u"/home"_s); // Home on a separate drive.
             }
             const long long minSize = partman->volSpecTotal(u"/"_s, excludes).minimum;
 
             if ((device->size - sizeHead) >= minSize) {
-                device->addToCombo(gui.comboDiskRoot);
+                device->addToCombo(gui.comboDriveSystem);
             }
             if (device->size >= minHome) {
-                device->addToCombo(gui.comboDiskHome);
-                // Select the largest drive for home that is not already chosen for root.
-                if (dualDisk && device->size > largestHome && device->name != gui.comboDiskRoot->currentData()) {
+                device->addToCombo(gui.comboDriveHome);
+                // Select the largest drive for home that is not already chosen for the system drive.
+                if (dualDrive && device->size > largestHome && device->name != gui.comboDriveSystem->currentData()) {
                     largestHome = device->size;
-                    gui.comboDiskHome->setCurrentIndex(gui.comboDiskHome->count() - 1);
+                    gui.comboDriveHome->setCurrentIndex(gui.comboDriveHome->count() - 1);
                 }
             }
         }
     }
 
-    if (gui.comboDiskHome->count() < 1) {
-        gui.checkDualDisk->setChecked(false);
-        gui.checkDualDisk->setEnabled(false);
-    } else if (gui.comboDiskHome->count() == 1 && gui.comboDiskRoot->count() == 1) {
-        gui.checkDualDisk->setChecked(gui.comboDiskHome->itemData(0) != gui.comboDiskRoot->itemData(0));
-        gui.checkDualDisk->setEnabled(false);
+    if (gui.comboDriveHome->count() < 1) {
+        gui.checkDualDrive->setChecked(false);
+        gui.checkDualDrive->setEnabled(false);
+    } else if (gui.comboDriveHome->count() == 1 && gui.comboDriveSystem->count() == 1) {
+        gui.checkDualDrive->setChecked(gui.comboDriveHome->itemData(0) != gui.comboDriveSystem->itemData(0));
+        gui.checkDualDrive->setEnabled(false);
     }
-    gui.comboDiskHome->blockSignals(false);
-    gui.comboDiskRoot->blockSignals(false);
-    comboDiskRoot_currentIndexChanged();
+    gui.comboDriveHome->blockSignals(false);
+    gui.comboDriveSystem->blockSignals(false);
+    comboDriveSystem_currentIndexChanged();
     refresh();
 }
 void AutoPart::refresh() noexcept
@@ -152,10 +152,10 @@ void AutoPart::refresh() noexcept
 
 bool AutoPart::validate(bool automatic, const QString &project) const noexcept
 {
-    PartMan::Device *drvroot = selectedDrive(gui.comboDiskRoot);
-    PartMan::Device *drvhome = selectedDrive(gui.comboDiskHome);
-    if (!drvroot || !drvhome) return false;
-    if (!automatic && !core.detectEFI() && drvroot->size >= 2*TB) {
+    PartMan::Device *drvsystem = selectedDrive(gui.comboDriveSystem);
+    PartMan::Device *drvhome = selectedDrive(gui.comboDriveHome);
+    if (!drvsystem || !drvhome) return false;
+    if (!automatic && !core.detectEFI() && drvsystem->size >= 2*TB) {
         QMessageBox msgbox(gui.boxMain);
         msgbox.setIcon(QMessageBox::Warning);
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
@@ -165,21 +165,21 @@ bool AutoPart::validate(bool automatic, const QString &project) const noexcept
             + '\n' + tr("Are you sure you want to continue?"));
         if (msgbox.exec() != QMessageBox::Yes) return false;
     }
-    if (gui.checkDualDisk->isChecked()) {
-        if (drvhome == drvroot) {
+    if (gui.checkDualDrive->isChecked()) {
+        if (drvhome == drvsystem) {
             QMessageBox::critical(gui.boxMain, QString(),
-                tr("The same drive cannot be used for both root and home."));
+                tr("The system and home drives cannot be the same for this type of installation."));
             return false;
         }
         QTreeWidgetItem *twroot = new QTreeWidgetItem(gui.treeConfirm);
-        twroot->setText(0, tr("Format and use multiple disks entirely for %2").arg(project));
+        twroot->setText(0, tr("Format and use drives entirely for %1").arg(project));
         QTreeWidgetItem *twit = new QTreeWidgetItem(twroot);
-        twit->setText(0, tr("Format and use for root: %1").arg(drvroot->friendlyName()));
+        twit->setText(0, tr("System drive: %1").arg(drvsystem->friendlyName()));
         twit = new QTreeWidgetItem(twroot);
-        twit->setText(0, tr("Format and use for home: %1").arg(drvhome->friendlyName()));
+        twit->setText(0, tr("Home drive: %1").arg(drvhome->friendlyName()));
     } else {
         QTreeWidgetItem *twit = new QTreeWidgetItem(gui.treeConfirm);
-        twit->setText(0, tr("Format and use the entire disk for %1: %2").arg(project, drvroot->friendlyName()));
+        twit->setText(0, tr("Format and use the entire drive for %1: %2").arg(project, drvsystem->friendlyName()));
     }
     return true;
 }
@@ -187,7 +187,7 @@ bool AutoPart::validate(bool automatic, const QString &project) const noexcept
 void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot) noexcept
 {
     QStringList volumes;
-    PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
+    PartMan::Device *drive = selectedDrive(gui.comboDriveSystem);
     if (!drive) return;
     available = drive->size - layoutHead(drive, encrypt, false, &volumes);
     volumes.append(u"/home"_s);
@@ -324,7 +324,7 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
     }
     // Return the partition slider assembly back to the disk page.
     playout->replaceWidget(placeholder, gui.boxSliderPart);
-    comboDiskRoot_currentIndexChanged();
+    comboDriveSystem_currentIndexChanged();
     gui.sliderPart->setSliderPosition(oldPos);
     delete placeholder;
 
@@ -338,15 +338,15 @@ bool AutoPart::buildLayout() noexcept
 {
     partman->scan();
     const bool crypto = gui.checkEncryptAuto->isChecked();
-    PartMan::Device *drvroot = selectedDrive(gui.comboDiskRoot);
-    PartMan::Device *drvhome = selectedDrive(gui.comboDiskHome);
+    PartMan::Device *drvroot = selectedDrive(gui.comboDriveSystem);
+    PartMan::Device *drvhome = selectedDrive(gui.comboDriveHome);
     if (!drvroot || !drvhome) return false;
 
     drvroot->clear();
 
     long long rootSize = drvroot->size - layoutHead(drvroot, crypto, true);
     long long homeSize = drvhome->size - PARTMAN_SAFETY;
-    if (gui.checkDualDisk->isChecked()) {
+    if (gui.checkDualDrive->isChecked()) {
         drvhome->clear();
     } else {
         drvhome = drvroot;
@@ -406,17 +406,17 @@ QString AutoPart::sizeString(long long size) noexcept
 
 // Slots
 
-void AutoPart::checkDualDisk_toggled(bool checked) noexcept
+void AutoPart::checkDualDrive_toggled(bool checked) noexcept
 {
-    gui.labelDiskRoot->setText(checked ? tr("Root disk:") : tr("Use disk:"));
-    gui.labelDiskHome->setVisible(checked);
-    gui.comboDiskHome->setVisible(checked);
+    gui.labelDriveSystem->setText(checked ? tr("System drive:") : tr("Use disk:"));
+    gui.labelDriveHome->setVisible(checked);
+    gui.comboDriveHome->setVisible(checked);
     gui.boxSliderPart->setHidden(checked);
     scan();
 }
-void AutoPart::comboDiskRoot_currentIndexChanged() noexcept
+void AutoPart::comboDriveSystem_currentIndexChanged() noexcept
 {
-    PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
+    PartMan::Device *drive = selectedDrive(gui.comboDriveSystem);
     if (!drive) return;
 
     // Is encryption possible?
@@ -432,7 +432,7 @@ void AutoPart::comboDiskRoot_currentIndexChanged() noexcept
 }
 void AutoPart::checkEncryptAuto_toggled(bool checked) noexcept
 {
-    PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
+    PartMan::Device *drive = selectedDrive(gui.comboDriveSystem);
     if (!drive) return;
 
     // Is hibernation possible?

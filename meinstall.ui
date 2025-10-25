@@ -315,7 +315,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="pageDisk">
+         <widget class="QWidget" name="pageInstallation">
           <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
@@ -342,7 +342,7 @@
              </property>
              <layout class="QGridLayout">
               <item row="0" column="0">
-               <widget class="QRadioButton" name="radioEntireDisk">
+               <widget class="QRadioButton" name="radioEntireDrive">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -355,9 +355,9 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QCheckBox" name="checkDualDisk">
+               <widget class="QCheckBox" name="checkDualDrive">
                 <property name="text">
-                 <string>Dual disk</string>
+                 <string>Dual drive</string>
                 </property>
                </widget>
               </item>
@@ -365,24 +365,24 @@
                <widget class="QGroupBox" name="boxAutoPart">
                 <layout class="QFormLayout">
                  <item row="0" column="0">
-                  <widget class="QLabel" name="labelDiskRoot">
+                  <widget class="QLabel" name="labelDriveSystem">
                    <property name="text">
-                    <string>Root disk:</string>
+                    <string>System drive:</string>
                    </property>
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QComboBox" name="comboDiskRoot"/>
+                  <widget class="QComboBox" name="comboDriveSystem"/>
                  </item>
                  <item row="1" column="0">
-                  <widget class="QLabel" name="labelDiskHome">
+                  <widget class="QLabel" name="labelDriveHome">
                    <property name="text">
-                    <string>Home disk:</string>
+                    <string>Home drive:</string>
                    </property>
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QComboBox" name="comboDiskHome"/>
+                  <widget class="QComboBox" name="comboDriveHome"/>
                  </item>
                  <item row="2" column="0" colspan="2">
                   <widget class="QFrame" name="boxSliderPart">
@@ -2017,10 +2017,10 @@ QSlider::handle:horizontal:disabled {
   <tabstop>pushSetKeyboard</tabstop>
   <tabstop>pushBack</tabstop>
   <tabstop>pushNext</tabstop>
-  <tabstop>radioEntireDisk</tabstop>
-  <tabstop>checkDualDisk</tabstop>
-  <tabstop>comboDiskRoot</tabstop>
-  <tabstop>comboDiskHome</tabstop>
+  <tabstop>radioEntireDrive</tabstop>
+  <tabstop>checkDualDrive</tabstop>
+  <tabstop>comboDriveSystem</tabstop>
+  <tabstop>comboDriveHome</tabstop>
   <tabstop>sliderPart</tabstop>
   <tabstop>radioCustomPart</tabstop>
   <tabstop>radioReplace</tabstop>

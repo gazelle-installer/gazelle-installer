@@ -60,7 +60,7 @@ using namespace Qt::Literals::StringLiterals;
 enum Step {
     SPLASH,
     TERMS,
-    DISK,
+    INSTALLATION,
     REPLACE,
     PARTITIONS,
     ENCRYPTION,
@@ -211,8 +211,8 @@ void MInstall::startup()
         replacer = new Replacer(proc, partman, gui, appConf);
         //experimental tag
         gui.radioReplace->setText(gui.radioReplace->text() + " (" + tr("Experimental","As In feature is not polished and may not work properly") + ")");
-        connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.checkDualDisk, &QCheckBox::setEnabled);
-        connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
+        connect(gui.radioEntireDrive, &QRadioButton::toggled, gui.checkDualDrive, &QCheckBox::setEnabled);
+        connect(gui.radioEntireDrive, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
         gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
             + "<br/><img src=':/dialog-warning'/>"_L1 + tr("These actions cannot be undone. Do you want to continue?")
             + "<img src=':/dialog-warning'/>"_L1);
@@ -243,9 +243,9 @@ void MInstall::startup()
         partman->scan();
         autopart->scan();
         replacer->scan();
-        if (gui.comboDiskRoot->count() > 0) {
-            gui.comboDiskRoot->setCurrentIndex(0);
-            gui.radioEntireDisk->setChecked(true);
+        if (gui.comboDriveSystem->count() > 0) {
+            gui.comboDriveSystem->setCurrentIndex(0);
+            gui.radioEntireDrive->setChecked(true);
             for (PartMan::Iterator it(*partman); *it; it.next()) {
                 if ((*it)->isVolume()) {
                     // found at least one partition
@@ -254,8 +254,8 @@ void MInstall::startup()
                 }
             }
         } else {
-            gui.radioEntireDisk->setEnabled(false);
-            gui.checkDualDisk->setEnabled(false);
+            gui.radioEntireDrive->setEnabled(false);
+            gui.checkDualDrive->setEnabled(false);
             gui.boxAutoPart->setEnabled(false);
             gui.radioCustomPart->setChecked(true);
         }
@@ -503,9 +503,9 @@ void MInstall::loadConfig(int stage) noexcept
 
     if (stage == 1) {
         // Automatic or Manual partitioning
-        config.setSection(u"Storage"_s, gui.pageDisk);
+        config.setSection(u"Storage"_s, gui.pageInstallation);
         static constexpr const char *diskChoices[] = {"Drives", "Partitions"};
-        QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
+        QRadioButton *const diskRadios[] = {gui.radioEntireDrive, gui.radioCustomPart};
         config.manageRadios(u"Target"_s, 2, diskChoices, diskRadios);
 
         // Storage and partition management
@@ -540,13 +540,13 @@ void MInstall::saveConfig() noexcept
     config.setString(u"Product"_s, PROJECTNAME + ' ' + PROJECTVERSION);
 
     // Automatic or Manual partitioning
-    config.setSection(u"Storage"_s, gui.pageDisk);
+    config.setSection(u"Storage"_s, gui.pageInstallation);
     static constexpr const char *diskChoices[] = {"Drives", "Partitions"};
-    QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
+    QRadioButton *const diskRadios[] = {gui.radioEntireDrive, gui.radioCustomPart};
     config.manageRadios(u"Target"_s, 2, diskChoices, diskRadios);
 
     // Storage and partition management
-    if(gui.radioEntireDisk->isChecked()) {
+    if(gui.radioEntireDrive->isChecked()) {
         autopart->manageConfig(config);
     } else {
         partman->saveConfig(config);
@@ -580,8 +580,8 @@ int MInstall::showPage(int curr, int next) noexcept
         gui.boxMain->unsetCursor();
     } else if (curr == Step::TERMS && next > curr) {
         if (modeOOBE) return Step::NETWORK;
-    } else if (curr == Step::DISK && next > curr) {
-        if (gui.radioEntireDisk->isChecked()) {
+    } else if (curr == Step::INSTALLATION && next > curr) {
+        if (gui.radioEntireDrive->isChecked()) {
             gui.treeConfirm->clear();
             if (!autopart->validate(automatic, PROJECTNAME)) {
                 return curr;
@@ -637,15 +637,15 @@ int MInstall::showPage(int curr, int next) noexcept
             }
             return Step::CONFIRM;
         }
-        return Step::DISK;
+        return Step::INSTALLATION;
     } else if (curr == Step::ENCRYPTION && next < curr) {
-        if (gui.radioEntireDisk->isChecked()) {
-            return Step::DISK;
+        if (gui.radioEntireDrive->isChecked()) {
+            return Step::INSTALLATION;
         }
         return Step::PARTITIONS;
     } else if (curr == Step::CONFIRM) {
         if (next > curr) {
-            if (gui.radioEntireDisk->isChecked()) {
+            if (gui.radioEntireDrive->isChecked()) {
                 gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
                 if (!autopart->buildLayout()) {
                     gui.labelSplash->setText(tr("Cannot find selected drive."));
@@ -660,8 +660,8 @@ int MInstall::showPage(int curr, int next) noexcept
             swapman->setupDefaults();
             loadConfig(2);
         } else {
-            if (gui.radioEntireDisk->isChecked()) {
-                return Step::DISK;
+            if (gui.radioEntireDrive->isChecked()) {
+                return Step::INSTALLATION;
             } else if (gui.radioCustomPart->isChecked()) {
                 return Step::PARTITIONS;
             } else if (gui.radioReplace->isChecked()) {
@@ -740,7 +740,7 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
                 " It is solely your responsibility to backup your data before proceeding.") + "</p>"_L1);
         break;
-    case Step::DISK:
+    case Step::INSTALLATION:
         gui.textHelp->setText("<p><b>"_L1 + tr("Installation Options") + "</b><br/>"_L1
             + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"_L1
             "<p><b>"_L1 + tr("Using the root-home space slider") + "</b><br/>"_L1
