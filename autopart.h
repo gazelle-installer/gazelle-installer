@@ -42,12 +42,12 @@ class AutoPart : public QObject
     class QCheckBox *checkSnapshot = nullptr;
     bool inBuilder = false;
     // Slots
-    void checkDoubleDiskToggled(bool checked) noexcept;
-    void diskChanged() noexcept;
-    void toggleEncrypt(bool checked) noexcept;
-    void sliderPressed() noexcept;
-    void sliderActionTriggered(int action) noexcept;
-    void sliderValueChanged(int value) noexcept;
+    void checkDualDisk_toggled(bool checked) noexcept;
+    void comboDiskRoot_currentIndexChanged() noexcept;
+    void checkEncryptAuto_toggled(bool checked) noexcept;
+    void sliderPart_sliderPressed() noexcept;
+    void sliderPart_actionTriggered(int action) noexcept;
+    void sliderPart_valueChanged(int value) noexcept;
 public:
     AutoPart(class MProcess &mproc, class Core &mcore, class PartMan *pman,
         Ui::MeInstall &ui, MIni &appConf, QObject *parent = nullptr) noexcept;

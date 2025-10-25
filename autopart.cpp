@@ -35,14 +35,15 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     Ui::MeInstall &ui, MIni &appConf, QObject *parent) noexcept
     : QObject(parent), proc(mproc), core(mcore), gui(ui), partman(pman)
 {
-    connect(gui.checkDoubleDisk, &QCheckBox::toggled, this, &AutoPart::checkDoubleDiskToggled);
-    connect(gui.comboDiskRoot, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
-    connect(gui.checkEncryptAuto, &QCheckBox::toggled, this, &AutoPart::toggleEncrypt);
+    connect(gui.checkDualDisk, &QCheckBox::toggled, this, &AutoPart::checkDualDisk_toggled);
+    connect(gui.comboDiskRoot, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this, &AutoPart::comboDiskRoot_currentIndexChanged);
+    connect(gui.checkEncryptAuto, &QCheckBox::toggled, this, &AutoPart::checkEncryptAuto_toggled);
     connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
         [this](bool checked){ setParams(true, gui.checkEncryptAuto->isChecked(), checked, true); });
-    connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPressed);
-    connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderActionTriggered);
-    connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::sliderValueChanged);
+    connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPart_sliderPressed);
+    connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderPart_actionTriggered);
+    connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::sliderPart_valueChanged);
 
     connect(gui.spinRoot, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value){
         const int vmax = 100 - percent(minHome, available, true);
@@ -66,7 +67,7 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     appConf.setSection();
     refresh();
     // Ensure the displayed auto partition controls are appropriate.
-    checkDoubleDiskToggled(gui.checkDoubleDisk->isChecked());
+    checkDualDisk_toggled(gui.checkDualDisk->isChecked());
 }
 
 void AutoPart::manageConfig(MSettings &config) noexcept
@@ -76,7 +77,7 @@ void AutoPart::manageConfig(MSettings &config) noexcept
     config.manageComboBox(u"Home"_s, gui.comboDiskHome, true);
     config.manageCheckBox(u"Encrypt"_s, gui.checkEncryptAuto);
     if (gui.comboDiskRoot->currentData() == gui.comboDiskHome->currentData()) {
-        gui.checkDoubleDisk->setChecked(false);
+        gui.checkDualDisk->setChecked(false);
         if (config.isSave()) {
             config.setInteger(u"RootPortion"_s, gui.sliderPart->value());
         } else if (config.contains(u"RootPortion"_s)) {
@@ -87,7 +88,7 @@ void AutoPart::manageConfig(MSettings &config) noexcept
             }
         }
     } else {
-        gui.checkDoubleDisk->setChecked(true);
+        gui.checkDualDisk->setChecked(true);
     }
 }
 
@@ -98,12 +99,12 @@ void AutoPart::scan() noexcept
     gui.comboDiskRoot->clear();
     gui.comboDiskHome->clear();
     long long largestHome = 0;
-    const bool doubleDisk = gui.checkDoubleDisk->isChecked();
+    const bool dualDisk = gui.checkDualDisk->isChecked();
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::DRIVE && (!device->flags.bootRoot || installFromRootDevice)) {
             QStringList excludes;
             const long long sizeHead = layoutHead(device, false, false, &excludes);
-            if (doubleDisk) {
+            if (dualDisk) {
                 excludes.append(u"/home"_s); // Home on a separate disk.
             }
             const long long minSize = partman->volSpecTotal(u"/"_s, excludes).minimum;
@@ -114,7 +115,7 @@ void AutoPart::scan() noexcept
             if (device->size >= minHome) {
                 device->addToCombo(gui.comboDiskHome);
                 // Select the largest drive for home that is not already chosen for root.
-                if (doubleDisk && device->size > largestHome && device->name != gui.comboDiskRoot->currentData()) {
+                if (dualDisk && device->size > largestHome && device->name != gui.comboDiskRoot->currentData()) {
                     largestHome = device->size;
                     gui.comboDiskHome->setCurrentIndex(gui.comboDiskHome->count() - 1);
                 }
@@ -123,15 +124,15 @@ void AutoPart::scan() noexcept
     }
 
     if (gui.comboDiskHome->count() < 1) {
-        gui.checkDoubleDisk->setChecked(false);
-        gui.checkDoubleDisk->setEnabled(false);
+        gui.checkDualDisk->setChecked(false);
+        gui.checkDualDisk->setEnabled(false);
     } else if (gui.comboDiskHome->count() == 1 && gui.comboDiskRoot->count() == 1) {
-        gui.checkDoubleDisk->setChecked(gui.comboDiskHome->itemData(0) != gui.comboDiskRoot->itemData(0));
-        gui.checkDoubleDisk->setEnabled(false);
+        gui.checkDualDisk->setChecked(gui.comboDiskHome->itemData(0) != gui.comboDiskRoot->itemData(0));
+        gui.checkDualDisk->setEnabled(false);
     }
     gui.comboDiskHome->blockSignals(false);
     gui.comboDiskRoot->blockSignals(false);
-    diskChanged();
+    comboDiskRoot_currentIndexChanged();
     refresh();
 }
 void AutoPart::refresh() noexcept
@@ -146,7 +147,7 @@ void AutoPart::refresh() noexcept
     gui.labelSliderRoot->setText(strNone);
     gui.labelSliderHome->setText(strNone);
     // Refresh visual elements.
-    sliderValueChanged(gui.sliderPart->value());
+    sliderPart_valueChanged(gui.sliderPart->value());
 }
 
 bool AutoPart::validate(bool automatic, const QString &project) const noexcept
@@ -164,7 +165,7 @@ bool AutoPart::validate(bool automatic, const QString &project) const noexcept
             + '\n' + tr("Are you sure you want to continue?"));
         if (msgbox.exec() != QMessageBox::Yes) return false;
     }
-    if (gui.checkDoubleDisk->isChecked()) {
+    if (gui.checkDualDisk->isChecked()) {
         if (drvhome == drvroot) {
             QMessageBox::critical(gui.boxMain, QString(),
                 tr("The same drive cannot be used for both root and home."));
@@ -323,7 +324,7 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
     }
     // Return the partition slider assembly back to the disk page.
     playout->replaceWidget(placeholder, gui.boxSliderPart);
-    diskChanged();
+    comboDiskRoot_currentIndexChanged();
     gui.sliderPart->setSliderPosition(oldPos);
     delete placeholder;
 
@@ -345,7 +346,7 @@ bool AutoPart::buildLayout() noexcept
 
     long long rootSize = drvroot->size - layoutHead(drvroot, crypto, true);
     long long homeSize = drvhome->size - PARTMAN_SAFETY;
-    if (gui.checkDoubleDisk->isChecked()) {
+    if (gui.checkDualDisk->isChecked()) {
         drvhome->clear();
     } else {
         drvhome = drvroot;
@@ -405,7 +406,7 @@ QString AutoPart::sizeString(long long size) noexcept
 
 // Slots
 
-void AutoPart::checkDoubleDiskToggled(bool checked) noexcept
+void AutoPart::checkDualDisk_toggled(bool checked) noexcept
 {
     gui.labelDiskRoot->setText(checked ? tr("Root disk:") : tr("Use disk:"));
     gui.labelDiskHome->setVisible(checked);
@@ -413,7 +414,7 @@ void AutoPart::checkDoubleDiskToggled(bool checked) noexcept
     gui.boxSliderPart->setHidden(checked);
     scan();
 }
-void AutoPart::diskChanged() noexcept
+void AutoPart::comboDiskRoot_currentIndexChanged() noexcept
 {
     PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
     if (!drive) return;
@@ -427,9 +428,9 @@ void AutoPart::diskChanged() noexcept
     }
 
     // Refresh encrypt/hibernate capabilities and cascade to set parameters.
-    toggleEncrypt(gui.checkEncryptAuto->isChecked());
+    checkEncryptAuto_toggled(gui.checkEncryptAuto->isChecked());
 }
-void AutoPart::toggleEncrypt(bool checked) noexcept
+void AutoPart::checkEncryptAuto_toggled(bool checked) noexcept
 {
     PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
     if (!drive) return;
@@ -445,7 +446,7 @@ void AutoPart::toggleEncrypt(bool checked) noexcept
     setParams(true, checked, gui.checkHibernationReg->isChecked(), true);
 }
 
-void AutoPart::sliderPressed() noexcept
+void AutoPart::sliderPart_sliderPressed() noexcept
 {
     QString tipText(tr("%1% root\n%2% home"));
     const int val = gui.sliderPart->value();
@@ -458,7 +459,7 @@ void AutoPart::sliderPressed() noexcept
     }
 }
 
-void AutoPart::sliderActionTriggered(int action) noexcept
+void AutoPart::sliderPart_actionTriggered(int action) noexcept
 {
     int pos = gui.sliderPart->sliderPosition();
     const int oldPos = pos;
@@ -483,9 +484,11 @@ void AutoPart::sliderActionTriggered(int action) noexcept
         pos = gui.sliderPart->sliderPosition(); // Now snapped to valid range
     }
     // Always refresh if this is a programmatic purposeful action.
-    if (action == QSlider::SliderNoAction && pos == gui.sliderPart->value()) sliderValueChanged(pos);
+    if (action == QSlider::SliderNoAction && pos == gui.sliderPart->value()) {
+        sliderPart_valueChanged(pos);
+    }
 }
-void AutoPart::sliderValueChanged(int value) noexcept
+void AutoPart::sliderPart_valueChanged(int value) noexcept
 {
     sizeRoot = portion(available, value, MB);
     QString valstr = sizeString(sizeRoot);
@@ -509,7 +512,7 @@ void AutoPart::sliderValueChanged(int value) noexcept
     gui.labelSliderHome->setText(valstr);
     gui.labelSliderRoot->setPalette(palRoot);
     gui.labelSliderHome->setPalette(palHome);
-    sliderPressed(); // For the tool tip.
+    sliderPart_sliderPressed(); // For the tool tip.
 
     // Unselect features that won't fit with the current configuration.
     const QStringList vols(sizeRoot < available ? "/home" : "/");
