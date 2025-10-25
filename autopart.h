@@ -41,19 +41,14 @@ class AutoPart : public QObject
     // Layout Builder
     class QCheckBox *checkSnapshot = nullptr;
     bool inBuilder = false;
-    // Slots
-    void checkDualDrive_toggled(bool checked) noexcept;
-    void comboDriveSystem_currentIndexChanged() noexcept;
-    void checkEncryptAuto_toggled(bool checked) noexcept;
-    void sliderPart_sliderPressed() noexcept;
-    void sliderPart_actionTriggered(int action) noexcept;
-    void sliderPart_valueChanged(int value) noexcept;
 public:
     AutoPart(class MProcess &mproc, class Core &mcore, class PartMan *pman,
         Ui::MeInstall &ui, MIni &appConf, QObject *parent = nullptr) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void scan() noexcept;
     void refresh() noexcept;
+
+    void setupDualDriveCheckbox(bool enabled) const noexcept;
 
     bool validate(bool automatic, const QString &project) const noexcept;
 
@@ -69,6 +64,17 @@ public:
         bool addToTree, QStringList *volList = nullptr) noexcept;
     // Helpers
     static QString sizeString(long long size) noexcept;
+
+private:
+    bool canChangeDualDrive = false;
+    bool eventFilter(QObject *watched, QEvent *event) noexcept;
+    // Slots
+    void checkDualDrive_toggled(bool checked) noexcept;
+    void comboDriveSystem_currentIndexChanged() noexcept;
+    void checkEncryptAuto_toggled(bool checked) noexcept;
+    void sliderPart_sliderPressed() noexcept;
+    void sliderPart_actionTriggered(int action) noexcept;
+    void sliderPart_valueChanged(int value) noexcept;
 };
 
 // Calculate a percentage without compromising the range of long long.

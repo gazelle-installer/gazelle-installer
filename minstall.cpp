@@ -211,7 +211,6 @@ void MInstall::startup()
         replacer = new Replacer(proc, partman, gui, appConf);
         //experimental tag
         gui.radioReplace->setText(gui.radioReplace->text() + " (" + tr("Experimental","As In feature is not polished and may not work properly") + ")");
-        connect(gui.radioEntireDrive, &QRadioButton::toggled, gui.checkDualDrive, &QCheckBox::setEnabled);
         connect(gui.radioEntireDrive, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
         gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
             + "<br/><img src=':/dialog-warning'/>"_L1 + tr("These actions cannot be undone. Do you want to continue?")
@@ -255,7 +254,6 @@ void MInstall::startup()
             }
         } else {
             gui.radioEntireDrive->setEnabled(false);
-            gui.checkDualDrive->setEnabled(false);
             gui.boxAutoPart->setEnabled(false);
             gui.radioCustomPart->setChecked(true);
         }

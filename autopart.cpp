@@ -35,6 +35,7 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     Ui::MeInstall &ui, MIni &appConf, QObject *parent) noexcept
     : QObject(parent), proc(mproc), core(mcore), gui(ui), partman(pman)
 {
+    gui.boxAutoPart->installEventFilter(this);
     connect(gui.checkDualDrive, &QCheckBox::toggled, this, &AutoPart::checkDualDrive_toggled);
     connect(gui.comboDriveSystem, QOverload<int>::of(&QComboBox::currentIndexChanged),
         this, &AutoPart::comboDriveSystem_currentIndexChanged);
@@ -73,12 +74,19 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
 void AutoPart::manageConfig(MSettings &config) noexcept
 {
     config.setSection(u"Storage"_s, gui.pageInstallation);
-    config.manageComboBox(u"System"_s, gui.comboDriveSystem, true);
-    config.manageComboBox(u"Home"_s, gui.comboDriveHome, true);
     config.manageCheckBox(u"Encrypt"_s, gui.checkEncryptAuto);
-    if (gui.comboDriveSystem->currentData() == gui.comboDriveHome->currentData()) {
-        gui.checkDualDrive->setChecked(false);
+    config.manageComboBox(u"System"_s, gui.comboDriveSystem, true);
+    // Determine what the dual drive check box should be (if loading the config).
+    if (!config.isSave()) {
+        const QString &strhome = config.getString(u"Home"_s);
+        gui.checkDualDrive->setChecked(!strhome.isEmpty() && strhome != config.getString(u"System"_s));
+    }
+    // Home drive (dual drive) or root/home partitioning (single drive).
+    if (gui.checkDualDrive->isChecked()) {
+        config.manageComboBox(u"Home"_s, gui.comboDriveHome, true);
+    } else {
         if (config.isSave()) {
+            config.manageComboBox(u"Home"_s, gui.comboDriveSystem, true);
             config.setInteger(u"RootPortion"_s, gui.sliderPart->value());
         } else if (config.contains(u"RootPortion"_s)) {
             const int portion = config.getInteger(u"RootPortion"_s);
@@ -87,8 +95,6 @@ void AutoPart::manageConfig(MSettings &config) noexcept
                 config.markBadWidget(gui.boxSliderPart);
             }
         }
-    } else {
-        gui.checkDualDrive->setChecked(true);
     }
 }
 
@@ -123,13 +129,21 @@ void AutoPart::scan() noexcept
         }
     }
 
-    if (gui.comboDriveHome->count() < 1) {
+    // Determine if the check box can be changed. If not, check/uncheck according to what is possible.
+    canChangeDualDrive = true; // This is used by the event filter with boxAutoPart enabled property.
+    // Toggling the check box should automatically re-run the scan.
+    if (gui.comboDriveSystem->count() < 1) {
+        gui.checkDualDrive->setChecked(true);
+        canChangeDualDrive = false;
+    } else if (gui.comboDriveHome->count() < 1) {
         gui.checkDualDrive->setChecked(false);
-        gui.checkDualDrive->setEnabled(false);
-    } else if (gui.comboDriveHome->count() == 1 && gui.comboDriveSystem->count() == 1) {
+        canChangeDualDrive = false;
+    } else if (gui.comboDriveSystem->count() == 1 && gui.comboDriveHome->count() == 1) {
         gui.checkDualDrive->setChecked(gui.comboDriveHome->itemData(0) != gui.comboDriveSystem->itemData(0));
-        gui.checkDualDrive->setEnabled(false);
+        canChangeDualDrive = false;
     }
+    gui.checkDualDrive->setEnabled(gui.boxAutoPart->isEnabled() && canChangeDualDrive);
+
     gui.comboDriveHome->blockSignals(false);
     gui.comboDriveSystem->blockSignals(false);
     comboDriveSystem_currentIndexChanged();
@@ -402,6 +416,15 @@ QString AutoPart::sizeString(long long size) noexcept
         return QLocale::system().formattedDataSize(size, 0, QLocale::DataSizeTraditionalFormat);
     }
     return strout;
+}
+
+// Event filter for dual drive checkbox
+bool AutoPart::eventFilter(QObject *watched, QEvent *event) noexcept
+{
+    if (event->type() == QEvent::EnabledChange) {
+        gui.checkDualDrive->setEnabled(gui.boxAutoPart->isEnabled() && canChangeDualDrive);
+    }
+    return QObject::eventFilter(watched, event);
 }
 
 // Slots
