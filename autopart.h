@@ -61,7 +61,7 @@ public:
     enum Part { Root, Home };
     void setPartSize(Part part, long long nbytes) noexcept;
     long long partSize(Part part = Root) const noexcept;
-    class PartMan::Device *selectedDrive() const noexcept;
+    class PartMan::Device *selectedDrive(const class QComboBox *combo) const noexcept;
     // Layout Builder
     void builderGUI(class PartMan::Device *drive) noexcept;
     long long buildLayout(class PartMan::Device *drive, long long rootFormatSize,

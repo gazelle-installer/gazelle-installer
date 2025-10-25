@@ -930,16 +930,16 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
     for (const Device *drive : std::as_const(root->children)) {
         QTreeWidgetItem *twdrive = new QTreeWidgetItem(confroot);
         if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
-            twdrive->setText(0, tr("Prepare %1 partition table on %2").arg(drive->format, drive->name));
+            twdrive->setText(0, tr("Prepare %1 partition table on %2").arg(drive->format, drive->friendlyName()));
         } else {
-            twdrive->setText(0, tr("Re-use partition table on %1").arg(drive->name));
+            twdrive->setText(0, tr("Re-use partition table on %1").arg(drive->friendlyName()));
         }
         for (const Device *part : std::as_const(drive->children)) {
             QString actmsg;
             if (drive->flags.oldLayout) {
-            if (part->usefor.isEmpty()) {
-                if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
-                else continue;
+                if (part->usefor.isEmpty()) {
+                    if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
+                    else continue;
                 } else {
                     if (part->usefor == "FORMAT"_L1) actmsg = tr("Format %1");
                     else if (part->willFormat()) actmsg = tr("Format %1 to use for %2");
@@ -1165,16 +1165,6 @@ bool PartMan::checkTargetDrivesOK() const
         }
     }
     return true;
-}
-
-PartMan::Device *PartMan::selectedDriveAuto() noexcept
-{
-    QString drv(gui.comboDiskRoot->currentData().toString());
-    if (!findByPath("/dev/"_L1 + drv)) return nullptr;
-    for (Device *drive : root->children) {
-        if (drive->name == drv) return drive;
-    }
-    return nullptr;
 }
 
 int PartMan::countPrepSteps() noexcept
@@ -2431,17 +2421,21 @@ void PartMan::Device::labelParts() noexcept
 }
 
 // Return block device info that is suitable for a combo box.
-void PartMan::Device::addToCombo(QComboBox *combo, bool warnNasty) const noexcept
+QString PartMan::Device::friendlyName() const noexcept
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
     strout += ' ' + finalFormat();
     const QString &flabel = finalLabel();
     if (!flabel.isEmpty()) strout += " - "_L1 + flabel;
     if (!model.isEmpty()) strout += (flabel.isEmpty() ? " - "_L1 : "; "_L1) + model;
+    return name + " ("_L1 + strout + ")"_L1;
+}
+void PartMan::Device::addToCombo(QComboBox *combo, bool warnNasty) const noexcept
+{
     QString stricon;
     if (!flags.oldLayout || !usefor.isEmpty()) stricon = ":/appointment-soon"_L1;
     else if (flags.nasty && warnNasty) stricon = ":/dialog-warning"_L1;
-    combo->addItem(QIcon(stricon), name + " ("_L1 + strout + ")"_L1, name);
+    combo->addItem(QIcon(stricon), friendlyName(), name);
 }
 // Split a device name into its drive and partition.
 PartMan::NameParts PartMan::splitName(const QString &devname) noexcept

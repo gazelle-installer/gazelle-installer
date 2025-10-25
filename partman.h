@@ -96,7 +96,6 @@ public:
     void saveConfig(class MSettings &config) const noexcept;
     bool validate(bool automatic, QTreeWidgetItem *confroot = nullptr) const noexcept;
     bool checkTargetDrivesOK() const;
-    Device *selectedDriveAuto() noexcept;
     int countPrepSteps() noexcept;
     void prepStorage();
     bool installTabs() noexcept;
@@ -243,6 +242,7 @@ public:
     bool canMount(bool fsonly = true) const noexcept;
     long long driveFreeSpace(bool inclusive = false) const noexcept;
     /* Convenience */
+    QString friendlyName() const noexcept;
     void addToCombo(QComboBox *combo, bool warnNasty = false) const noexcept;
 
 private:

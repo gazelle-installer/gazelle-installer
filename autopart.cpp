@@ -137,9 +137,10 @@ void AutoPart::refresh() noexcept
 
 bool AutoPart::validate(bool automatic, const QString &project) const noexcept
 {
-    PartMan::Device *drive = selectedDrive();
-    if (!drive) return false;
-    if (!automatic && !core.detectEFI() && drive->size >= 2*TB) {
+    PartMan::Device *drvroot = selectedDrive(gui.comboDiskRoot);
+    PartMan::Device *drvhome = selectedDrive(gui.comboDiskHome);
+    if (!drvroot || !drvhome) return false;
+    if (!automatic && !core.detectEFI() && drvroot->size >= 2*TB) {
         QMessageBox msgbox(gui.boxMain);
         msgbox.setIcon(QMessageBox::Warning);
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
@@ -149,16 +150,29 @@ bool AutoPart::validate(bool automatic, const QString &project) const noexcept
             + '\n' + tr("Are you sure you want to continue?"));
         if (msgbox.exec() != QMessageBox::Yes) return false;
     }
-    gui.treeConfirm->clear();
-    QTreeWidgetItem *twit = new QTreeWidgetItem(gui.treeConfirm);
-    twit->setText(0, tr("Format and use the entire disk (%1) for %2").arg(drive->name, project));
+    if (gui.checkDoubleDisk->isChecked()) {
+        if (drvhome == drvroot) {
+            QMessageBox::critical(gui.boxMain, QString(),
+                tr("The same drive cannot be used for both root and home."));
+            return false;
+        }
+        QTreeWidgetItem *twroot = new QTreeWidgetItem(gui.treeConfirm);
+        twroot->setText(0, tr("Format and use multiple disks entirely for %2").arg(project));
+        QTreeWidgetItem *twit = new QTreeWidgetItem(twroot);
+        twit->setText(0, tr("Format and use for root: %1").arg(drvroot->friendlyName()));
+        twit = new QTreeWidgetItem(twroot);
+        twit->setText(0, tr("Format and use for home: %1").arg(drvhome->friendlyName()));
+    } else {
+        QTreeWidgetItem *twit = new QTreeWidgetItem(gui.treeConfirm);
+        twit->setText(0, tr("Format and use the entire disk for %1: %2").arg(project, drvroot->friendlyName()));
+    }
     return true;
 }
 
 void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot) noexcept
 {
     QStringList volumes;
-    PartMan::Device *drive = selectedDrive();
+    PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
     if (!drive) return;
     available = buildLayout(drive, -1, encrypt, false, &volumes);
     volumes.append(u"/home"_s);
@@ -206,9 +220,9 @@ long long AutoPart::partSize(Part part) const noexcept
     return part==Root ? sizeRoot : (available - sizeRoot);
 }
 
-PartMan::Device *AutoPart::selectedDrive() const noexcept
+PartMan::Device *AutoPart::selectedDrive(const QComboBox *combo) const noexcept
 {
-    return partman->findByPath("/dev/"_L1 + gui.comboDiskRoot->currentData().toString());
+    return partman->findByPath("/dev/"_L1 + combo->currentData().toString());
 }
 
 // Layout Builder
@@ -352,7 +366,7 @@ void AutoPart::checkDoubleDiskToggled(bool checked) noexcept
 }
 void AutoPart::diskChanged() noexcept
 {
-    PartMan::Device *drive = selectedDrive();
+    PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
     if (!drive) return;
 
     // Is encryption possible?
@@ -365,7 +379,7 @@ void AutoPart::diskChanged() noexcept
 }
 void AutoPart::toggleEncrypt(bool checked) noexcept
 {
-    PartMan::Device *drive = selectedDrive();
+    PartMan::Device *drive = selectedDrive(gui.comboDiskRoot);
     if (!drive) return;
     // Is hibernation possible?
     const bool canHibernate = (buildLayout(drive, -1, checked, false) >= (minRoot + SwapMan::recommended(true)));
