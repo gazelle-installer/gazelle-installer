@@ -7,7 +7,7 @@ project(minstall
 	LANGUAGES CXX
 )
 # TODO: Remove for final release
-set(PROJECT_VERSION "${PROJECT_VERSION}-ALPHA")
+set(PROJECT_VERSION "${PROJECT_VERSION}-RC")
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Concurrent LinguistTools)
 set(CMAKE_AUTORCC ON)
