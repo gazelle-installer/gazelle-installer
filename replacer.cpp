@@ -283,6 +283,20 @@ bool Replacer::preparePartMan() const noexcept
         }
     };
 
+    auto markPreserve = [&](PartMan::Device *device) {
+        if (!device) return;
+        auto preserve = [&](PartMan::Device *target) {
+            if (!target) return;
+            partman->changeBegin(target);
+            target->format = "PRESERVE"_L1;
+            partman->changeEnd();
+        };
+        preserve(device);
+        if (device->type == PartMan::Device::VIRTUAL && device->origin) preserve(device->origin);
+        else if (device->type == PartMan::Device::SUBVOLUME) preserve(device->parent());
+        else if (!device->map.isEmpty()) preserve(partman->findByPath(u"/dev/mapper/"_s + device->map));
+    };
+
     auto resolveFsDevice = [&](const QString &source, const RootBase::MountEntry *mountInfo) -> PartMan::Device * {
         QString fs = source.trimmed();
         if (fs.isEmpty()) return nullptr;
@@ -335,21 +349,13 @@ bool Replacer::preparePartMan() const noexcept
         PartMan::Device *dev = resolveFsDevice(mount.fsname, &mount);
         if (!dev) continue;
         setMount(dev, mount.dir, &mount);
-        if ((mount.dir.startsWith(u"/"_s) && (mount.dir != "/" && rbase.homeSeparate))
-            || mount.type.compare(u"swap"_s, Qt::CaseInsensitive) == 0
-            || mount.dir.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
-            auto preserve = [&](PartMan::Device *target) {
-                if (!target) return;
-                partman->changeBegin(target);
-                target->format = "PRESERVE"_L1;
-                partman->changeEnd();
-            };
-            preserve(dev);
-            if (dev->type == PartMan::Device::VIRTUAL && dev->origin) preserve(dev->origin);
-            else if (dev->type == PartMan::Device::SUBVOLUME) preserve(dev->parent());
-            else if (!dev->map.isEmpty()) {
-                preserve(partman->findByPath(u"/dev/mapper/"_s + dev->map));
-            }
+        if (mount.dir == "/"_L1) {
+            if (!rbase.homeSeparate) markPreserve(dev);
+        } else if (mount.dir.startsWith(u"/"_s)) {
+            markPreserve(dev);
+        } else if (mount.type.compare(u"swap"_s, Qt::CaseInsensitive) == 0
+                   || mount.dir.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
+            markPreserve(dev);
         }
     }
 
