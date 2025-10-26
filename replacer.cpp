@@ -107,14 +107,12 @@ bool Replacer::validate(bool automatic) const noexcept
     }
     const auto &rbase = bases.at(currow);
 
-    gui.treeConfirm->clear();
     QTreeWidgetItem *twit = new QTreeWidgetItem(gui.treeConfirm);
     QString location = rbase.devpath;
     if (!rbase.physdev.isEmpty() && rbase.physdev != rbase.devpath) {
         location += QStringLiteral(" [%1]").arg(rbase.physdev);
     }
     twit->setText(0, tr("Replace the installation in %1 (%2)").arg(location, rbase.release));
-    twit->setExpanded(true);
     return true;
 }
 
@@ -124,20 +122,15 @@ void Replacer::buildDetailedConfirmation() const noexcept
     if (currow < 0 || currow >= (int)bases.size()) return;
     const auto &rbase = bases.at(currow);
 
-    gui.treeConfirm->clear();
     QTreeWidgetItem *twroot = new QTreeWidgetItem(gui.treeConfirm);
     QString location = rbase.devpath;
     if (!rbase.physdev.isEmpty() && rbase.physdev != rbase.devpath) {
         location += QStringLiteral(" [%1]").arg(rbase.physdev);
     }
     twroot->setText(0, tr("Replace the installation in %1 (%2)").arg(location, rbase.release));
-    twroot->setExpanded(true);
 
     // Now build detailed partition actions under this root
     partman->validate(true, twroot);
-
-    // Expand all tree items to show the detailed actions
-    gui.treeConfirm->expandAll();
 }
 bool Replacer::preparePartMan() const noexcept
 {

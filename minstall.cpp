@@ -577,11 +577,9 @@ int MInstall::showPage(int curr, int next) noexcept
         if (modeOOBE) return Step::NETWORK;
     } else if (curr == Step::INSTALLATION && next > curr) {
         if (gui.radioEntireDrive->isChecked()) {
-            gui.treeConfirm->clear();
             if (!autopart->validate(automatic, PROJECTNAME)) {
                 return curr;
             }
-            gui.treeConfirm->expandAll();
             if (gui.checkEncryptAuto->isChecked()) {
                 return Step::ENCRYPTION;
             }
@@ -611,12 +609,10 @@ int MInstall::showPage(int curr, int next) noexcept
         if (partman) partman->closeTemporaryUnlocks();
     } else if (curr == Step::PARTITIONS) {
         if (next > curr) {
-            gui.treeConfirm->clear();
             if (!partman->validate(automatic)) {
                 nextFocus = gui.treePartitions;
                 return curr;
             }
-            gui.treeConfirm->expandAll();
             if (!pretend && !(base && base->saveHomeBasic())) {
                 QMessageBox msgbox(this);
                 msgbox.setIcon(QMessageBox::Critical);
@@ -639,6 +635,7 @@ int MInstall::showPage(int curr, int next) noexcept
         }
         return Step::PARTITIONS;
     } else if (curr == Step::CONFIRM) {
+        gui.treeConfirm->clear(); // Revisiting a step produces a fresh confirmation list.
         if (next > curr) {
             if (gui.radioEntireDrive->isChecked()) {
                 if (!autopart->buildLayout()) {
@@ -888,6 +885,9 @@ void MInstall::pageDisplayed(int next) noexcept
     case Step::CONFIRM: // Confirmation and review.
         gui.textHelp->setText("<p><b>"_L1 + tr("Final Review and Confirmation") + "</b><br/>"_L1
             + tr("Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.") + "</p>"_L1);
+
+        gui.treeConfirm->expandAll();
+        gui.treeConfirm->resizeColumnToContents(0);
         if (!automatic) {
             core.sleep(500, true); // Prevent accidentally skipping the confirmation.
         }
