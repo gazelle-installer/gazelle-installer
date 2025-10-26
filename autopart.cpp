@@ -40,8 +40,6 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     connect(gui.comboDriveSystem, QOverload<int>::of(&QComboBox::currentIndexChanged),
         this, &AutoPart::comboDriveSystem_currentIndexChanged);
     connect(gui.checkEncryptAuto, &QCheckBox::toggled, this, &AutoPart::checkEncryptAuto_toggled);
-    connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
-        [this](bool checked){ setParams(true, gui.checkEncryptAuto->isChecked(), checked, true); });
     connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPart_sliderPressed);
     connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderPart_actionTriggered);
     connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::sliderPart_valueChanged);
@@ -198,26 +196,24 @@ bool AutoPart::validate(bool automatic, const QString &project) const noexcept
     return true;
 }
 
-void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot) noexcept
+void AutoPart::setParams(PartMan::Device *drive, bool swapfile, bool encrypt, bool snapshot) noexcept
 {
+    assert(drive != nullptr);
     QStringList volumes;
-    PartMan::Device *drive = selectedDrive(gui.comboDriveSystem);
-    if (!drive) return;
     available = drive->size - layoutHead(drive, encrypt, false, &volumes);
     volumes.append(u"/home"_s);
     const PartMan::VolumeSpec &vspecRoot = partman->volSpecTotal(u"/"_s, volumes);
     if (available <= vspecRoot.minimum) return;
     minRoot = vspecRoot.minimum;
-    recRoot = vspecRoot.preferred;
+    hiberRoot = recRoot = vspecRoot.preferred;
     addSnapshot = 2 * vspecRoot.image;
 
     const PartMan::VolumeSpec &vspecHome = partman->volSpecTotal(u"/home"_s, volumes);
     minHome = vspecHome.minimum;
     recHome = vspecHome.preferred;
     if (swapfile) {
-        const long long swapsize = SwapMan::recommended(hibernation);
-        recRoot += swapsize;
-        if (hibernation) minRoot += swapsize;
+        recRoot += SwapMan::recommended(false);
+        hiberRoot += SwapMan::recommended(true);
     }
     if (snapshot) recHome += addSnapshot; // squashfs + ISO
 
@@ -225,10 +221,10 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
     gui.spinRoot->setMinimum(rootMinPercent);
     gui.spinHome->setMaximum(100 - rootMinPercent);
 
-    gui.labelSliderRoot->setToolTip(tr("Recommended: %1\n"
-        "Minimum: %2").arg(sizeString(recRoot), sizeString(minRoot)));
-    gui.labelSliderHome->setToolTip(tr("Recommended: %1\n"
-        "Minimum: %2").arg(sizeString(recHome), sizeString(minHome)));
+    const QString &tip = tr("Recommended: %1\nMinimum: %2");
+    gui.labelSliderRoot->setToolTip(tip.arg(sizeString(recRoot), sizeString(minRoot))
+        + "\n\n"_L1 + tr("Minimum for hibernation support: %1").arg(sizeString(hiberRoot)));
+    gui.labelSliderHome->setToolTip(tip.arg(sizeString(recHome), sizeString(minHome)));
     gui.spinRoot->setToolTip(gui.labelSliderRoot->toolTip());
     gui.spinHome->setToolTip(gui.labelSliderHome->toolTip());
     gui.sliderPart->triggerAction(QSlider::SliderNoAction); // Snap the slider within range.
@@ -257,6 +253,7 @@ PartMan::Device *AutoPart::selectedDrive(const QComboBox *combo) const noexcept
 // Layout Builder
 void AutoPart::builderGUI(PartMan::Device *drive) noexcept
 {
+    assert(drive != nullptr);
     inBuilder = true;
     long long swapRec = SwapMan::recommended(false);
     long long swapHiber = SwapMan::recommended(true);
@@ -295,22 +292,27 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
         checkEncrypt->setChecked(false);
     }
 
-    auto updateUI = [&]() {
+    auto updateUI = [&](QCheckBox *check) {
         available = drive->size - layoutHead(drive, checkEncrypt->isChecked(), false);
         // Is hibernation possible?
         bool canHibernate = checkSwapFile->isChecked() && (available >= (minRoot + swapHiber));
         checkHibernation->setEnabled(canHibernate);
         if (!canHibernate) checkHibernation->setChecked(false);
 
-        auto check = qobject_cast<QCheckBox *>(sender());
-        if (available <= 0) check->setChecked(false);
-        setParams(checkSwapFile->isChecked(), checkEncrypt->isChecked(),
-            checkHibernation->isChecked(), checkSnapshot->isChecked());
+        if (available <= 0) {
+            assert(check != nullptr);
+            check->setChecked(false);
+        }
+        setParams(drive, checkSwapFile->isChecked(), checkEncrypt->isChecked(), checkSnapshot->isChecked());
+
+        if (checkHibernation->isChecked() && sizeRoot < hiberRoot) {
+            setPartSize(Root, hiberRoot); // Snap slider to hibernation-supported root.
+        }
     };
-    connect(checkSwapFile, &QCheckBox::toggled, &dialog, updateUI);
-    connect(checkEncrypt, &QCheckBox::toggled, &dialog, updateUI);
-    connect(checkHibernation, &QCheckBox::toggled, &dialog, updateUI);
-    connect(checkSnapshot, &QCheckBox::toggled, &dialog, updateUI);
+    connect(checkSwapFile, &QCheckBox::toggled, &dialog, [&](){ updateUI(checkSwapFile); });
+    connect(checkEncrypt, &QCheckBox::toggled, &dialog, [&](){ updateUI(checkEncrypt); });
+    connect(checkHibernation, &QCheckBox::toggled, &dialog, [&](){ updateUI(checkHibernation); });
+    connect(checkSnapshot, &QCheckBox::toggled, &dialog, [&](){ updateUI(checkSnapshot); });
     checkSwapFile->setChecked(true); // Automatically triggers UI update.
 
     QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
@@ -458,15 +460,7 @@ void AutoPart::checkEncryptAuto_toggled(bool checked) noexcept
     PartMan::Device *drive = selectedDrive(gui.comboDriveSystem);
     if (!drive) return;
 
-    // Is hibernation possible?
-    if ((drive->size - layoutHead(drive, checked, false)) >= (minRoot + SwapMan::recommended(true))) {
-        gui.checkHibernationReg->setEnabled(true);
-    } else {
-        gui.checkHibernationReg->setEnabled(false);
-        gui.checkHibernationReg->setChecked(false);
-    }
-
-    setParams(true, checked, gui.checkHibernationReg->isChecked(), true);
+    setParams(drive, true, checked, true);
 }
 
 void AutoPart::sliderPart_sliderPressed() noexcept
@@ -488,12 +482,15 @@ void AutoPart::sliderPart_actionTriggered(int action) noexcept
     const int oldPos = pos;
     if (action == QSlider::SliderPageStepAdd || action == QSlider::SliderPageStepSub
         || action == QSlider::SliderNoAction) {
-        const int recPortionMin = percent(recRoot, available, true); // Recommended root size.
-        const int recPortionMax = percent(available-recHome, available, true); // Recommended minimum home.
-        if (pos < recPortionMin) pos = recPortionMin;
-        else if (pos > recPortionMax) {
+        const int rpmin = percent(recRoot, available, true); // Recommended root portion.
+        const int rphiber = percent(hiberRoot, available, true); // Recommended root portion for hibernation support.
+        const int rpmax = percent(available-recHome, available, true); // Recommended minimum home portion.
+        if (pos < rpmin) pos = rpmin;
+        else if (pos < rphiber) {
+            if (action == QSlider::SliderPageStepAdd) pos = rphiber;
+        } else if (pos > rpmax) {
             if (action == QSlider::SliderPageStepAdd) pos = 100;
-            else if (pos < 100) pos = recPortionMax;
+            else if (pos < 100) pos = rpmax;
         }
     } else {
         const int min = percent(minRoot, available, true);
@@ -522,7 +519,12 @@ void AutoPart::sliderPart_valueChanged(int value) noexcept
 
     QPalette palRoot = QApplication::palette();
     QPalette palHome = QApplication::palette();
-    if (sizeRoot < recRoot) palRoot.setColor(QPalette::WindowText, Qt::red);
+
+    if (sizeRoot < recRoot) {
+        palRoot.setColor(QPalette::WindowText, Qt::red);
+    } else if (sizeRoot < hiberRoot) {
+        palRoot.setColor(QPalette::WindowText, Qt::blue);
+    }
     const long long newHome = available - sizeRoot;
     if (newHome == 0) {
         valstr = strNone;

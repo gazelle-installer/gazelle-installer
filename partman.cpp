@@ -548,7 +548,12 @@ void PartMan::treeMenu(const QPoint &)
         actClear->setDisabled(locked);
         actReset->setDisabled(locked);
 
-        const long long minSpace = brave ? 0 : volSpecTotal(u"/"_s, false).minimum;
+        long long minSpace = 0;
+        if (!brave && autopart) {
+            QStringList excludes;
+            minSpace = autopart->layoutHead(seldev, false, false, &excludes);
+            minSpace += volSpecTotal(u"/"_s, excludes).minimum;
+        }
         actBuilder->setEnabled(!locked && autopart && seldev->size >= minSpace);
 
         QAction *action = menu.exec(QCursor::pos());

@@ -259,9 +259,6 @@ void MInstall::startup()
         }
         // Override with whatever is in the config.
         loadConfig(1);
-        // Hibernation check box (regular install).
-        gui.checkHibernationReg->setChecked(gui.checkHibernation->isChecked());
-        connect(gui.checkHibernationReg, &QCheckBox::clicked, gui.checkHibernation, &QCheckBox::setChecked);
     }
     oobe->stashServices(true);
 
@@ -644,7 +641,6 @@ int MInstall::showPage(int curr, int next) noexcept
     } else if (curr == Step::CONFIRM) {
         if (next > curr) {
             if (gui.radioEntireDrive->isChecked()) {
-                gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
                 if (!autopart->buildLayout()) {
                     gui.labelSplash->setText(tr("Cannot find selected drive."));
                     abortEndUI(false);

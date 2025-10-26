@@ -33,7 +33,7 @@ class AutoPart : public QObject
     class PartMan *partman;
     QString strRoot, strHome, strNone;
     long long available = 0;
-    long long minRoot = 0, recRoot = 0, sizeRoot = 0;
+    long long minRoot = 0, recRoot = 0, hiberRoot = 0, sizeRoot = 0;
     long long minHome = 0, recHome = 0, sizeHome = 0;
     long long addSnapshot = 0;
     bool installFromRootDevice = false;
@@ -52,7 +52,7 @@ public:
 
     bool validate(bool automatic, const QString &project) const noexcept;
 
-    void setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot) noexcept;
+    void setParams(class PartMan::Device *drive, bool swapfile, bool encrypt, bool snapshot) noexcept;
     enum Part { Root, Home };
     void setPartSize(Part part, long long nbytes) noexcept;
     long long partSize(Part part = Root) const noexcept;
