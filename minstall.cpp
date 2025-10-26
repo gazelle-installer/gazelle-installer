@@ -588,7 +588,7 @@ int MInstall::showPage(int curr, int next) noexcept
             return Step::PARTITIONS;
         }
     } else if (curr == Step::REPLACE && next > curr) {
-        if (!replacer->validate(automatic)) {
+        if (!replacer->validate()) {
             nextFocus = gui.tableExistInst;
             return curr;
         }
@@ -603,7 +603,6 @@ int MInstall::showPage(int curr, int next) noexcept
             msgbox.exec();
             return curr;
         }
-        replacer->buildDetailedConfirmation();
         return Step::CONFIRM;
     } else if (curr == Step::REPLACE && next < curr) {
         if (partman) partman->closeTemporaryUnlocks();
