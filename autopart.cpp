@@ -388,9 +388,10 @@ long long AutoPart::layoutHead(PartMan::Device *drive, bool crypto,
     long long total = PARTMAN_SAFETY;
 
     if (core.detectEFI()) {
-        if (addToTree) drive->addPart(256*MB, u"ESP"_s, crypto);
+        const long long size = partman->volSpecs[u"ESP"_s].preferred;
+        if (addToTree) drive->addPart(size, u"ESP"_s, crypto);
         if (volList) volList->append(u"ESP"_s);
-        total += 256*MB;
+        total += size;
     } else if (drive->format == "GPT"_L1) {
         if (addToTree) drive->addPart(1*MB, u"BIOS-GRUB"_s, crypto);
         if (volList) volList->append(u"BIOS-GRUB"_s);
@@ -398,10 +399,10 @@ long long AutoPart::layoutHead(PartMan::Device *drive, bool crypto,
     }
 
     if (crypto) {
-        const long long bootFormatSize = partman->volSpecs[u"/boot"_s].preferred;
-        if (addToTree) drive->addPart(bootFormatSize, u"/boot"_s, crypto);
+        const long long size = partman->volSpecs[u"/boot"_s].preferred;
+        if (addToTree) drive->addPart(size, u"/boot"_s, crypto);
         if (volList) volList->append(u"/boot"_s);
-        total += bootFormatSize;
+        total += size;
     }
 
     return total;
