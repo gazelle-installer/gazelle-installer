@@ -44,7 +44,8 @@ Replacer::Replacer(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui
 
 void Replacer::scan(bool full, bool allowUnlock) noexcept
 {
-        gui.tableExistInst->setEnabled(false);
+    gui.tableExistInst->setEnabled(false);
+    // clear() erases the headers, and clearContents() keeps the cells.
     while (gui.tableExistInst->rowCount() > 0) {
         gui.tableExistInst->removeRow(0);
     }
@@ -55,8 +56,8 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::PARTITION && device->size >= minSpace
             && (!device->flags.bootRoot || installFromRootDevice)) {
+            gui.radioReplace->setEnabled(true);
             if (device->curFormat == "crypto_LUKS"_L1 && device->mapCount == 0) {
-                gui.radioReplace->setEnabled(true);
                 if (!allowUnlock) continue;
                 if (partman->promptUnlock(device, true)) {
                     rescan = true;
@@ -64,7 +65,6 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
                 }
                 continue;
             }
-            gui.radioReplace->setEnabled(true);
             if(full) {
                 const auto &rbase = bases.emplace_back(proc, device);
                 if(rbase.ok) {
