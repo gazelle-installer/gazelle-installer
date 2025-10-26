@@ -432,7 +432,6 @@ bool AutoPart::eventFilter(QObject *watched, QEvent *event) noexcept
 
 void AutoPart::checkDualDrive_toggled(bool checked) noexcept
 {
-    gui.labelDriveSystem->setText(checked ? tr("System drive:") : tr("Use disk:"));
     gui.labelDriveHome->setVisible(checked);
     gui.comboDriveHome->setVisible(checked);
     gui.boxSliderPart->setHidden(checked);
