@@ -53,6 +53,12 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
         << u"/live/aufs/etc"_s << u"/live/aufs/lib"_s
         << u"/live/aufs/media"_s << u"/live/aufs/mnt"_s << u"/live/aufs/root"_s
         << u"/live/aufs/sbin"_s << u"/live/aufs/usr"_s << u"/live/aufs/var"_s;
+    if (QFileInfo::exists(u"/live/aufs/initrd.img"_s)) {
+        rootSources << u"/live/aufs/initrd.img"_s;
+    }
+    if (QFileInfo::exists(u"/live/aufs/vmlinuz"_s)) {
+        rootSources << u"/live/aufs/vmlinuz"_s;
+    }
     if (QFileInfo::exists(u"/live/aufs/libx32"_s)){
         rootSources << u"/live/aufs/libx32"_s ;
     }
