@@ -89,7 +89,11 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
             if(rbase.ok) {
                 const int newrow = gui.tableExistInst->rowCount();
                 gui.tableExistInst->insertRow(newrow);
-                gui.tableExistInst->setItem(newrow, 0, new QTableWidgetItem(device->friendlyName()));
+                QTableWidgetItem *partit =  new QTableWidgetItem(device->friendlyName());
+                if (device->parent()) {
+                    partit->setToolTip(tr("Drive: %1").arg(device->parent()->friendlyName()));
+                }
+                gui.tableExistInst->setItem(newrow, 0, partit);
                 gui.tableExistInst->setItem(newrow, 1, new QTableWidgetItem(rbase.release));
             } else {
                 bases.pop_back();
