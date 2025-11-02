@@ -313,6 +313,32 @@ void PartMan::scanVirtualDevices(bool rescan)
     gui.treePartitions->expand(index(virtdevs));
 }
 
+void PartMan::scanSubvolumes(Device *part)
+{
+    while (part->children.size()) delete part->child(0);
+    QString defline;
+    QStringList lines;
+    if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,ro"_s,
+                                part->mappedDevice(), u"/mnt/btrfs-scratch"_s})) return;
+    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"get-default"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
+    defline = proc.readOut();
+    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
+    lines = proc.readOutLines();
+    proc.exec(u"umount"_s, {u"/mnt/btrfs-scratch"_s});
+    for (const QString &line : std::as_const(lines)) {
+        const int start = line.indexOf("path"_L1) + 5;
+        if (line.length() <= start) return;
+        Device *subvol = new Device(Device::SUBVOLUME, part);
+        subvol->flags.oldLayout = true;
+        subvol->label = subvol->curLabel = line.mid(start);
+        subvol->format = "PRESERVE"_L1;
+        if (line == defline) {
+            subvol->setActive(true);
+        }
+        notifyChange(subvol);
+    }
+}
+
 bool PartMan::loadConfig(MSettings &config) noexcept
 {
     config.setSection(u"Storage"_s, gui.treePartitions);
@@ -534,8 +560,12 @@ void PartMan::treeMenu(const QPoint &)
             subvol->autoFill();
             gui.treePartitions->expand(selIndex);
         } else if (action == actScanSubvols) {
+            qApp->setOverrideCursor(Qt::WaitCursor);
+            gui.boxMain->setEnabled(false);
             scanSubvolumes(seldev);
             gui.treePartitions->expand(selIndex);
+            gui.boxMain->setEnabled(true);
+            qApp->restoreOverrideCursor();
         }
     } else if (seldev->type == Device::DRIVE) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
@@ -756,37 +786,6 @@ void PartMan::partMenuLock(Device *volume)
         msgbox.setText(tr("Failed to close %1").arg(volume->name));
         msgbox.exec();
     }
-}
-
-void PartMan::scanSubvolumes(Device *part)
-{
-    qApp->setOverrideCursor(Qt::WaitCursor);
-    gui.boxMain->setEnabled(false);
-    while (part->children.size()) delete part->child(0);
-    QString defline;
-    QStringList lines;
-    if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,ro"_s,
-        part->mappedDevice(), u"/mnt/btrfs-scratch"_s})) goto END;
-    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"get-default"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
-    defline = proc.readOut();
-    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
-    lines = proc.readOutLines();
-    proc.exec(u"umount"_s, {u"/mnt/btrfs-scratch"_s});
-    for (const QString &line : std::as_const(lines)) {
-        const int start = line.indexOf("path"_L1) + 5;
-        if (line.length() <= start) goto END;
-        Device *subvol = new Device(Device::SUBVOLUME, part);
-        subvol->flags.oldLayout = true;
-        subvol->label = subvol->curLabel = line.mid(start);
-        subvol->format = "PRESERVE"_L1;
-        if (line == defline) {
-            subvol->setActive(true);
-        }
-        notifyChange(subvol);
-    }
- END:
-    gui.boxMain->setEnabled(true);
-    qApp->restoreOverrideCursor();
 }
 
 bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept

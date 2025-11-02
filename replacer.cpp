@@ -16,6 +16,7 @@
  *
  * This file is part of the gazelle-installer.
  ****************************************************************************/
+#include <set>
 #include <mntent.h>
 #include <QFile>
 #include <QFileInfo>
@@ -156,142 +157,36 @@ bool Replacer::preparePartMan() noexcept
 
     // Populate layout usage information based on the selected existing installation.
 
-    auto ensureBtrfsSubvolume = [&](PartMan::Device *device, const RootBase::MountEntry &mount) -> PartMan::Device * {
-        if (!device) return nullptr;
-        if (!mount.isBtrfs || mount.subvol.isEmpty()) return device;
-
-        PartMan::Device *partition = device;
-        if (partition->type == PartMan::Device::SUBVOLUME) partition = partition->parent();
-
-        auto matchesLabel = [&](PartMan::Device *subvol) -> bool {
-            if (subvol->label.compare(mount.subvol, Qt::CaseInsensitive) == 0) return true;
-            if (!subvol->curLabel.isEmpty()
-                && subvol->curLabel.compare(mount.subvol, Qt::CaseInsensitive) == 0) return true;
-            return false;
-        };
-
-        PartMan::Device *subvol = nullptr;
-        for (PartMan::Iterator it(*partman); PartMan::Device *candidate = *it; it.next()) {
-            if (!candidate || candidate->parent() != partition) continue;
-            if (candidate->type != PartMan::Device::SUBVOLUME) continue;
-            if (matchesLabel(candidate)) {
-                subvol = candidate;
-                break;
-            }
-        }
-        if (!subvol) {
-            subvol = new PartMan::Device(PartMan::Device::SUBVOLUME, partition);
-            subvol->flags.oldLayout = true;
-            subvol->label = mount.subvol;
-            subvol->curLabel = mount.subvol;
-            subvol->format = "CREATE"_L1;
-            subvol->dump = mount.freq != 0;
-            subvol->pass = mount.passno;
-            partman->notifyChange(subvol);
-        }
-        if (mount.dir == "/"_L1) subvol->setActive(true);
-        return subvol;
-    };
-
-    auto finalizeDevice = [&](PartMan::Device *dev, const RootBase::MountEntry *mountInfo) -> PartMan::Device * {
-        if (!dev) return nullptr;
-        if (mountInfo && mountInfo->isBtrfs) {
-            PartMan::Device *candidate = dev;
-            if (candidate) {
-                PartMan::Device *resolved = ensureBtrfsSubvolume(candidate, *mountInfo);
-                if (resolved) dev = resolved;
-            }
-        }
-        return dev;
-    };
-
-    auto setMount = [&](PartMan::Device *device, const QString &dir, const RootBase::MountEntry *mountInfo) {
-        if (!device) return;
-        PartMan::Device *volume = device;
-        if (!volume) return;
-        const bool isBtrfsSubvolume = mountInfo && mountInfo->isBtrfs && device->type == PartMan::Device::SUBVOLUME;
-        QString usefor = dir;
-        if (mountInfo && mountInfo->type.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
-            usefor = u"SWAP"_s;
-        } else if (usefor.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
-            usefor = u"SWAP"_s;
-        } else if (mountInfo && mountInfo->type.compare(u"none"_s, Qt::CaseInsensitive) == 0
-                   && mountInfo->fsname.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
-            usefor = u"SWAP"_s;
-        }
-        auto assignUsefor = [&](PartMan::Device *target, const QString &fmt, bool applyProps, bool canSetUse) {
-            if (!target) return;
-            partman->changeBegin(target);
-            if (canSetUse) {
-                target->usefor = usefor;
-            } else if (target->usefor == usefor) {
-                target->usefor.clear();
-            }
-            if (!dir.isEmpty() && !fmt.isEmpty()) target->format = fmt;
-            if (applyProps && mountInfo) {
-                target->dump = mountInfo->freq != 0;
-                target->pass = mountInfo->passno;
-                if (target->type == PartMan::Device::SUBVOLUME && mountInfo->isBtrfs) {
-                    QStringList opts = mountInfo->optionList;
-                    for (int ix = opts.count() - 1; ix >= 0; --ix) {
-                        const QString trimmed = opts.at(ix).trimmed();
-                        if (trimmed.startsWith(u"subvol="_s, Qt::CaseInsensitive)
-                            || trimmed.startsWith(u"subvolid="_s, Qt::CaseInsensitive)) {
-                            opts.removeAt(ix);
-                        } else {
-                            opts[ix] = trimmed;
-                        }
-                    }
-                    target->options = opts.join(','_L1);
-                } else {
-                    target->options = mountInfo->opts.trimmed();
-                }
-            }
-            partman->changeEnd();
-        };
-
-        if (!usefor.isEmpty()) {
-            for (PartMan::Iterator it(*partman); PartMan::Device *other = *it; it.next()) {
-                if (other == volume) continue;
-                if (other->usefor == usefor) {
-                    partman->changeBegin(other);
-                    other->usefor.clear();
-                    partman->changeEnd();
-                }
-            }
-        }
-
-        QString newFormat = volume->format.isEmpty() ? volume->curFormat : volume->format;
-        if (device->type == PartMan::Device::VIRTUAL && !device->curFormat.isEmpty()) newFormat = device->curFormat;
-
-        assignUsefor(volume, newFormat, device == volume, !(isBtrfsSubvolume && volume == device->parent()));
-        if (volume != device) assignUsefor(device, newFormat, true, true);
-        if (!volume->map.isEmpty()) {
-            if (PartMan::Device *virt = partman->findByPath(u"/dev/mapper/"_s + volume->map)) {
-                const bool setUse = !(isBtrfsSubvolume && virt == volume);
-                assignUsefor(virt, newFormat, device == virt, setUse);
-            }
-        }
-    };
-
-    auto resolveFsDevice = [&](const QString &source, const RootBase::MountEntry *mountInfo) -> PartMan::Device * {
-        QString fs = source.trimmed();
-        PartMan::Device *dev = resolveDevSource(fs);
-        if (!dev && fs.startsWith(u"/dev/mapper/"_s)) {
-            dev = partman->findByPath(fs.mid(5));
-        }
-        if (!dev && mountInfo && mountInfo->isBtrfs) {
-            if (!rbase.devpath.isEmpty()) dev = partman->findByPath(rbase.devpath);
-            if (!dev && !rbase.physdev.isEmpty()) dev = partman->findByPath(rbase.physdev);
-        }
-        return finalizeDevice(dev, mountInfo);
-    };
-
+    std::set<PartMan::Device *> btrfsParts;
     for (const auto &mount : rbase.mounts) {
-        PartMan::Device *dev = resolveFsDevice(mount.fsname, &mount);
-        if (!dev) continue;
-        setMount(dev, mount.dir, &mount);
+        PartMan::Device *dev = resolveDevSource(mount.fsname);
+        if (dev && dev->curFormat == "btrfs") {
+            if (btrfsParts.insert(dev).second) {
+                // Partition freshly inserted, scan for subvolumes here.
+                partman->scanSubvolumes(dev);
+            }
+            // Redirect to the associated subvolume (if specified).
+            if (!mount.subvol.isEmpty()) {
+                PartMan::Iterator it(dev);
+                dev = nullptr; // Invalid if no associated subvolume.
+                for (; PartMan::Device *candidate = *it; it.next()) {
+                    if (candidate->curLabel.compare(mount.subvol, Qt::CaseInsensitive) == 0) {
+                        dev = candidate;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!dev) {
+            continue; // Non-existent device or (if btrfs) subvolume not found.
+        }
+
         partman->changeBegin(dev);
+
+        // Preserve flag (or overwrite if need be).
+        if (dev->type == PartMan::Device::SUBVOLUME) {
+            dev->format = u"CREATE"_s; // Change to Overwrite by default.
+        }
         if (mount.dir == "/"_L1) {
             if (!rbase.homeSeparate) dev->format = u"PRESERVE"_s;
         } else if (mount.dir.startsWith(u"/"_s)) {
@@ -299,15 +194,18 @@ bool Replacer::preparePartMan() noexcept
         } else if (mount.type.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
             dev->format = u"PRESERVE"_s;
         }
-        partman->changeEnd(true, false);
-    }
 
-    for (const auto &mount : rbase.mounts) {
-        if (!mount.dir.startsWith(u"/"_s)) continue;
-        if (partman->findByMount(mount.dir)) continue;
-        if (PartMan::Device *dev = resolveFsDevice(mount.fsname, &mount)) {
-            setMount(dev, mount.dir, &mount);
+        // What to use the device for.
+        if (mount.type.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
+            dev->usefor = u"SWAP"_s;
+        } else if (mount.type.compare(u"none"_s, Qt::CaseInsensitive) == 0
+            && mount.fsname.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
+            dev->usefor = u"SWAP"_s;
+        } else {
+            dev->usefor = mount.dir;
         }
+
+        partman->changeEnd(true, false);
     }
 
     // Confirmation and validation
@@ -619,7 +517,9 @@ Replacer::RootBase::MountEntry::MountEntry(struct mntent *mntent)
     opts(mntent->mnt_opts), freq(mntent->mnt_freq), passno(mntent->mnt_passno)
 {
     optionList = opts.split(','_L1, Qt::SkipEmptyParts);
-    for (QString &opt : optionList) opt = opt.trimmed();
+    for (QString &opt : optionList) {
+        opt = opt.trimmed();
+    }
     if (type.compare(u"btrfs"_s, Qt::CaseInsensitive) == 0) {
         isBtrfs = true;
         auto stripQuotes = [](QString value) {
@@ -633,10 +533,16 @@ Replacer::RootBase::MountEntry::MountEntry(struct mntent *mntent)
             }
             return value;
         };
-        for (const QString &opt : std::as_const(optionList)) {
-            if (opt.startsWith(u"subvol="_s, Qt::CaseInsensitive)) subvol = stripQuotes(opt.mid(7).trimmed());
-            else if (opt.startsWith(u"subvolid="_s, Qt::CaseInsensitive)) subvolId = stripQuotes(opt.mid(9).trimmed());
+        for (QString &opt : optionList) {
+            if (opt.startsWith(u"subvol="_s, Qt::CaseInsensitive)) {
+                subvol = stripQuotes(opt.mid(7).trimmed());
+                opt.clear();
+            } else if (opt.startsWith(u"subvolid="_s, Qt::CaseInsensitive)) {
+                subvolId = stripQuotes(opt.mid(9).trimmed());
+                opt.clear();
+            }
         }
+        optionList.removeAll(QString());
         if (subvol.startsWith('/')) subvol.remove(0, 1);
     }
 }

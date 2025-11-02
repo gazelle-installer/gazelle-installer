@@ -93,6 +93,7 @@ public:
     ~PartMan();
     void scan(Device *drvstart = nullptr);
     void scanVirtualDevices(bool rescan);
+    void scanSubvolumes(class Device *part);
     bool loadConfig(class MSettings &config) noexcept;
     void saveConfig(class MSettings &config) const noexcept;
     bool validate(bool automatic, QTreeWidgetItem *confroot = nullptr) const noexcept;
@@ -143,7 +144,6 @@ private:
     void partManRunClick();
     void partMenuUnlock(class Device *part);
     void partMenuLock(class Device *volume);
-    void scanSubvolumes(class Device *part);
     bool confirmSpace() const noexcept;
     bool confirmBootable() const noexcept;
 
