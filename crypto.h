@@ -37,7 +37,8 @@ public:
     bool valid() const noexcept;
     inline bool supported() const noexcept { return cryptsupport; }
     void formatAll(const class PartMan &partman);
-    void open(class PartMan::Device *part, const class QByteArray &password);
+    bool open(class PartMan::Device *part, const class QByteArray &password, bool readonly = false) noexcept;
+    bool close(class PartMan::Device *volume) const noexcept;
     bool makeCrypttab(const class PartMan &partman) noexcept;
 };
 

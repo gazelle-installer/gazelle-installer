@@ -62,21 +62,57 @@ void Crypto::formatAll(const PartMan &partman)
         proc.exec(u"cryptsetup"_s, {u"--batch-mode"_s, u"--key-size=512"_s,
             u"--hash=sha512"_s, u"luksFormat"_s, part->path}, &encPass);
         proc.status();
-        open(part, encPass);
+        if (!open(part, encPass)) {
+            throw QT_TR_NOOP("Failed to open LUKS container.");
+        }
     }
 }
-void Crypto::open(PartMan::Device *part, const QByteArray &password)
+bool Crypto::open(PartMan::Device *part, const QByteArray &password, bool readonly) noexcept
 {
-    MProcess::Section sect(proc, QT_TR_NOOP("Failed to open LUKS container."));
+    MProcess::Section sect(proc, nullptr);
+
     if (part->map.isEmpty()) {
-        proc.exec(u"cryptsetup"_s, {u"luksUUID"_s, part->path}, nullptr, true);
+        if (!proc.exec(u"cryptsetup"_s, {u"luksUUID"_s, part->path}, nullptr, true)) {
+            return false;
+        }
         part->map = "luks-" + proc.readAll().trimmed();
     }
+
     QStringList cargs({u"open"_s, part->path, part->map, u"--type"_s, u"luks"_s});
-    if (part->discgran) {
+    if (readonly) {
+        cargs.prepend(u"--readonly"_s);
+    } else if (part->discgran) {
         cargs.prepend(u"--allow-discards"_s);
     }
-    proc.exec(u"cryptsetup"_s, cargs, &password);
+    if (!proc.exec(u"cryptsetup"_s, cargs, &password)) return false;
+    part->mapCount++;
+    return true;
+}
+bool Crypto::close(PartMan::Device *volume) const noexcept
+{
+    bool ok = false;
+    PartMan::Device *origin = volume->origin;
+    if (origin) {
+        // Volume is a LUKS container belonging to a partition.
+        ok = proc.exec(u"cryptsetup"_s, {u"close"_s, volume->path});
+        if (ok) {
+            if (origin->mapCount > 0) {
+                origin->mapCount--;
+            }
+            origin->map.clear();
+            origin->addToCrypttab = false;
+        }
+        volume->origin = nullptr;
+    } else if (volume->mapCount == 1) {
+        // Volume is a partition containing one LUKS container.
+        ok = proc.exec(u"cryptsetup"_s, {u"close"_s, volume->map});
+        if (ok) {
+            volume->mapCount--;
+            volume->map.clear();
+            volume->addToCrypttab = false;
+        }
+    }
+    return ok;
 }
 
 // write out crypttab if encrypting for auto-opening

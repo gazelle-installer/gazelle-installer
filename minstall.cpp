@@ -138,12 +138,12 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
 MInstall::~MInstall() {
     if (oobe) delete oobe;
     if (base) delete base;
+    if (replacer) delete replacer;
     if (checkmd5) delete checkmd5;
     if (bootman) delete bootman;
     if (swapman) delete swapman;
     if (partman) delete partman;
     if (crypto) delete crypto;
-    if (replacer) delete replacer;
     if (autopart) delete autopart;
     if (throbber) delete throbber;
 }
@@ -208,7 +208,7 @@ void MInstall::startup()
         swapman = new SwapMan(proc, core, *partman, gui, this);
         autopart = new AutoPart(proc, core, partman, gui, appConf, this);
         partman->autopart = autopart;
-        replacer = new Replacer(proc, partman, gui, appConf);
+        replacer = new Replacer(proc, partman, gui, *crypto, appConf);
         //experimental tag
         gui.radioReplace->setText(gui.radioReplace->text() + " (" + tr("Experimental","As In feature is not polished and may not work properly") + ")");
         connect(gui.radioEntireDrive, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
@@ -241,7 +241,7 @@ void MInstall::startup()
         // Build disk widgets
         partman->scan();
         autopart->scan();
-        replacer->scan();
+        replacer->scan(false);
         if (gui.comboDriveSystem->count() > 0) {
             gui.comboDriveSystem->setCurrentIndex(0);
             gui.radioEntireDrive->setChecked(true);
@@ -605,7 +605,7 @@ int MInstall::showPage(int curr, int next) noexcept
         }
         return Step::CONFIRM;
     } else if (curr == Step::REPLACE && next < curr) {
-        if (partman) partman->closeTemporaryUnlocks();
+        replacer->clean();
     } else if (curr == Step::PARTITIONS) {
         if (next > curr) {
             if (!partman->validate(automatic)) {
@@ -760,32 +760,11 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("There is no guarantee of this working successfully. Ensure you have a good working backup of all important data before continuing.") + "</p>"_L1);
 
         if(gui.tableExistInst->rowCount() <= 0) {
-            replacer->scan(true, true);
+            QTimer::singleShot(0, gui.pushReplaceScan, &QPushButton::click);
         }
         break;
 
     case Step::PARTITIONS:
-        if (partman) partman->closeTemporaryUnlocks();
-        if (!customUnlockPrompted && partman) {
-            customUnlockPrompted = true;
-            bool unlockedAny = false;
-            do {
-                unlockedAny = false;
-                for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-                    if (dev->type != PartMan::Device::PARTITION) continue;
-                    if (dev->curFormat != "crypto_LUKS"_L1 || dev->mapCount != 0) continue;
-                    if (partman->promptUnlock(dev)) {
-                        unlockedAny = true;
-                    }
-                    break;
-                }
-                if (unlockedAny) {
-                    partman->scan();
-                    if (autopart) autopart->scan();
-                    if (replacer) replacer->scan();
-                }
-            } while (unlockedAny);
-        }
         gui.textHelp->setText("<p><b>"_L1 + tr("Choose Partitions") + "</b><br/>"_L1
             + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"_L1
             "<p>"_L1 + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"_L1

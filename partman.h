@@ -92,6 +92,7 @@ public:
         const class MIni &appConf, const QCommandLineParser &appArgs, QObject *parent = nullptr);
     ~PartMan();
     void scan(Device *drvstart = nullptr);
+    void scanVirtualDevices(bool rescan);
     bool loadConfig(class MSettings &config) noexcept;
     void saveConfig(class MSettings &config) const noexcept;
     bool validate(bool automatic, QTreeWidgetItem *confroot = nullptr) const noexcept;
@@ -103,7 +104,6 @@ public:
     Device *findByPath(const QString &devpath) const noexcept;
     Device *findByMount(const QString &mount) const noexcept;
     Device *findHostDev(const QString &path) const noexcept;
-    bool promptUnlock(Device *part, bool temporary = false) noexcept;
     void closeTemporaryUnlocks() noexcept;
     void clearReadOnly(class Device *device) noexcept;
     struct VolumeSpec volSpecTotal(const QString &path, const QStringList &excludes) const noexcept;
@@ -126,7 +126,6 @@ private:
     Ui::MeInstall &gui;
     class Crypto &crypto;
     bool brave;
-    void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit() noexcept;
     void preparePartitions();
     void formatPartitions();

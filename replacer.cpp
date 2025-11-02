@@ -21,30 +21,32 @@
 #include <QFileInfo>
 #include <QHash>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QRegularExpression>
 #include "mprocess.h"
 #include "partman.h"
 #include "msettings.h"
+#include "crypto.h"
 #include "replacer.h"
 
 using namespace Qt::Literals::StringLiterals;
 
-Replacer::Replacer(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, class MIni &appConf)
-    : proc(mproc), partman(pman), gui(ui)
+Replacer::Replacer(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, Crypto &cman, class MIni &appConf)
+    : proc(mproc), partman(pman), gui(ui), crypto(cman)
 {
     appConf.setSection(u"Storage"_s);
     installFromRootDevice = appConf.getBoolean(u"InstallFromRootDevice"_s);
     appConf.setSection();
-    connect(gui.pushReplaceScan, &QPushButton::clicked, this, [this](bool) noexcept {
-        scan(true, true);
-    });
+    connect(gui.pushReplaceScan, &QPushButton::clicked, this, &Replacer::pushReplaceScan_clicked);
 
     ui.boxReplaceOptions->hide(); // TODO: Delete when implemented.
+}
+Replacer::~Replacer() {
+    clean();
 }
 
 void Replacer::scan(bool full, bool allowUnlock) noexcept
 {
-    gui.tableExistInst->setEnabled(false);
     // clear() erases the headers, and clearContents() keeps the cells.
     while (gui.tableExistInst->rowCount() > 0) {
         gui.tableExistInst->removeRow(0);
@@ -52,39 +54,51 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
 
     long long minSpace = partman->volSpecTotal(u"/"_s, false).minimum;
     bases.clear();
-    bool rescan = false;
+    bool cryptoPrompted = false;
+    bool cryptoAny = false;
+    bool cryptoUnlocked = false;
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::PARTITION && device->size >= minSpace
             && (!device->flags.bootRoot || installFromRootDevice)) {
             gui.radioReplace->setEnabled(true);
-            if (device->curFormat == "crypto_LUKS"_L1 && device->mapCount == 0) {
-                if (!allowUnlock) continue;
-                if (partman->promptUnlock(device, true)) {
-                    rescan = true;
-                    break;
-                }
-                continue;
-            }
-            if(full) {
-                const auto &rbase = bases.emplace_back(proc, device);
-                if(rbase.ok) {
-                    const int newrow = gui.tableExistInst->rowCount();
-                    gui.tableExistInst->insertRow(newrow);
-                    gui.tableExistInst->setItem(newrow, 0, new QTableWidgetItem(rbase.devpath));
-                    gui.tableExistInst->setItem(newrow, 1, new QTableWidgetItem(rbase.release));
-                } else {
-                    bases.pop_back();
-                }
-            } else {
+            if (!full) {
                 break; // Not a full scan, so only need to check if there is any possible replacement.
             }
-        }
-    }
 
-    gui.tableExistInst->setEnabled(!bases.empty());
-    if (rescan) {
-        scan(full, allowUnlock);
-        return;
+            // Attempt to unlock encrypted containers (read-only) for scanning.
+            bool unlocked = false;
+            if (device->curFormat == "crypto_LUKS"_L1 && device->mapCount == 0) {
+                if (allowUnlock && !cryptoPrompted) {
+                    cryptoPrompted = true;
+                    allowUnlock = promptPass();
+                }
+                if (!allowUnlock) continue;
+                // Prompted and allowed to unlock.
+                cryptoAny = true;
+                if (crypto.open(device, cryptoPass, true)) {
+                    unlocked = true;
+                    cryptoUnlocked = true;
+                } else {
+                    continue; // Unable to open this LUKS container.
+                }
+            }
+
+            // Obtain required information and add to the list if it is a supported installation.
+            const auto &rbase = bases.emplace_back(proc, device);
+            if(rbase.ok) {
+                const int newrow = gui.tableExistInst->rowCount();
+                gui.tableExistInst->insertRow(newrow);
+                gui.tableExistInst->setItem(newrow, 0, new QTableWidgetItem(device->friendlyName()));
+                gui.tableExistInst->setItem(newrow, 1, new QTableWidgetItem(rbase.release));
+            } else {
+                bases.pop_back();
+            }
+
+            // Lock encrypted volume if it was unlocked in this loop.
+            if (unlocked) {
+                crypto.close(device);
+            }
+        }
     }
 
     if (gui.tableExistInst->columnCount() > 0) {
@@ -93,6 +107,26 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
             gui.tableExistInst->resizeColumnToContents(col);
         }
     }
+
+    if (cryptoAny && !cryptoUnlocked) {
+        QMessageBox msgbox(gui.boxMain);
+        msgbox.setIcon(QMessageBox::Information);
+        msgbox.setText(tr("Could not open any of the locked encrypted containers."));
+        msgbox.setInformativeText(tr("Possible incorrect password."
+                                     " Press the 'Scan' button to try again with a different password."));
+        msgbox.exec();
+    }
+}
+
+void Replacer::clean() noexcept
+{
+    cryptoPass.fill('#'); // Wipe the secret.
+    // Close every encrypted container opened by the replacer.
+    for (RootBase &rbase : bases) {
+        closeEncrypted(rbase);
+    }
+    // Completely refresh the partition tree.
+    partman->scan();
 }
 
 bool Replacer::validate() const noexcept
@@ -106,22 +140,21 @@ bool Replacer::validate() const noexcept
     return true;
 }
 
-bool Replacer::preparePartMan() const noexcept
+bool Replacer::preparePartMan() noexcept
 {
     const int currow = gui.tableExistInst->currentRow();
     assert(gui.tableExistInst->rowCount() == bases.size());
     assert(currow >= 0 && currow < (int)bases.size());
+    RootBase &rbase = bases[currow];
 
     partman->scan();
-    for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-        if (dev->type == PartMan::Device::PARTITION && dev->curFormat == "crypto_LUKS"_L1
-            && dev->mapCount == 0) {
-            if (!partman->promptUnlock(dev, true)) return false;
-            partman->scan(dev);
-        }
+    if (!openEncrypted(rbase)) {
+        closeEncrypted(rbase); // Clean up any that were successfully opened.
+        return false;
     }
+    partman->scanVirtualDevices(true);
+
     // Populate layout usage information based on the selected existing installation.
-    const auto &rbase = bases.at(currow);
 
     auto ensureBtrfsSubvolume = [&](PartMan::Device *device, const RootBase::MountEntry &mount) -> PartMan::Device * {
         if (!device) return nullptr;
@@ -129,10 +162,6 @@ bool Replacer::preparePartMan() const noexcept
 
         PartMan::Device *partition = device;
         if (partition->type == PartMan::Device::SUBVOLUME) partition = partition->parent();
-        if (partition && partition->type == PartMan::Device::VIRTUAL && partition->origin) {
-            partition = partition->origin;
-        }
-        if (!partition || partition->type != PartMan::Device::PARTITION) return device;
 
         auto matchesLabel = [&](PartMan::Device *subvol) -> bool {
             if (subvol->label.compare(mount.subvol, Qt::CaseInsensitive) == 0) return true;
@@ -168,22 +197,17 @@ bool Replacer::preparePartMan() const noexcept
         if (!dev) return nullptr;
         if (mountInfo && mountInfo->isBtrfs) {
             PartMan::Device *candidate = dev;
-            if (candidate->type == PartMan::Device::VIRTUAL && candidate->origin) {
-                candidate = candidate->origin;
-            }
             if (candidate) {
                 PartMan::Device *resolved = ensureBtrfsSubvolume(candidate, *mountInfo);
                 if (resolved) dev = resolved;
             }
         }
-        if (dev->type == PartMan::Device::VIRTUAL && dev->origin) return dev->origin;
         return dev;
     };
 
     auto setMount = [&](PartMan::Device *device, const QString &dir, const RootBase::MountEntry *mountInfo) {
         if (!device) return;
         PartMan::Device *volume = device;
-        if (device->type == PartMan::Device::VIRTUAL && device->origin) volume = device->origin;
         if (!volume) return;
         const bool isBtrfsSubvolume = mountInfo && mountInfo->isBtrfs && device->type == PartMan::Device::SUBVOLUME;
         QString usefor = dir;
@@ -259,49 +283,13 @@ bool Replacer::preparePartMan() const noexcept
             partman->changeEnd();
         };
         preserve(device);
-        if (device->type == PartMan::Device::VIRTUAL && device->origin) preserve(device->origin);
-        else if (device->type == PartMan::Device::SUBVOLUME) preserve(device->parent());
+        if (device->type == PartMan::Device::SUBVOLUME) preserve(device->parent());
         else if (!device->map.isEmpty()) preserve(partman->findByPath(u"/dev/mapper/"_s + device->map));
     };
 
     auto resolveFsDevice = [&](const QString &source, const RootBase::MountEntry *mountInfo) -> PartMan::Device * {
         QString fs = source.trimmed();
-        if (fs.isEmpty()) return nullptr;
-        if (fs.startsWith(u"UUID="_s)) {
-            const QString uuid = fs.mid(5);
-            for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-                if (dev->uuid.compare(uuid, Qt::CaseInsensitive) == 0) return finalizeDevice(dev, mountInfo);
-            }
-            return nullptr;
-        }
-        if (fs.startsWith(u"PARTUUID="_s)) {
-            const QString partuuid = fs.mid(9);
-            for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-                if (dev->partuuid.compare(partuuid, Qt::CaseInsensitive) == 0) return finalizeDevice(dev, mountInfo);
-            }
-            return nullptr;
-        }
-        if (fs.startsWith(u"LABEL="_s)) {
-            const QString label = fs.mid(6);
-            for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-                if (dev->label.compare(label, Qt::CaseInsensitive) == 0
-                    || dev->curLabel.compare(label, Qt::CaseInsensitive) == 0) return finalizeDevice(dev, mountInfo);
-            }
-            return nullptr;
-        }
-        if (fs.startsWith(u"PARTLABEL="_s)) {
-            const QString partlabel = fs.mid(10);
-            for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-                if (dev->partlabel.compare(partlabel, Qt::CaseInsensitive) == 0) return finalizeDevice(dev, mountInfo);
-            }
-            return nullptr;
-        }
-        QFileInfo info(fs);
-        if (!fs.startsWith(u"/dev/"_s) && info.exists()) {
-            const QString canon = info.canonicalFilePath();
-            if (!canon.isEmpty()) fs = canon;
-        }
-        PartMan::Device *dev = partman->findByPath(fs);
+        PartMan::Device *dev = resolveDevSource(fs);
         if (!dev && fs.startsWith(u"/dev/mapper/"_s)) {
             dev = partman->findByPath(fs.mid(5));
         }
@@ -315,6 +303,7 @@ bool Replacer::preparePartMan() const noexcept
     for (const auto &mount : rbase.mounts) {
         PartMan::Device *dev = resolveFsDevice(mount.fsname, &mount);
         if (!dev) continue;
+        qDebug() << "DEV" << dev->path << dev->mappedDevice() << mount.dir << mount.type << mount.fsname;
         setMount(dev, mount.dir, &mount);
         if (mount.dir == "/"_L1) {
             if (!rbase.homeSeparate) markPreserve(dev);
@@ -424,21 +413,6 @@ bool Replacer::preparePartMan() const noexcept
             && !dev->flags.sysEFI && dev->type == PartMan::Device::PARTITION;
     });
 
-    auto resolveCryptDevice = [&](const QString &source) -> PartMan::Device * {
-        return resolveFsDevice(source, nullptr);
-    };
-
-    for (const auto &crypt : rbase.crypts) {
-        PartMan::Device *cryptdev = resolveCryptDevice(crypt.encdev);
-        if (!cryptdev) continue;
-        partman->changeBegin(cryptdev);
-        cryptdev->addToCrypttab = true;
-        if (!crypt.volume.isEmpty() && (cryptdev->map.isEmpty() || cryptdev->map == crypt.volume)) {
-            cryptdev->map = crypt.volume;
-        }
-        partman->changeEnd();
-    }
-
     // Confirmation and validation
     QTreeWidgetItem *twroot = new QTreeWidgetItem(gui.treeConfirm);
     QString location = rbase.devpath;
@@ -447,6 +421,92 @@ bool Replacer::preparePartMan() const noexcept
     }
     twroot->setText(0, tr("Replace the installation in %1 (%2)").arg(location, rbase.release));
     return partman->validate(true, twroot);
+}
+
+bool Replacer::promptPass() noexcept
+{
+    cryptoPass.fill('#');
+    QInputDialog prompt(gui.boxMain);
+    prompt.setLabelText(tr("Password for encrypted volumes:"));
+    prompt.setTextEchoMode(QLineEdit::Password);
+    prompt.setCancelButtonText(tr("Ignore encrypted volumes"));
+    cryptoPass.clear();
+    if (prompt.exec() == QInputDialog::Accepted) {
+        cryptoPass = prompt.textValue().toUtf8();
+        return true;
+    }
+    return false;
+}
+
+PartMan::Device *Replacer::resolveDevSource(const QString &source) const noexcept
+{
+    if (source.isEmpty()) {
+        return nullptr;
+    } else if (source.startsWith(u"UUID="_s)) {
+        const QString &uuid = source.mid(5);
+        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+            if (dev->uuid.compare(uuid, Qt::CaseInsensitive) == 0) return dev;
+        }
+    } else if (source.startsWith(u"PARTUUID="_s)) {
+        const QString &partuuid = source.mid(9);
+        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+            if (dev->partuuid.compare(partuuid, Qt::CaseInsensitive) == 0) return dev;
+        }
+    } else if (source.startsWith(u"LABEL="_s)) {
+        const QString &label = source.mid(6);
+        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+            if (dev->finalLabel().compare(label, Qt::CaseInsensitive) == 0) return dev;
+        }
+    } else if (source.startsWith(u"PARTLABEL="_s)) {
+        const QString partlabel = source.mid(10);
+        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
+            if (dev->partlabel.compare(partlabel, Qt::CaseInsensitive) == 0) return dev;
+        }
+    } else {
+        QFileInfo info(source);
+        if (!source.startsWith(u"/dev/"_s) && info.exists()) {
+            const QString canon = info.canonicalFilePath();
+            if (!canon.isEmpty()) {
+                return partman->findByPath(canon);
+            }
+        }
+    }
+    return partman->findByPath(source);
+}
+
+bool Replacer::openEncrypted(RootBase &base) noexcept
+{
+    for (auto &crypt : base.crypts) {
+        PartMan::Device *dev = resolveDevSource(crypt.encdev);
+        if (dev) {
+            if (dev->mapCount == 0 && !crypto.open(dev, cryptoPass)) {
+                QMessageBox::critical(gui.boxMain, QString(),
+                    tr("Cannot unlock encrypted partition: %1").arg(crypt.encdev));
+                return false;
+            }
+            dev->addToCrypttab = true;
+            crypt.device = dev;
+        } else {
+            QMessageBox::critical(gui.boxMain, QString(),
+                tr("Cannot find partition listed in crypttab: %1").arg(crypt.encdev));
+            return false;
+        }
+    }
+    return true;
+}
+bool Replacer::closeEncrypted(RootBase &base) noexcept
+{
+    bool ok = true;
+    for (auto &crypt : base.crypts) {
+        if (crypt.device) {
+            if (crypto.close(crypt.device)) {
+                crypt.device = nullptr;
+            } else {
+                ok = false;
+            }
+        }
+    }
+    return ok;
 }
 
 Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
@@ -687,4 +747,16 @@ Replacer::RootBase::CryptEntry::CryptEntry(const QByteArray &line)
     encdev = fields.at(1);
     keyfile = fields.value(2);
     options = fields.value(3);
+    qDebug() << "Crypttab" << volume << encdev << keyfile << options;
+}
+
+// Slots
+
+void Replacer::pushReplaceScan_clicked(bool) noexcept
+{
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    gui.boxReplace->setEnabled(false);
+    scan(true, true);
+    gui.boxReplace->setEnabled(true);
+    QGuiApplication::restoreOverrideCursor();
 }

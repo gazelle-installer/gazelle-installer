@@ -30,16 +30,26 @@ class Replacer : public QObject
     Q_OBJECT
 public:
     class RootBase;
-    Replacer(class MProcess &mproc, class PartMan *pman, class Ui::MeInstall &ui, class MIni &appConf);
-    void scan(bool full = false, bool allowUnlock = false) noexcept;
+    Replacer(class MProcess &mproc, class PartMan *pman, class Ui::MeInstall &ui, class Crypto &cman, class MIni &appConf);
+    ~Replacer();
+    void scan(bool full, bool allowUnlock = false) noexcept;
+    void clean() noexcept;
     bool validate() const noexcept;
-    bool preparePartMan() const noexcept;
+    bool preparePartMan() noexcept;
+    class PartMan::Device *resolveDevSource(const QString &source) const noexcept;
+    bool openEncrypted(class RootBase &base) noexcept;
+    bool closeEncrypted(class RootBase &base) noexcept;
 private:
     std::vector<RootBase> bases;
     class MProcess &proc;
     class PartMan *partman;
     class Ui::MeInstall &gui;
+    class Crypto &crypto;
     bool installFromRootDevice = false;
+    QByteArray cryptoPass;
+    bool promptPass() noexcept;
+    // Slots
+    void pushReplaceScan_clicked(bool) noexcept;
 };
 
 class Replacer::RootBase
@@ -64,6 +74,7 @@ public:
         QString encdev;     /* encrypted device */
         QString keyfile;    /* key file */
         QString options;    /* options */
+        PartMan::Device *device = nullptr; /* encrypted device (as found - populated later) */
         CryptEntry(const QByteArray &line);
     };
     std::vector<struct MountEntry> mounts;

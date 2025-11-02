@@ -232,7 +232,9 @@ void PartMan::scanVirtualDevices(bool rescan)
         for (Device *drive : root->children) {
             if (drive->type == Device::VIRTUAL_DEVICES) {
                 virtdevs = drive;
-                for (Device *device : virtdevs->children) listed[device->path] = device;
+                for (Device *device : virtdevs->children) {
+                    listed[device->path] = device;
+                }
                 break;
             }
         }
@@ -664,10 +666,8 @@ void PartMan::partManRunClick()
 }
 
 // Partition menu items
-bool PartMan::promptUnlock(Device *part, bool temporary) noexcept
+void PartMan::partMenuUnlock(Device *part)
 {
-    if (!part) return false;
-
     QDialog dialog(gui.boxMain);
     QFormLayout layout(&dialog);
     dialog.setWindowTitle(tr("Unlock Drive"));
@@ -683,23 +683,18 @@ bool PartMan::promptUnlock(Device *part, bool temporary) noexcept
     connect(&buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
-    bool unlocked = false;
     if (dialog.exec() == QDialog::Accepted) {
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
-        try {
-            clearReadOnly(part);
-            crypto.open(part, editPass->text().toUtf8());
+        clearReadOnly(part);
+        if (crypto.open(part, editPass->text().toUtf8())) {
             clearReadOnly(part);
             part->usefor.clear();
             part->addToCrypttab = checkCrypttab->isChecked();
-            part->mapCount++;
-            if (temporary) part->flags.tempUnlock = true;
             notifyChange(part);
             scanVirtualDevices(true);
             treeSelChange();
-            unlocked = true;
-        } catch (...) {
+        } else {
             QMessageBox msgbox(gui.boxMain);
             msgbox.setIcon(QMessageBox::Warning);
             msgbox.setText(tr("Could not unlock device."));
@@ -709,12 +704,6 @@ bool PartMan::promptUnlock(Device *part, bool temporary) noexcept
         gui.boxMain->setEnabled(true);
         qApp->restoreOverrideCursor();
     }
-    return unlocked;
-}
-
-void PartMan::partMenuUnlock(Device *part)
-{
-    promptUnlock(part);
 }
 
 void PartMan::clearReadOnly(Device *device) noexcept
@@ -750,14 +739,10 @@ void PartMan::partMenuLock(Device *volume)
     bool ok = false;
     // Find the associated partition and decrement its reference count if found.
     Device *origin = volume->origin;
-    if (origin) ok = proc.exec(u"cryptsetup"_s, {u"close"_s, volume->path});
-    if (ok) {
-        if (origin->mapCount > 0) origin->mapCount--;
-        origin->map.clear();
-        origin->addToCrypttab = false;
-        notifyChange(origin);
+    if (crypto.close(volume)) {
+        // Notify that the former parent may not have any unlocked children.
+        if (origin) notifyChange(origin);
     }
-    volume->origin = nullptr;
     // Refresh virtual devices list.
     scanVirtualDevices(true);
     treeSelChange();
@@ -792,10 +777,8 @@ void PartMan::closeTemporaryUnlocks() noexcept
             part->flags.tempUnlock = false;
             continue;
         }
-        if (proc.exec(u"cryptsetup"_s, {u"close"_s, mapName})) {
+        if (crypto.close(part)) {
             part->flags.tempUnlock = false;
-            if (part->mapCount > 0) part->mapCount--;
-            part->map.clear();
             notifyChange(part);
         } else {
             failed.append(mapName);
@@ -1625,12 +1608,12 @@ void PartMan::clearWorkArea()
             if (closedMaps.contains(device->map)) continue;
             const QString mapperPath = u"/dev/mapper/"_s + device->map;
             if (!QFile::exists(mapperPath)) continue;
-            proc.exec(u"cryptsetup"_s, {u"close"_s, device->map});
-            closedMaps.append(device->map);
-            device->mapCount = 0;
-            device->map.clear();
-            device->addToCrypttab = false;
-            notifyChange(device);
+            if (crypto.close(device)) {
+                closedMaps.append(device->map);
+                device->mapCount = 0;
+                device->addToCrypttab = false;
+                notifyChange(device);
+            }
         }
     }
 }
