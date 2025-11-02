@@ -716,9 +716,7 @@ void PartMan::partMenuUnlock(Device *part)
     if (dialog.exec() == QDialog::Accepted) {
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
-        clearReadOnly(part);
         if (crypto.open(part, editPass->text().toUtf8())) {
-            clearReadOnly(part);
             part->usefor.clear();
             part->addToCrypttab = checkCrypttab->isChecked();
             notifyChange(part);
@@ -734,32 +732,6 @@ void PartMan::partMenuUnlock(Device *part)
         gui.boxMain->setEnabled(true);
         qApp->restoreOverrideCursor();
     }
-}
-
-void PartMan::clearReadOnly(Device *device) noexcept
-{
-    if (!device) return;
-
-    auto ensureWritable = [this](const QString &dev) noexcept {
-        if (dev.isEmpty()) return;
-        QFileInfo info(dev);
-        if (!info.exists()) return;
-        if (!proc.exec(u"blockdev"_s, {u"--getro"_s, dev}, nullptr, true)) return;
-        const QString roflag = proc.readOut(true).trimmed();
-        if (roflag != u"1"_s) return;
-        proc.exec(u"blockdev"_s, {u"--setrw"_s, dev});
-    };
-
-    QStringList devices;
-    devices << device->path;
-    const QString mapped = device->mappedDevice();
-    if (!mapped.isEmpty() && !devices.contains(mapped)) devices << mapped;
-    if (device->origin) {
-        if (!devices.contains(device->origin->path)) devices << device->origin->path;
-        const QString orgmap = device->origin->mappedDevice();
-        if (!orgmap.isEmpty() && !devices.contains(orgmap)) devices << orgmap;
-    }
-    for (const QString &dev : devices) ensureWritable(dev);
 }
 
 void PartMan::partMenuLock(Device *volume)
@@ -1522,7 +1494,6 @@ void PartMan::mountPartitions()
     for (auto &it : mounts) {
         const QString point("/mnt/antiX"_L1 + it.first);
         const QString &dev = it.second->mappedDevice();
-        clearReadOnly(it.second);
         proc.status(tr("Mounting: %1").arg(it.first));
         QStringList opts;
         if (it.second->type == Device::SUBVOLUME) {
