@@ -758,44 +758,6 @@ void PartMan::partMenuLock(Device *volume)
     }
 }
 
-void PartMan::closeTemporaryUnlocks() noexcept
-{
-    QList<Device *> toClose;
-    for (Iterator it(*this); Device *part = *it; it.next()) {
-        if (part->type != Device::PARTITION) continue;
-        if (!part->flags.tempUnlock) continue;
-        toClose.append(part);
-    }
-    if (toClose.isEmpty()) return;
-
-    qApp->setOverrideCursor(Qt::WaitCursor);
-    gui.boxMain->setEnabled(false);
-    QStringList failed;
-    for (Device *part : std::as_const(toClose)) {
-        const QString mapName = part->map;
-        if (mapName.isEmpty()) {
-            part->flags.tempUnlock = false;
-            continue;
-        }
-        if (crypto.close(part)) {
-            part->flags.tempUnlock = false;
-            notifyChange(part);
-        } else {
-            failed.append(mapName);
-        }
-    }
-    scanVirtualDevices(true);
-    gui.boxMain->setEnabled(true);
-    qApp->restoreOverrideCursor();
-
-    if (!failed.isEmpty()) {
-        QMessageBox msgbox(gui.boxMain);
-        msgbox.setIcon(QMessageBox::Warning);
-        msgbox.setText(tr("Could not re-lock encrypted device(s): %1").arg(failed.join(u", "_s)));
-        msgbox.exec();
-    }
-}
-
 void PartMan::scanSubvolumes(Device *part)
 {
     qApp->setOverrideCursor(Qt::WaitCursor);

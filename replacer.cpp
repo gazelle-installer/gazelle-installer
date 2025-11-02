@@ -494,19 +494,24 @@ bool Replacer::openEncrypted(RootBase &base) noexcept
     }
     return true;
 }
-bool Replacer::closeEncrypted(RootBase &base) noexcept
+void Replacer::closeEncrypted(RootBase &base) noexcept
 {
-    bool ok = true;
+    QStringList failed;
     for (auto &crypt : base.crypts) {
         if (crypt.device) {
             if (crypto.close(crypt.device)) {
                 crypt.device = nullptr;
             } else {
-                ok = false;
+                failed.append(crypt.volume);
             }
         }
     }
-    return ok;
+    if (!failed.isEmpty()) {
+        QMessageBox msgbox(gui.boxMain);
+        msgbox.setIcon(QMessageBox::Warning);
+        msgbox.setText(tr("Could not re-lock encrypted device(s): %1").arg(failed.join(u", "_s)));
+        msgbox.exec();
+    }
 }
 
 Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept

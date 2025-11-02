@@ -38,7 +38,7 @@ public:
     bool preparePartMan() noexcept;
     class PartMan::Device *resolveDevSource(const QString &source) const noexcept;
     bool openEncrypted(class RootBase &base) noexcept;
-    bool closeEncrypted(class RootBase &base) noexcept;
+    void closeEncrypted(class RootBase &base) noexcept;
 private:
     std::vector<RootBase> bases;
     class MProcess &proc;
