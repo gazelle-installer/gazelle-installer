@@ -118,7 +118,7 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
         msgbox.setIcon(QMessageBox::Information);
         msgbox.setText(tr("Could not open any of the locked encrypted containers."));
         msgbox.setInformativeText(tr("Possible incorrect password."
-                                     " Press the 'Scan' button to try again with a different password."));
+            " Press the 'Scan' button to try again with a different password."));
         msgbox.exec();
     }
 }
