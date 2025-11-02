@@ -90,8 +90,12 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
                 const int newrow = gui.tableExistInst->rowCount();
                 gui.tableExistInst->insertRow(newrow);
                 QTableWidgetItem *partit =  new QTableWidgetItem(device->friendlyName());
+                if (device->curFormat == "crypto_LUKS" && device->mapCount > 0) {
+                    partit->setIcon(QIcon::fromTheme(u"lock"_s));
+                }
                 if (device->parent()) {
-                    partit->setToolTip(tr("Drive: %1").arg(device->parent()->friendlyName()));
+                    const QString &tt = tr("Volume %1 on drive %2");
+                    partit->setToolTip(tt.arg(device->name, device->parent()->friendlyName()));
                 }
                 gui.tableExistInst->setItem(newrow, 0, partit);
                 gui.tableExistInst->setItem(newrow, 1, new QTableWidgetItem(rbase.release));
@@ -566,9 +570,9 @@ Replacer::RootBase::CryptEntry::CryptEntry(const QByteArray &line)
 
 void Replacer::pushReplaceScan_clicked(bool) noexcept
 {
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    gui.pageReplace->setCursor(Qt::WaitCursor);
     gui.boxReplace->setEnabled(false);
     scan(true, true);
     gui.boxReplace->setEnabled(true);
-    QGuiApplication::restoreOverrideCursor();
+    gui.pageReplace->unsetCursor();
 }

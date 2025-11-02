@@ -588,6 +588,7 @@ int MInstall::showPage(int curr, int next) noexcept
             return Step::PARTITIONS;
         }
     } else if (curr == Step::REPLACE && next > curr) {
+        gui.boxMain->setCursor(Qt::WaitCursor);
         if (!replacer->validate()) {
             nextFocus = gui.tableExistInst;
             return curr;
@@ -603,9 +604,12 @@ int MInstall::showPage(int curr, int next) noexcept
             msgbox.exec();
             return curr;
         }
+        gui.boxMain->unsetCursor();
         return Step::CONFIRM;
     } else if (curr == Step::REPLACE && next < curr) {
+        gui.boxMain->setCursor(Qt::WaitCursor);
         replacer->clean();
+        gui.boxMain->unsetCursor();
     } else if (curr == Step::PARTITIONS) {
         if (next > curr) {
             if (!partman->validate(automatic)) {
