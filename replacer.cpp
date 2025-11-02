@@ -184,7 +184,7 @@ bool Replacer::preparePartMan() noexcept
             subvol->flags.oldLayout = true;
             subvol->label = mount.subvol;
             subvol->curLabel = mount.subvol;
-            subvol->format = "PRESERVE"_L1;
+            subvol->format = "CREATE"_L1;
             subvol->dump = mount.freq != 0;
             subvol->pass = mount.passno;
             partman->notifyChange(subvol);
@@ -274,19 +274,6 @@ bool Replacer::preparePartMan() noexcept
         }
     };
 
-    auto markPreserve = [&](PartMan::Device *device) {
-        if (!device) return;
-        auto preserve = [&](PartMan::Device *target) {
-            if (!target) return;
-            partman->changeBegin(target);
-            target->format = "PRESERVE"_L1;
-            partman->changeEnd();
-        };
-        preserve(device);
-        if (device->type == PartMan::Device::SUBVOLUME) preserve(device->parent());
-        else if (!device->map.isEmpty()) preserve(partman->findByPath(u"/dev/mapper/"_s + device->map));
-    };
-
     auto resolveFsDevice = [&](const QString &source, const RootBase::MountEntry *mountInfo) -> PartMan::Device * {
         QString fs = source.trimmed();
         PartMan::Device *dev = resolveDevSource(fs);
@@ -303,16 +290,16 @@ bool Replacer::preparePartMan() noexcept
     for (const auto &mount : rbase.mounts) {
         PartMan::Device *dev = resolveFsDevice(mount.fsname, &mount);
         if (!dev) continue;
-        qDebug() << "DEV" << dev->path << dev->mappedDevice() << mount.dir << mount.type << mount.fsname;
         setMount(dev, mount.dir, &mount);
+        partman->changeBegin(dev);
         if (mount.dir == "/"_L1) {
-            if (!rbase.homeSeparate) markPreserve(dev);
+            if (!rbase.homeSeparate) dev->format = u"PRESERVE"_s;
         } else if (mount.dir.startsWith(u"/"_s)) {
-            markPreserve(dev);
-        } else if (mount.type.compare(u"swap"_s, Qt::CaseInsensitive) == 0
-                   || mount.dir.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
-            markPreserve(dev);
+            dev->format = u"PRESERVE"_s;
+        } else if (mount.type.compare(u"swap"_s, Qt::CaseInsensitive) == 0) {
+            dev->format = u"PRESERVE"_s;
         }
+        partman->changeEnd(true, false);
     }
 
     auto dedupeMounts = [&]() {
