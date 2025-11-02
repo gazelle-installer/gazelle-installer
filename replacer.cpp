@@ -302,34 +302,6 @@ bool Replacer::preparePartMan() noexcept
         partman->changeEnd(true, false);
     }
 
-    auto dedupeMounts = [&]() {
-        QHash<QString, PartMan::Device *> owners;
-        for (PartMan::Iterator it(*partman); PartMan::Device *node = *it; it.next()) {
-            if (node->usefor.isEmpty()) continue;
-            if (!node->usefor.startsWith('/')) continue;
-            auto found = owners.find(node->usefor);
-            if (found == owners.end()) {
-                owners.insert(node->usefor, node);
-                continue;
-            }
-            PartMan::Device *current = found.value();
-            if (current == node) continue;
-            auto clearUsefor = [&](PartMan::Device *target) {
-                if (!target) return;
-                partman->changeBegin(target);
-                target->usefor.clear();
-                partman->changeEnd();
-            };
-            if (node->type == PartMan::Device::SUBVOLUME && current->type != PartMan::Device::SUBVOLUME) {
-                clearUsefor(current);
-                found.value() = node;
-            } else {
-                clearUsefor(node);
-            }
-        }
-    };
-    dedupeMounts();
-
     for (const auto &mount : rbase.mounts) {
         if (!mount.dir.startsWith(u"/"_s)) continue;
         if (partman->findByMount(mount.dir)) continue;
@@ -337,68 +309,6 @@ bool Replacer::preparePartMan() noexcept
             setMount(dev, mount.dir, &mount);
         }
     }
-    auto ensureMountFromFstab = [&](const QString &dir) {
-        if (partman->findByMount(dir)) return;
-        for (const auto &mount : rbase.mounts) {
-            if (mount.dir == dir) {
-                if (PartMan::Device *dev = resolveFsDevice(mount.fsname, &mount)) {
-                    setMount(dev, dir, &mount);
-                }
-                return;
-            }
-        }
-    };
-    ensureMountFromFstab(u"/"_s);
-    ensureMountFromFstab(u"/boot/efi"_s);
-    ensureMountFromFstab(u"/boot"_s);
-    if (!partman->findByMount(u"/boot/efi"_s)) {
-        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-            if (dev->flags.sysEFI && dev->type == PartMan::Device::PARTITION) {
-                setMount(dev, u"/boot/efi"_s, nullptr);
-                break;
-            }
-        }
-    }
-    if (!partman->findByMount(u"/boot"_s)) {
-        auto hasBootLabel = [](const QString &label) -> bool {
-            return !label.isEmpty() && label.contains(u"boot"_s, Qt::CaseInsensitive);
-        };
-        auto looksLikeBoot = [&](PartMan::Device *dev) -> bool {
-            return hasBootLabel(dev->curLabel) || hasBootLabel(dev->label) || hasBootLabel(dev->partlabel);
-        };
-        PartMan::Device *cand = nullptr;
-        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-            if (dev->type != PartMan::Device::PARTITION) continue;
-            if (dev->flags.sysEFI) continue;
-            const QString fmt = dev->format.isEmpty() ? dev->curFormat : dev->format;
-            if (!fmt.startsWith(u"ext"_s, Qt::CaseInsensitive)) continue;
-            if (dev->flags.bootRoot) continue;
-            if (!looksLikeBoot(dev)) continue;
-            cand = dev;
-            break;
-        }
-        if (cand) setMount(cand, u"/boot"_s, nullptr);
-    }
-
-    auto ensureMount = [&](const QString &dir, auto &&predicate) {
-        if (partman->findByMount(dir)) return;
-        for (PartMan::Iterator it(*partman); PartMan::Device *dev = *it; it.next()) {
-            if (predicate(dev)) {
-                setMount(dev, dir, nullptr);
-                partman->changeBegin(dev);
-                dev->format = dev->format.isEmpty() ? dev->curFormat : dev->format;
-                partman->changeEnd();
-                break;
-            }
-        }
-    };
-    ensureMount(u"/boot/efi"_s, [](PartMan::Device *dev) {
-        return dev->flags.sysEFI;
-    });
-    ensureMount(u"/boot"_s, [](PartMan::Device *dev) {
-        return dev->usefor.isEmpty() && dev->format.startsWith(u"ext"_s, Qt::CaseInsensitive)
-            && !dev->flags.sysEFI && dev->type == PartMan::Device::PARTITION;
-    });
 
     // Confirmation and validation
     QTreeWidgetItem *twroot = new QTreeWidgetItem(gui.treeConfirm);
