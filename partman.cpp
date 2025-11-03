@@ -861,14 +861,17 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
     // Confirmation page action list
     for (const Device *drive : std::as_const(root->children)) {
         QTreeWidgetItem *twdrive = new QTreeWidgetItem(confroot);
-        if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
-            twdrive->setText(0, tr("Prepare %1 partition table on %2").arg(drive->format, drive->friendlyName()));
-        } else {
+        if (drive->type == Device::VIRTUAL_DEVICES) {
+            twdrive->setText(0, tr("Virtual Devices"));
+        } else if (drive->flags.oldLayout) {
             twdrive->setText(0, tr("Re-use partition table on %1").arg(drive->friendlyName()));
+        } else {
+            twdrive->setText(0, tr("Prepare %1 partition table on %2").arg(drive->format, drive->friendlyName()));
         }
+
         for (const Device *part : std::as_const(drive->children)) {
             QString actmsg;
-            if (drive->flags.oldLayout) {
+            if (drive->flags.oldLayout || drive->type == Device::VIRTUAL_DEVICES) {
                 if (part->usefor.isEmpty()) {
                     if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
                     else continue;
@@ -885,6 +888,11 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
             // QString::arg() emits warnings if a marker is not in the string.
             QTreeWidgetItem *twpart = new QTreeWidgetItem(twdrive);
             twpart->setText(0, actmsg.replace("%1"_L1, part->shownDevice()).replace("%2"_L1, part->usefor));
+            if (part->origin) {
+                twpart->setToolTip(0, part->origin->friendlyName());
+            } else {
+                twpart->setToolTip(0, part->friendlyName());
+            }
 
             for (const Device *subvol : std::as_const(part->children)) {
                 const bool svnouse = subvol->usefor.isEmpty();
