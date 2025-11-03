@@ -145,7 +145,7 @@ void Replacer::clean() noexcept
 bool Replacer::validate() const noexcept
 {
     const int currow = gui.tableExistInst->currentRow();
-    assert(gui.tableExistInst->rowCount() == bases.size());
+    assert(static_cast<size_t>(gui.tableExistInst->rowCount()) == bases.size());
     if (currow < 0 || currow >= (int)bases.size()) {
         QMessageBox::critical(gui.boxMain, QString(), tr("No existing installation selected."));
         return false;
@@ -156,7 +156,7 @@ bool Replacer::validate() const noexcept
 bool Replacer::preparePartMan() noexcept
 {
     const int currow = gui.tableExistInst->currentRow();
-    assert(gui.tableExistInst->rowCount() == bases.size());
+    assert(static_cast<size_t>(gui.tableExistInst->rowCount()) == bases.size());
     assert(currow >= 0 && currow < (int)bases.size());
     RootBase &rbase = bases[currow];
 
