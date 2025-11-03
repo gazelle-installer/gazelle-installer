@@ -1092,7 +1092,7 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
         static constexpr qreal angle = 360.0 / blades;
         painter.rotate(angle * throbPos);
         float hue = 1.0, alpha = 0.18;
-        const float huestep = std::min(throbPos, 60) / (60.0 * blades);
+        const float huestep = std::min(throbPos, 360) / (360.0 * blades);
         static constexpr float alphastep = 0.18 / blades;
         QPen pen;
         pen.setWidth(3);
@@ -1100,7 +1100,10 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
         for (unsigned int ixi=blades; ixi>0; --ixi) {
             const QColor &color = QColor::fromHsvF(hue, 1.0, 1.0, alpha);
             hue -= huestep, alpha += alphastep;
-            painter.setBrush(color);
+            static constexpr qreal bladeangle = 23.5; // atan(30/(75-6)) in degrees.
+            QConicalGradient gradient(-15, -6, 90-bladeangle);
+            gradient.setStops({{0, color}, {bladeangle/360.0, color.darker()}});
+            painter.setBrush(gradient);
             pen.setColor(color.darker());
             painter.setPen(pen);
             static constexpr QPoint blade[] = {{-15, -6}, {15, -75}, {0, -93}, {-15, -75}};
