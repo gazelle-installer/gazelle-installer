@@ -47,6 +47,7 @@
 #include "oobe.h"
 #include "bootman.h"
 #include "swapman.h"
+#include "throbber.h"
 
 #include "minstall.h"
 
@@ -274,26 +275,6 @@ void MInstall::startup()
     }
 
     gotoPage(Step::TERMS);
-}
-
-void MInstall::splashSetThrobber(bool active) noexcept
-{
-    if (active) {
-        if (throbber) return;
-        gui.labelSplash->installEventFilter(this);
-        throbber = new QTimer(this);
-        connect(throbber, &QTimer::timeout, this, [this]() noexcept {
-            ++throbPos;
-            gui.labelSplash->update();
-        });
-        throbber->start(120);
-    } else {
-        if (!throbber) return;
-        delete throbber;
-        throbber = nullptr;
-        gui.labelSplash->removeEventFilter(this);
-    }
-    gui.labelSplash->update();
 }
 
 // turn auto-mount off and on
@@ -567,11 +548,16 @@ int MInstall::showPage(int curr, int next) noexcept
     if (next == Step::SPLASH) { // Enter splash screen
         gui.boxMain->setCursor(Qt::WaitCursor);
         appConf.setSection(u"GUI"_s);
-        splashSetThrobber(appConf.getBoolean(u"SplashThrobber"_s, true));
+        if (appConf.getBoolean(u"SplashThrobber"_s, true)) {
+            throbber = new Throbber(gui.labelSplash);
+        }
         appConf.setSection();
     } else if (curr == Step::SPLASH) { // Leave splash screen
         gui.labelSplash->clear();
-        splashSetThrobber(false);
+        if (throbber) {
+            delete throbber;
+            throbber = nullptr;
+        }
         gui.boxMain->unsetCursor();
     } else if (curr == Step::TERMS && next > curr) {
         if (modeOOBE) return Step::NETWORK;
@@ -1078,44 +1064,7 @@ void MInstall::gotoPage(int next) noexcept
 
 bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
 {
-    if (event->type() != QEvent::Paint) {
-        return QDialog::eventFilter(watched, event);
-    } else if (watched == gui.labelSplash) {
-        // Draw the load indicator on the splash screen.
-        QPainter painter(gui.labelSplash);
-        painter.setRenderHints(QPainter::Antialiasing);
-        const int lW = gui.labelSplash->width(), lH = gui.labelSplash->height();
-        painter.translate(lW / 2, lH / 2);
-        painter.scale(lW / 200.0, lH / 200.0);
-
-        static constexpr int blades = 12;
-        static constexpr qreal angle = 360.0 / blades;
-        static constexpr float alphastep = 0.18 / blades;
-        const float huestep = std::min(throbPos, 360) / (360.0 * blades);
-
-        float hue = 1.0, alpha = 0.18;
-        QPen pen;
-        pen.setWidth(3);
-        pen.setJoinStyle(Qt::MiterJoin);
-
-        painter.rotate(angle * throbPos); // Angle of current position.
-        for (unsigned int ixi=blades; ixi>0; --ixi) {
-            static constexpr QPoint blade[] = {{-15, -6}, {15, -75}, {0, -93}, {-15, -75}};
-            static constexpr qreal bladeangle = 23.5; // atan(30/(75-6)) in degrees.
-
-            QConicalGradient gradient(-15, -6, 90-bladeangle);
-            const QColor &color = QColor::fromHsvF(hue, 1.0, 1.0, alpha);
-            gradient.setStops({{0, color}, {bladeangle/360.0, color.darker()}});
-            hue -= huestep, alpha += alphastep;
-
-            painter.setBrush(gradient);
-            pen.setColor(color.darker());
-            painter.setPen(pen);
-
-            painter.drawConvexPolygon(blade, 4);
-            painter.rotate(angle);
-        }
-    } else if (watched == gui.textHelp) {
+    if (watched == gui.textHelp && event->type() == QEvent::Paint) {
         // Draw the help pane backdrop image, which goes through the alpha-channel background.
         QPainter painter(gui.textHelp);
         painter.setRenderHints(QPainter::Antialiasing);
@@ -1193,7 +1142,10 @@ void MInstall::abortEndUI(bool closenow) noexcept
 {
     if (closenow) qApp->exit(EXIT_FAILURE); // this->close() doesn't work.
     else {
-        splashSetThrobber(false);
+        if (throbber) {
+            delete throbber;
+            throbber = nullptr;
+        }
         gui.boxMain->unsetCursor();
         // Close should be the right button at this stage.
         disconnect(gui.pushNext);

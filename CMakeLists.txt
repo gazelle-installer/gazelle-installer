@@ -34,6 +34,7 @@ qt_add_executable(minstall
 	passedit.cpp passedit.h
 	replacer.cpp replacer.h
 	swapman.cpp swapman.h
+	throbber.h throbber.cpp
 	images.qrc
 )
 qt_add_ui(minstall SOURCES

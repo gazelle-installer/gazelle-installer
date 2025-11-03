@@ -87,8 +87,7 @@ private:
 
     QPixmap helpBackdrop;
     // Splash screen
-    QTimer *throbber = nullptr;
-    int throbPos = 0;
+    class Throbber *throbber = nullptr;
     // for the tips display
     int ixTip = -1, ixTipStart = -1;
     int iLastProgress = -1;
