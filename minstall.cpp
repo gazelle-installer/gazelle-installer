@@ -726,6 +726,9 @@ void MInstall::pageDisplayed(int next) noexcept
     case Step::INSTALLATION:
         gui.textHelp->setText("<p><b>"_L1 + tr("Installation Options") + "</b><br/>"_L1
             + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Dual drive") + "</b><br/>"_L1
+            + tr("If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive),"
+                " while keeping the data of all users on a separate drive (the Home drive).") + "</p>"_L1
             "<p><b>"_L1 + tr("Using the root-home space slider") + "</b><br/>"_L1
             + tr("The drive can be divided into separate system (root) and user data (home) partitions using the slider.") + "</p>"_L1
             "<p>"_L1 + tr("The <b>root</b> partition will contain the operating system and applications.") + "<br/>"_L1
@@ -742,15 +745,19 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
                 " partitions you need.").arg(PROJECTNAME, gui.radioCustomPart->text().remove('&')) + "</p>"_L1
-                              + "<p>" + "<b>"_L1 + tr("Replace existing installation") + "</b><br/>"_L1 + tr("Replace existing installation option will attempt to replace an existing installation with the same "
-                                           "disk configuration as the existing installation.  Home directories are preserved."));
+            "<p><b>"_L1 + tr("Replace existing installation") + "</b><br/>"_L1 + tr("Replace existing installation option will attempt to replace an existing installation with the same "
+                "disk configuration as the existing installation.  Home directories are preserved."));
         break;
 
     case Step::REPLACE:
         gui.textHelp->setText("<p><b>"_L1 + tr("Replace existing installation") + "</b><br/>"_L1
             + tr("If you have an existing installation, you can use this function to replace it with a fresh installation.") + "</p>"_L1
-            "<p>"_L1 + tr("This is particularly useful if you are upgrading from a previous version and want to preserve your data.") + "<br/>"_L1
-            + tr("There is no guarantee of this working successfully. Ensure you have a good working backup of all important data before continuing.") + "</p>"_L1);
+            "<p>"_L1 + tr("This is particularly useful if you are upgrading from a previous version and want to preserve your data.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Warning") + "</b><br/>"_L1
+            + tr("There is no guarantee of this working successfully. Ensure you have a good working backup of all important data before continuing.") + "</p>"_L1
+            "<p>"_L1 + tr("This feature is designed to replace an installation performed using the regular install method,"
+                " and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.") + "<br/>"_L1
+            + tr("To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.") + "</p>"_L1);
 
         if(gui.tableExistInst->rowCount() <= 0) {
             QTimer::singleShot(0, gui.pushReplaceScan, &QPushButton::click);
