@@ -238,7 +238,7 @@ public:
     bool canMount(bool fsonly = true) const noexcept;
     long long driveFreeSpace(bool inclusive = false) const noexcept;
     /* Convenience */
-    QString friendlyName() const noexcept;
+    QString friendlyName(bool mappedFormat = false) const noexcept;
     void addToCombo(QComboBox *combo, bool warnNasty = false) const noexcept;
 
 private:

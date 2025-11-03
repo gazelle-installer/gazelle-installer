@@ -54,34 +54,38 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
     }
 
     long long minSpace = partman->volSpecTotal(u"/"_s, false).minimum;
+    clean();
     bases.clear();
-    bool cryptoPrompted = false;
+    cryptoPass.clear();
     bool cryptoAny = false;
-    bool cryptoUnlocked = false;
+    // Attempt to unlock encrypted containers (read-only) for scanning.
+    std::vector<PartMan::Device *> unlocked;
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::PARTITION && device->size >= minSpace
-            && (!device->flags.bootRoot || installFromRootDevice)) {
-            gui.radioReplace->setEnabled(true);
-            if (!full) {
+            && (!device->flags.bootRoot || installFromRootDevice)
+            && (device->curFormat == "crypto_LUKS"_L1 && device->mapCount == 0)) {
+            if (!full || !allowUnlock) {
+                gui.radioReplace->setEnabled(true);
                 break; // Not a full scan, so only need to check if there is any possible replacement.
             }
 
-            // Attempt to unlock encrypted containers (read-only) for scanning.
-            bool unlocked = false;
-            if (device->curFormat == "crypto_LUKS"_L1 && device->mapCount == 0) {
-                if (allowUnlock && !cryptoPrompted) {
-                    cryptoPrompted = true;
-                    allowUnlock = promptPass();
-                }
-                if (!allowUnlock) continue;
-                // Prompted and allowed to unlock.
-                cryptoAny = true;
-                if (crypto.open(device, cryptoPass, true)) {
-                    unlocked = true;
-                    cryptoUnlocked = true;
-                } else {
-                    continue; // Unable to open this LUKS container.
-                }
+            if (cryptoPass.isEmpty()) {
+                if (!promptPass()) break; // User wants to skip encrypted volumes.
+            }
+            cryptoAny = true;
+            if (crypto.open(device, cryptoPass, true)) {
+                unlocked.push_back(device); // Add to list for re-locking later.
+            }
+        }
+    }
+    partman->scanVirtualDevices(true);
+
+    for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
+        if (device->type == PartMan::Device::PARTITION && device->size >= minSpace
+            && (!device->flags.bootRoot || installFromRootDevice)) {
+            if (!full) {
+                gui.radioReplace->setEnabled(true);
+                break; // Not a full scan, so only need to check if there is any possible replacement.
             }
 
             // Obtain required information and add to the list if it is a supported installation.
@@ -89,7 +93,7 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
             if(rbase.ok) {
                 const int newrow = gui.tableExistInst->rowCount();
                 gui.tableExistInst->insertRow(newrow);
-                QTableWidgetItem *partit =  new QTableWidgetItem(device->friendlyName());
+                QTableWidgetItem *partit = new QTableWidgetItem(device->friendlyName(true));
                 if (device->curFormat == "crypto_LUKS" && device->mapCount > 0) {
                     partit->setIcon(QIcon::fromTheme(u"lock"_s));
                 }
@@ -102,11 +106,6 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
             } else {
                 bases.pop_back();
             }
-
-            // Lock encrypted volume if it was unlocked in this loop.
-            if (unlocked) {
-                crypto.close(device);
-            }
         }
     }
 
@@ -117,7 +116,12 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
         }
     }
 
-    if (cryptoAny && !cryptoUnlocked) {
+    if (!unlocked.empty()) {
+        // Lock encrypted volumes that were unlocked in this routine.
+        for(PartMan::Device *device : unlocked) {
+            crypto.close(device);
+        }
+    } else if (cryptoAny) {
         QMessageBox msgbox(gui.boxMain);
         msgbox.setIcon(QMessageBox::Information);
         msgbox.setText(tr("Could not open any of the locked encrypted containers."));
@@ -218,11 +222,9 @@ bool Replacer::preparePartMan() noexcept
 
     // Confirmation and validation
     QTreeWidgetItem *twroot = new QTreeWidgetItem(gui.treeConfirm);
-    QString location = rbase.devpath;
-    if (!rbase.physdev.isEmpty() && rbase.physdev != rbase.devpath) {
-        location += QStringLiteral(" [%1]").arg(rbase.physdev);
-    }
-    twroot->setText(0, tr("Replace the installation in %1 (%2)").arg(location, rbase.release));
+    const QTableWidgetItem *tbwdev = gui.tableExistInst->item(currow, 0);
+    assert (tbwdev != nullptr);
+    twroot->setText(0, tr("Replace the installation in %1: %2").arg(tbwdev->text(), rbase.release));
     return partman->validate(true, twroot);
 }
 
@@ -344,7 +346,6 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
     QString subvolumeBase;
     bool premounted = false;
     devpath = device->mappedDevice();
-    physdev = device->path;
     if (devpath.isEmpty() || !QFile::exists(devpath)) return;
     if (proc.exec(u"findmnt"_s, {u"-AfnCoTARGET"_s, u"--source"_s, devpath}, nullptr, true)) {
         const QString output = proc.readOut(true).trimmed();

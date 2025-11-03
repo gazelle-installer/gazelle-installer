@@ -2352,10 +2352,17 @@ void PartMan::Device::labelParts() noexcept
 }
 
 // Return block device info that is suitable for a combo box.
-QString PartMan::Device::friendlyName() const noexcept
+QString PartMan::Device::friendlyName(bool mappedFormat) const noexcept
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
-    strout += ' ' + finalFormat();
+    if (mappedFormat) {
+        Device *mdevice = partman.findByPath(mappedDevice());
+        if (mdevice) {
+            strout += ' ' + mdevice->finalFormat();
+        }
+    } else {
+        strout += ' ' + finalFormat();
+    }
     const QString &flabel = finalLabel();
     if (!flabel.isEmpty()) strout += " - "_L1 + flabel;
     if (!model.isEmpty()) strout += (flabel.isEmpty() ? " - "_L1 : "; "_L1) + model;
