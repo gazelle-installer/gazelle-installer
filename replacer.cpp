@@ -21,8 +21,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
+#include <QDialog>
 #include <QMessageBox>
-#include <QInputDialog>
 #include <QRegularExpression>
 #include "mprocess.h"
 #include "partman.h"
@@ -228,14 +228,32 @@ bool Replacer::preparePartMan() noexcept
 
 bool Replacer::promptPass() noexcept
 {
-    cryptoPass.fill('#');
-    QInputDialog prompt(gui.boxMain);
-    prompt.setLabelText(tr("Password for encrypted volumes:"));
-    prompt.setTextEchoMode(QLineEdit::Password);
-    prompt.setCancelButtonText(tr("Ignore encrypted volumes"));
+    cryptoPass.fill('#'); // Wipe existing secret.
+    QDialog dialog(gui.boxMain);
+    QFormLayout layout(&dialog);
+    dialog.setWindowTitle(tr("Unlock encrypted volumes"));
+
+    QLineEdit *editPass = new QLineEdit(&dialog);
+    editPass->setEchoMode(QLineEdit::Password);
+    layout.addRow(tr("Password:"), editPass);
+    QDialogButtonBox buttons(QDialogButtonBox::Ok, Qt::Horizontal, &dialog);
+    buttons.addButton(tr("Ignore encrypted volumes"), QDialogButtonBox::RejectRole);
+    layout.addRow(&buttons);
+    connect(&buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    // Do not allow empty text to be accepted.
+    QPushButton *pushOK = buttons.button(QDialogButtonBox::Ok);
+    assert(pushOK != nullptr);
+    pushOK->setDisabled(true);
+    connect(editPass, &QLineEdit::textChanged, this, [pushOK](const QString &text) {
+        assert(pushOK != nullptr);
+        pushOK->setDisabled(text.isEmpty());
+    });
+
     cryptoPass.clear();
-    if (prompt.exec() == QInputDialog::Accepted) {
-        cryptoPass = prompt.textValue().toUtf8();
+    if (dialog.exec() == QDialog::Accepted) {
+        cryptoPass = editPass->text().toUtf8();
         return true;
     }
     return false;

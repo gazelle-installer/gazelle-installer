@@ -701,17 +701,28 @@ void PartMan::partMenuUnlock(Device *part)
     QDialog dialog(gui.boxMain);
     QFormLayout layout(&dialog);
     dialog.setWindowTitle(tr("Unlock Drive"));
+
     QLineEdit *editPass = new QLineEdit(&dialog);
-    QCheckBox *checkCrypttab = new QCheckBox(tr("Add to crypttab"), &dialog);
     editPass->setEchoMode(QLineEdit::Password);
-    checkCrypttab->setChecked(true);
     layout.addRow(tr("Password:"), editPass);
+
+    QCheckBox *checkCrypttab = new QCheckBox(tr("Add to crypttab"), &dialog);
+    checkCrypttab->setChecked(true);
     layout.addRow(checkCrypttab);
-    QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        Qt::Horizontal, &dialog);
+
+    QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     layout.addRow(&buttons);
     connect(&buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    // Do not allow empty text to be accepted.
+    QPushButton *pushOK = buttons.button(QDialogButtonBox::Ok);
+    assert(pushOK != nullptr);
+    pushOK->setDisabled(true);
+    connect(editPass, &QLineEdit::textChanged, this, [pushOK](const QString &text) {
+        assert(pushOK != nullptr);
+        pushOK->setDisabled(text.isEmpty());
+    });
 
     if (dialog.exec() == QDialog::Accepted) {
         qApp->setOverrideCursor(Qt::WaitCursor);
