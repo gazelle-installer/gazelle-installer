@@ -1144,7 +1144,9 @@ void MInstall::closeEvent(QCloseEvent *event) noexcept
         gui.labelSplash->clear();
         gotoPage(Step::SPLASH);
         proc.unhalt();
-        proc.exec(u"/usr/sbin/shutdown"_s, {u"-hP"_s, u"now"_s});
+        if (!pretend) {
+            proc.exec(u"/usr/sbin/shutdown"_s, {u"-hP"_s, u"now"_s});
+        }
     } else {
         // Fully aborted installation (but not OOBE).
         event->accept();
