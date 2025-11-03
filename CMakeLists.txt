@@ -6,8 +6,6 @@ project(minstall
 	DESCRIPTION "Gazelle Installer for antiX Linux and MX Linux"
 	LANGUAGES CXX
 )
-# TODO: Remove for final release
-set(PROJECT_VERSION "${PROJECT_VERSION}-RC")
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Concurrent LinguistTools)
 set(CMAKE_AUTORCC ON)
