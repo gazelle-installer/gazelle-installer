@@ -192,7 +192,7 @@ void BootMan::install(const QStringList &cmdextra)
             // Remove old boot variables of the same label.
             proc.exec(u"efibootmgr"_s, {}, nullptr, true);
             const QStringList &existing = proc.readOutLines();
-            static const QRegularExpression regex(u"^Boot([0-9A-F]{4})\\*?\\s(.*)$"_s);
+            static const QRegularExpression regex(u"^Boot([0-9A-F]{4})\\*?\\s(.*)\\t.*$"_s);
             for (const QString &entry : existing) {
                 const QRegularExpressionMatch &match = regex.match(entry);
                 if (match.hasMatch() && match.captured(2) == loaderLabel) {
