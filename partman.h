@@ -93,7 +93,7 @@ public:
     ~PartMan();
     void scan(Device *drvstart = nullptr);
     void scanVirtualDevices(bool rescan);
-    void scanSubvolumes(class Device *part);
+    void scanSubvolumes(class Device *part, const QString &scratch = QString());
     bool loadConfig(class MSettings &config) noexcept;
     void saveConfig(class MSettings &config) const noexcept;
     bool validate(bool automatic, QTreeWidgetItem *confroot = nullptr) const noexcept;
@@ -255,11 +255,12 @@ private:
 
 class PartMan::Iterator
 {
+    Device *start = nullptr;
     Device *pos = nullptr;
     int ixPos = 0;
     std::stack<int, std::vector<int>> ixParents;
 public:
-    Iterator(Device *device) noexcept : pos(device) {}
+    Iterator(Device *device) noexcept : start(device), pos(device) {}
     Iterator(const PartMan &partman) noexcept;
     inline Device *operator*() const noexcept { return pos; }
     void next() noexcept;

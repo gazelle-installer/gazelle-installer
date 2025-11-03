@@ -313,18 +313,25 @@ void PartMan::scanVirtualDevices(bool rescan)
     gui.treePartitions->expand(index(virtdevs));
 }
 
-void PartMan::scanSubvolumes(Device *part)
+void PartMan::scanSubvolumes(Device *part, const QString &scratch)
 {
-    while (part->children.size()) delete part->child(0);
+    while (part->children.size()) {
+        delete part->child(0);
+    }
     QString defline;
     QStringList lines;
-    if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,ro"_s,
-                                part->mappedDevice(), u"/mnt/btrfs-scratch"_s})) return;
-    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"get-default"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
+    const QString &scratchpath = scratch.isEmpty() ? u"/mnt/scratch"_s : scratch;
+    if (scratch.isEmpty()) {
+        if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,ro"_s,
+            part->mappedDevice(), scratchpath})) return;
+    }
+    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"get-default"_s, scratchpath}, nullptr, true);
     defline = proc.readOut();
-    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, u"/mnt/btrfs-scratch"_s}, nullptr, true);
+    proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, scratchpath}, nullptr, true);
     lines = proc.readOutLines();
-    proc.exec(u"umount"_s, {u"/mnt/btrfs-scratch"_s});
+    if (scratch.isEmpty()) {
+        proc.exec(u"umount"_s, {scratchpath});
+    }
     for (const QString &line : std::as_const(lines)) {
         const int start = line.indexOf("path"_L1) + 5;
         if (line.length() <= start) return;
@@ -1389,18 +1396,19 @@ void PartMan::prepareSubvolumes(Device *part)
     if (subvolcount <= 0) return;
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
+    const QString &scratchpath = u"/mnt/scratch"_s;
 
-    proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,noatime"_s, part->mappedDevice(), u"/mnt/btrfs-scratch"_s});
+    proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,noatime"_s, part->mappedDevice(), scratchpath});
     const char *errmsg = nullptr;
     try {
         for (int ixsv = 0; ixsv < subvolcount; ++ixsv) {
             Device *subvol = part->child(ixsv);
             assert(subvol != nullptr);
-            const QString &svpath = "/mnt/btrfs-scratch/"_L1 + subvol->label;
+            const QString &svpath = scratchpath + '/' + subvol->label;
             if (subvol->format != "PRESERVE"_L1 && QFileInfo::exists(svpath)) {
                 if(subvol->isActive()) {
                     // Since the default subvolume cannot be deleted, ensure the default is set to the top.
-                    proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s, u"5"_s, u"/mnt/btrfs-scratch"_s});
+                    proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s, u"5"_s, scratchpath});
                 }
                 //remove contents so the subvolume can be deleted
                 proc.exec(u"rm"_s, {u"-r"_s, u"-f"_s, svpath + "/*"});
@@ -1414,12 +1422,12 @@ void PartMan::prepareSubvolumes(Device *part)
         // // Set the default subvolume if one was chosen.
         // if (part->active) {
         //     proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"set-default"_s,
-        //         "/mnt/btrfs-scratch/"_L1+part->active->label});
+        //         scratchpath + '/' + part->active->label});
         // }
     } catch(const char *msg) {
         errmsg = msg;
     }
-    proc.exec(u"umount"_s, {u"/mnt/btrfs-scratch"_s});
+    proc.exec(u"umount"_s, {scratchpath});
     if (errmsg) throw errmsg;
 }
 
@@ -2404,6 +2412,7 @@ PartMan::Iterator::Iterator(const PartMan &partman) noexcept
 {
     if (partman.root->children.size() < 1) return;
     ixParents.push(0);
+    start = partman.root;
     pos = partman.root->child(0);
 }
 void PartMan::Iterator::next() noexcept
@@ -2420,7 +2429,7 @@ void PartMan::Iterator::next() noexcept
             return;
         }
         Device *chnext = parent->child(ixPos+1);
-        while (!chnext && parent) {
+        while (!chnext && parent && parent != start) {
             parent = parent->parentItem;
             if (!parent) break;
             ixPos = ixParents.top();
@@ -2429,6 +2438,10 @@ void PartMan::Iterator::next() noexcept
         }
         if (chnext) ++ixPos;
         pos = chnext;
+    }
+    // If back to the start then stop the search.
+    if (pos == start) {
+        pos = nullptr;
     }
 }
 

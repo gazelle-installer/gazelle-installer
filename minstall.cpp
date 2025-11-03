@@ -577,12 +577,15 @@ int MInstall::showPage(int curr, int next) noexcept
         gui.boxMain->setCursor(Qt::WaitCursor);
         if (!replacer->validate()) {
             nextFocus = gui.tableExistInst;
+            gui.boxMain->unsetCursor();
             return curr;
         }
         if (!replacer->preparePartMan()) {
+            gui.boxMain->unsetCursor();
             return curr;
         }
         if (!pretend && !(base && base->saveHomeBasic())) {
+            gui.boxMain->unsetCursor();
             QMessageBox msgbox(this);
             msgbox.setIcon(QMessageBox::Critical);
             msgbox.setText(tr("The data in /home cannot be preserved because"
@@ -632,10 +635,10 @@ int MInstall::showPage(int curr, int next) noexcept
                     abortEndUI(false);
                     return Step::SPLASH;
                 }
-                next = (advanced ? Step::BOOT : Step::SWAP);
             } else if (!gui.radioReplace->isChecked()) {
                 advanced = true;
             }
+            next = (advanced ? Step::BOOT : Step::SWAP);
             bootman->buildBootLists();
             swapman->setupDefaults();
             loadConfig(2);

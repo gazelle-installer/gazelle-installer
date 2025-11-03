@@ -47,6 +47,7 @@ private:
     class Crypto &crypto;
     bool installFromRootDevice = false;
     QByteArray cryptoPass;
+    bool saveInstallInfo(const QString &scratchpath, class PartMan::Device *device) noexcept;
     bool promptPass() noexcept;
     // Slots
     void pushReplaceScan_clicked(bool) noexcept;
@@ -79,11 +80,10 @@ public:
     };
     std::vector<struct MountEntry> mounts;
     std::vector<struct CryptEntry> crypts;
-    QString devpath;
     QString release;
     bool homeSeparate = false;
     bool ok = false;
-    RootBase(MProcess &proc, PartMan::Device *device) noexcept;
+    RootBase(const QString &scratchpath) noexcept;
 };
 
 #endif // REPLACER_H

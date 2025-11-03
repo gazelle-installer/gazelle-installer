@@ -88,24 +88,40 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
                 break; // Not a full scan, so only need to check if there is any possible replacement.
             }
 
-            // Obtain required information and add to the list if it is a supported installation.
-            const auto &rbase = bases.emplace_back(proc, device);
-            if(rbase.ok) {
-                const int newrow = gui.tableExistInst->rowCount();
-                gui.tableExistInst->insertRow(newrow);
-                QTableWidgetItem *partit = new QTableWidgetItem(device->friendlyName(true));
-                if (device->curFormat == "crypto_LUKS" && device->mapCount > 0) {
-                    partit->setIcon(QIcon::fromTheme(u"lock"_s));
-                }
-                if (device->parent()) {
-                    const QString &tt = tr("Volume %1 on drive %2");
-                    partit->setToolTip(tt.arg(device->name, device->parent()->friendlyName()));
-                }
-                gui.tableExistInst->setItem(newrow, 0, partit);
-                gui.tableExistInst->setItem(newrow, 1, new QTableWidgetItem(rbase.release));
-            } else {
-                bases.pop_back();
+            // Mount this partition for checking and extracting information.
+            QString mappath = device->mappedDevice();
+            PartMan::Device *mapdev = partman->findByPath(mappath);
+            if (!mapdev) {
+                continue; // Unable to find the mapping so don't bother.
             }
+            const QString &scratchpath = u"/mnt/scratch"_s;
+            bool checkOK = false;
+            if (mapdev->curFormat == "btrfs"_L1) {
+                // Btrfs is a special case, search the subvolumes for a suitable root.
+                if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,ro"_s, mappath, scratchpath})) {
+                    continue;
+                }
+
+                partman->scanSubvolumes(mapdev, scratchpath);
+                if (mapdev->active) {
+                    // Default subvolume. Test here first, break loop if OK.
+                    checkOK = saveInstallInfo(scratchpath + '/' + mapdev->active->curLabel, device);
+                }
+                // Try other subvolumes if the default one doesn't have anything.
+                if (!checkOK) {
+                    PartMan::Iterator it(mapdev);
+                    for (it.next(); PartMan::Device *subvol = *it; it.next()) {
+                        checkOK = saveInstallInfo(scratchpath + '/' + subvol->curLabel, device);
+                    }
+                }
+            } else {
+                // Other file systems are normal.
+                if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"ro"_s, mappath, scratchpath})) {
+                    continue;
+                }
+                checkOK = saveInstallInfo(scratchpath, device);
+            }
+            proc.exec(u"umount"_s, {scratchpath});
         }
     }
 
@@ -129,6 +145,27 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
             " Press the 'Scan' button to try again with a different password."));
         msgbox.exec();
     }
+}
+bool Replacer::saveInstallInfo(const QString &scratchpath, PartMan::Device *device) noexcept
+{
+    const auto &rbase = bases.emplace_back(scratchpath);
+    if(rbase.ok) {
+        const int newrow = gui.tableExistInst->rowCount();
+        gui.tableExistInst->insertRow(newrow);
+        QTableWidgetItem *partit = new QTableWidgetItem(device->friendlyName(true));
+        if (device->curFormat == "crypto_LUKS"_L1 && device->mapCount > 0) {
+            partit->setIcon(QIcon::fromTheme(u"lock"_s));
+        }
+        if (device->parent()) {
+            const QString &tt = tr("Volume %1 on drive %2");
+            partit->setToolTip(tt.arg(device->name, device->parent()->friendlyName()));
+        }
+        gui.tableExistInst->setItem(newrow, 0, partit);
+        gui.tableExistInst->setItem(newrow, 1, new QTableWidgetItem(rbase.release));
+    } else {
+        bases.pop_back();
+    }
+    return rbase.ok;
 }
 
 void Replacer::clean() noexcept
@@ -337,133 +374,15 @@ void Replacer::closeEncrypted(RootBase &base) noexcept
     }
 }
 
-Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
+Replacer::RootBase::RootBase(const QString &scratchpath) noexcept
 {
-    MProcess::Section sect(proc, nullptr);
-    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
-
-    QString mountpoint;
-    QString subvolumeBase;
-    bool premounted = false;
-    devpath = device->mappedDevice();
-    if (devpath.isEmpty() || !QFile::exists(devpath)) return;
-    if (proc.exec(u"findmnt"_s, {u"-AfnCoTARGET"_s, u"--source"_s, devpath}, nullptr, true)) {
-        const QString output = proc.readOut(true).trimmed();
-        if (!output.isEmpty()) {
-            const QStringList fields = output.split(' ');
-            if (!fields.isEmpty()) {
-                mountpoint = fields.at(0).trimmed();
-                premounted = !mountpoint.isEmpty();
-            }
-            for (const QString &field : fields) {
-                if (field.startsWith(u"subvol="_s, Qt::CaseInsensitive)) {
-                    subvolumeBase = field.mid(field.indexOf('=') + 1).trimmed();
-                    if (subvolumeBase.startsWith(u"/"_s)) subvolumeBase.remove(0, 1);
-                    break;
-                }
-            }
-        }
-    }
-    bool mountedHere = false;
-    if (!premounted) {
-        mountpoint = "/mnt/temp"_L1;
-        QStringList mountArgs = {u"-o"_s, u"ro"_s};
-        const QString deviceFormat = device->format.isEmpty() ? device->curFormat : device->format;
-        const bool btrfsVolume = deviceFormat.compare(u"btrfs"_s, Qt::CaseInsensitive) == 0;
-        if (btrfsVolume) {
-            if (!subvolumeBase.isEmpty()) {
-                mountArgs = {u"-o"_s, QStringLiteral("ro,subvol=%1").arg(subvolumeBase)};
-            } else {
-                mountArgs = {u"-o"_s, u"ro,subvolid=5"_s};
-            }
-        }
-        if (!proc.exec(u"mount"_s, mountArgs << devpath << u"-m"_s << mountpoint)) return;
-        mountedHere = true;
-    }
-    QString rootBase = mountpoint;
-    QString rootSubvolume;
-    QHash<QString, QString> subvolById;
-    QString defaultSubvolume;
-    const QString deviceFormat = device->format.isEmpty() ? device->curFormat : device->format;
-    bool btrfsVolume = deviceFormat.compare(u"btrfs"_s, Qt::CaseInsensitive) == 0;
-
-    auto normalizeSubvolPath = [](QString path) -> QString {
-        path = path.trimmed();
-        if (path.startsWith('/')) path.remove(0, 1);
-        return path;
-    };
-
-    auto collectBtrfsSubvolumes = [&]() -> bool {
-        if (!proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, mountpoint}, nullptr, true)) {
-            proc.readOut(true);
-            return false;
-        }
-        const QStringList lines = proc.readOutLines();
-        const QRegularExpression matcher(u"ID\\s+(\\d+)\\s+.*\\spath\\s+(.+)$"_s);
-        for (const QString &line : lines) {
-            const QRegularExpressionMatch match = matcher.match(line);
-            if (!match.hasMatch()) continue;
-            const QString id = match.captured(1).trimmed();
-            QString path = normalizeSubvolPath(match.captured(2));
-            if (!id.isEmpty() && !path.isEmpty()) subvolById.insert(id, path);
-        }
-        return true;
-    };
-
-    auto fetchDefaultSubvolume = [&]() -> bool {
-        if (!proc.exec(u"btrfs"_s, {u"subvolume"_s, u"get-default"_s, mountpoint}, nullptr, true)) {
-            proc.readOut(true);
-            return false;
-        }
-        const QString output = proc.readOut();
-        QRegularExpression pathRe(u"path\\s+(.+)$"_s);
-        const QRegularExpressionMatch pathMatch = pathRe.match(output);
-        if (pathMatch.hasMatch()) {
-            defaultSubvolume = normalizeSubvolPath(pathMatch.captured(1));
-            return true;
-        }
-        QRegularExpression idRe(u"ID\\s+(\\d+)"_s);
-        const QRegularExpressionMatch idMatch = idRe.match(output);
-        if (idMatch.hasMatch()) {
-            const QString mapped = subvolById.value(idMatch.captured(1).trimmed());
-            if (!mapped.isEmpty()) {
-                defaultSubvolume = mapped;
-                return true;
-            }
-        }
-        return false;
-    };
-
-    auto trySetRootFrom = [&](const QString &path) -> bool {
-        if (path.isEmpty()) return false;
-        const QString normalized = normalizeSubvolPath(path);
-        const QString testBase = mountpoint + '/' + normalized;
-        if (QFileInfo::exists(testBase + "/etc/fstab"_L1)) {
-            rootSubvolume = normalized;
-            rootBase = testBase;
-            return true;
-        }
-        return false;
-    };
-
-    if (collectBtrfsSubvolumes()) {
-        btrfsVolume = true;
-        fetchDefaultSubvolume();
-        if (!trySetRootFrom(defaultSubvolume)) {
-            for (auto it = subvolById.cbegin(); it != subvolById.cend(); ++it) {
-                if (trySetRootFrom(it.value())) break;
-            }
-        }
-        if (!rootSubvolume.isEmpty()) defaultSubvolume = rootSubvolume;
-    }
-
     // Extract the release from lsb-release.
-    MIni lsbrel(rootBase + "/etc/lsb-release"_L1, MIni::OpenMode::ReadOnly);
+    MIni lsbrel(scratchpath + "/etc/lsb-release"_L1, MIni::OpenMode::ReadOnly);
     release = lsbrel.getString(u"PRETTY_NAME"_s);
 
     // Parse fstab
     bool hasFstabEntry = false;
-    const QString fstname(rootBase + "/etc/fstab"_L1);
+    const QString fstname(scratchpath + "/etc/fstab"_L1);
     FILE *fstab = setmntent(fstname.toUtf8().constData(), "r");
     if (fstab) {
         for (struct mntent *mntent = getmntent(fstab); mntent != nullptr; mntent = getmntent(fstab)) {
@@ -475,35 +394,6 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
         }
         endmntent(fstab);
     }
-    if (hasFstabEntry && btrfsVolume) {
-        bool needSubvolList = false;
-        bool needDefaultSubvol = false;
-        for (const auto &mount : mounts) {
-            if (!mount.isBtrfs) continue;
-            if (mount.subvol.isEmpty()) {
-                if (!mount.subvolId.isEmpty()) needSubvolList = true;
-                else if (mount.dir == "/"_L1) needDefaultSubvol = true;
-            }
-        }
-
-        if (needSubvolList && subvolById.isEmpty()) collectBtrfsSubvolumes();
-        if (needDefaultSubvol && defaultSubvolume.isEmpty()) fetchDefaultSubvolume();
-        if (defaultSubvolume.isEmpty() && !rootSubvolume.isEmpty()) defaultSubvolume = rootSubvolume;
-
-        for (auto &mount : mounts) {
-            if (!mount.isBtrfs) continue;
-            if (mount.subvol.isEmpty()) {
-                if (!mount.subvolId.isEmpty()) {
-                    const QString path = subvolById.value(mount.subvolId);
-                    if (!path.isEmpty()) mount.subvol = path;
-                } else if (mount.dir == "/"_L1 && !defaultSubvolume.isEmpty()) {
-                    mount.subvol = defaultSubvolume;
-                }
-            }
-            if (mount.subvol.startsWith('/')) mount.subvol.remove(0, 1);
-        }
-    }
-
     if (hasFstabEntry && release.isEmpty()) {
         release = tr("Unknown release");
     }
@@ -511,7 +401,7 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
 
     if (ok) {
         // Parse crypttab
-        QFile crypttab(rootBase + "/etc/crypttab"_L1);
+        QFile crypttab(scratchpath + "/etc/crypttab"_L1);
         if (crypttab.open(QFile::ReadOnly | QFile::Text)) {
             while (!crypttab.atEnd()) {
                 const QByteArray &line = crypttab.readLine().simplified();
@@ -522,18 +412,6 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
                     break;
                 }
             }
-        }
-    }
-
-    if (!mountpoint.isEmpty()) {
-        auto doUmount = [&](const QString &point) {
-            if (proc.exec(u"umount"_s, {point})) return true;
-            return proc.exec(u"umount"_s, {u"-l"_s, point});
-        };
-        if (mountedHere) {
-            doUmount(mountpoint);
-        } else if (premounted) {
-            doUmount(mountpoint);
         }
     }
 }
@@ -582,7 +460,6 @@ Replacer::RootBase::CryptEntry::CryptEntry(const QByteArray &line)
     encdev = fields.at(1);
     keyfile = fields.value(2);
     options = fields.value(3);
-    qDebug() << "Crypttab" << volume << encdev << keyfile << options;
 }
 
 // Slots
