@@ -88,39 +88,37 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
                 break; // Not a full scan, so only need to check if there is any possible replacement.
             }
 
-            // Mount this partition for checking and extracting information.
             QString mappath = device->mappedDevice();
             PartMan::Device *mapdev = partman->findByPath(mappath);
             if (!mapdev) {
                 continue; // Unable to find the mapping so don't bother.
             }
+            // Mount this partition for checking and extracting information.
             const QString &scratchpath = u"/mnt/scratch"_s;
-            bool checkOK = false;
-            if (mapdev->curFormat == "btrfs"_L1) {
-                // Btrfs is a special case, search the subvolumes for a suitable root.
-                if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,ro"_s, mappath, scratchpath})) {
-                    continue;
-                }
-
-                partman->scanSubvolumes(mapdev, scratchpath);
-                if (mapdev->active) {
-                    // Default subvolume. Test here first, break loop if OK.
-                    checkOK = saveInstallInfo(scratchpath + '/' + mapdev->active->curLabel, device);
-                }
-                // Try other subvolumes if the default one doesn't have anything.
-                if (!checkOK) {
-                    PartMan::Iterator it(mapdev);
-                    for (it.next(); PartMan::Device *subvol = *it; it.next()) {
-                        checkOK = saveInstallInfo(scratchpath + '/' + subvol->curLabel, device);
-                    }
-                }
-            } else {
-                // Other file systems are normal.
-                if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"ro"_s, mappath, scratchpath})) {
-                    continue;
-                }
-                checkOK = saveInstallInfo(scratchpath, device);
+            QString opts = u"ro"_s;
+            if (mapdev->curFormat == "ext3"_L1 || mapdev->curFormat == "ext4"_L1
+                || mapdev->curFormat == "xfs"_L1) {
+                // Trying to replay a "dirty" journal fails on a read-only file system.
+                opts += ",norecovery"_L1;
+            } else if (mapdev->curFormat == "btrfs"_L1) {
+                // Always mount the top subvolume on btrfs, not the deault subvolume.
+                opts += ",subvolid=5"_L1;
             }
+            if (!proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, opts, mappath, scratchpath})) {
+                continue; // Unable to mount the volume. Move on, no need to unmount.
+            }
+
+            // Gather the installation whose root resides in the top of the file system.
+            saveInstallInfo(scratchpath, device);
+            // If btrfs, also gather all installations whose root resides in subvolumes.
+            if (mapdev->curFormat == "btrfs"_L1) {
+                partman->scanSubvolumes(mapdev, scratchpath);
+                PartMan::Iterator it(mapdev);
+                for (it.next(); PartMan::Device *subvol = *it; it.next()) {
+                    saveInstallInfo(scratchpath + '/' + subvol->curLabel, device);
+                }
+            }
+
             proc.exec(u"umount"_s, {scratchpath});
         }
     }

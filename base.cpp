@@ -191,6 +191,10 @@ bool Base::saveHomeBasic() noexcept
     if (mount->type == PartMan::Device::SUBVOLUME) {
         opts += ",subvol="_L1 + mount->curLabel;
     }
+    if (mount->curFormat == "ext3"_L1 || mount->curFormat == "ext4"_L1
+        || mount->curFormat == "xfs"_L1) {
+        opts += ",norecovery"_L1;
+    }
     bool ok = proc.exec(u"mount"_s, {u"-o"_s, opts, homedev, u"/mnt/antiX"_s});
     if (ok) {
         QDir hd("/mnt/antiX"_L1 + homedir);
