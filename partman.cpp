@@ -1401,17 +1401,6 @@ void PartMan::prepareSubvolumes(Device *part)
     proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,noatime"_s, part->mappedDevice(), scratchpath});
     const char *errmsg = nullptr;
     try {
-        // Obtain a sorted list of current subvolumes. Descending order hits the deepest elements first.
-        // Nested subvolumes must be removed first, whether or not device tree contains them.
-        proc.exec(u"btrfs"_s, {u"subvolume"_s, u"list"_s, u"--sort=-path"_s, scratchpath}, nullptr, true);
-        QStringList subpaths = proc.readOutLines();
-        for (QString &sub : subpaths) {
-            const qsizetype start = sub.indexOf("path "_L1);
-            if (start == -1 || sub.size() < 6) {
-                throw sect.failMessage();
-            }
-            sub.slice(start + 5);
-        }
         // Current default subvolume, which could be on the volume itself, but not in the device tree.
         proc.exec(u"btrfs"_s, {u"subvolume"_s, u"get-default"_s, scratchpath}, nullptr, true);
         QString subdefault = proc.readOut(false);
@@ -1433,17 +1422,8 @@ void PartMan::prepareSubvolumes(Device *part)
                     proc.exec(u"btrfs"_s, {u"subvolume"_s, u"set-default"_s, u"5"_s, scratchpath});
                     subdefault.clear();
                 }
-                // Delete nested subvolumes.
-                for(QString &subpath : subpaths) {
-                    if (subpath.startsWith(svstart)) {
-                        const QString &path = scratchpath + '/' + subpath;
-                        proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"delete"_s, path});
-                        subpath.clear(); // Mark for purging from the list.
-                    }
-                }
-                subpaths.removeAll(QString());
-                // Finally remove this subvolume.
-                proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"delete"_s, svpath});
+                // Remove this subvolume and all nested subvolumes within.
+                proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"delete"_s, u"--recursive"_s, svpath});
             }
             if (subvol->format == "CREATE"_L1) {
                 proc.exec(u"btrfs"_s, {u"-q"_s, u"subvolume"_s, u"create"_s, svpath});
