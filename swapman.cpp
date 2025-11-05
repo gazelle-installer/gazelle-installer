@@ -118,6 +118,8 @@ void SwapMan::installSwapFile(QStringList &cmdboot_out) const
     if (!device) throw sect.failMessage();
 
     proc.status(tr("Creating swap file"));
+    // Remove stale swap space.
+    QFile::remove(instpath);
     // Create a blank swap file.
     core.mkpath(QFileInfo(instpath).path(), 0700);
     const bool btrfs = (device->type == PartMan::Device::SUBVOLUME || device->finalFormat() == "btrfs"_L1);
@@ -135,6 +137,7 @@ void SwapMan::installSwapFile(QStringList &cmdboot_out) const
     file.write(swapfile.toUtf8());
     file.write(" swap swap defaults 0 0\n");
     file.close();
+
     // Hibernation.
     if (gui.checkHibernation->isChecked()) {
         proc.shell("blkid -s UUID -o value $(df -P "_L1 + instpath + " | awk 'END{print $1}')"_L1, nullptr, true);
