@@ -182,7 +182,9 @@ void BootMan::install(const QStringList &cmdextra)
             if (espdev != nullptr) {
                 const QString &espdst = espdev->mountPoint() + "/EFI/"_L1;
                 const QString &espsrc = espdst + loaderID;
-                proc.exec(u"cp"_s, {u"-p"_s, espsrc + "/fbx64.efi"_L1, espdst + "BOOT/"_L1});
+                if (QFile(espsrc + "/fbx64.efi").exists()) {
+                    proc.exec(u"cp"_s, {u"-p"_s, espsrc + "/fbx64.efi"_L1, espdst + "BOOT/"_L1});
+                }
                 core.mkpath("/mnt/antiX"_L1 + espdst + "debian/"_L1);
                 proc.exec(u"cp"_s, {u"-p"_s, espsrc + "/grub.cfg"_L1, espdst + "debian/"_L1});
             }
