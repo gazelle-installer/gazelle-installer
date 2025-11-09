@@ -19,7 +19,7 @@
 #ifndef MSETTINGS_H
 #define MSETTINGS_H
 
-#include <map>
+#include <vector>
 #include <QFile>
 
 class MIni
@@ -27,11 +27,43 @@ class MIni
     friend class MSettings;
     static bool lessCaseInsensitive(const QString &a, const QString &b) noexcept;
     QFile file;
-    typedef std::map<QString, QString, decltype(&lessCaseInsensitive)> GroupMap;
-    typedef std::map<QString, GroupMap, decltype(&lessCaseInsensitive)> SectionMap;
-    typedef std::map<QString, SectionMap, decltype(&lessCaseInsensitive)> SettingsMap;
-    SettingsMap sections;
-    QString cursection, curgroup;
+    struct Setting {
+        QString key;
+        QString value;
+        Setting(const QString &key, const QString &value) noexcept : key(key), value(value) {}
+    };
+    class Group {
+    public:
+        QString name;
+        std::vector<Setting> settings;
+        std::vector<Group *> children;
+        Group *parent;
+        Group(Group *parent, const QString &name) noexcept;
+        Group(Group&& other) noexcept; // Move constructor
+        ~Group() noexcept;
+        QString path() const noexcept;
+        // Delete copy constructors because they cause problems.
+        Group(const Group &) = delete;
+        Group &operator=(const Group &) = delete;
+    };
+    class Iterator
+    {
+        const Group *start = nullptr;
+        const Group *pos = nullptr;
+        size_t ixPos = 0;
+        std::vector<int> ixParents;
+    public:
+        Iterator(const Group *group) noexcept;
+        inline const Group *operator*() const noexcept { return pos; }
+        void next() noexcept;
+        int level() noexcept;
+    };
+    std::vector<Group> sections;
+    std::vector<int> groupPath;
+    int curSectionIndex = 0;
+
+    const Group *currentGroup() const noexcept;
+    Group *currentGroup() noexcept;
 public:
     enum OpenMode {
         NotOpen = QIODeviceBase::NotOpen, // 0x0000
@@ -48,11 +80,11 @@ public:
     bool load() noexcept;
     bool save() noexcept;
     bool closeAndCopyTo(const QString &filename) noexcept;
-    void setSection(const QString &name = QString()) noexcept;
-    QString section() const noexcept { return cursection; }
-    void setGroup(const QString &path = QString()) noexcept;
-    QString group() const noexcept { return curgroup; }
-    void beginGroup(const QString &path) noexcept;
+    QString section() const noexcept;
+    bool setSection(const QString &name = QString(), bool create = true) noexcept;
+    QString group() const noexcept;
+    bool setGroup(const QString &path = QString(), bool create = true) noexcept;
+    bool beginGroup(const QString &name, bool create = true) noexcept;
     void endGroup() noexcept;
     QStringList getSections() const noexcept;
     QStringList getGroups() const noexcept;
