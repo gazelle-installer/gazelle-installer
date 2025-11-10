@@ -25,7 +25,6 @@
 class MIni
 {
     friend class MSettings;
-    static bool lessCaseInsensitive(const QString &a, const QString &b) noexcept;
     QFile file;
     struct Setting {
         QString key;
@@ -39,12 +38,12 @@ class MIni
         std::vector<Group *> children;
         Group *parent;
         Group(Group *parent, const QString &name) noexcept;
-        Group(Group&& other) noexcept; // Move constructor
         ~Group() noexcept;
         QString path() const noexcept;
-        // Delete copy constructors because they cause problems.
+        // Copy and move constructors will cause dangling pointers here.
         Group(const Group &) = delete;
         Group &operator=(const Group &) = delete;
+        Group(Group &&) = delete;
     };
     class Iterator
     {
@@ -58,12 +57,10 @@ class MIni
         void next() noexcept;
         int level() noexcept;
     };
-    std::vector<Group> sections;
+    std::vector<Group *> sections;
     std::vector<int> groupPath;
     int curSectionIndex = 0;
-
-    const Group *currentGroup() const noexcept;
-    Group *currentGroup() noexcept;
+    Group *currentGroup() const noexcept;
 public:
     enum OpenMode {
         NotOpen = QIODeviceBase::NotOpen, // 0x0000
