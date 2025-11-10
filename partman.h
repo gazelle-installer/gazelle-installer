@@ -206,6 +206,11 @@ public:
 
     Device(enum DeviceType type, Device *parent, Device *preceding = nullptr) noexcept;
     ~Device();
+    // Copy and move constructors will cause dangling pointers here.
+    Device(const Device &) = delete;
+    Device &operator=(const Device &) = delete;
+    Device(Device &&) = delete;
+
     void clear() noexcept;
     int row() const noexcept;
     Device *parent() const noexcept;
