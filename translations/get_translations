@@ -52,5 +52,4 @@ fi
 
 echo "Using lupdate: $LUPDATE"
 
-"$LUPDATE" ../*.pro # Update en.ts file
-"$LUPDATE" ../*.cpp ../*.h ../*.ui -ts *.ts
+"$LUPDATE" ../*.cpp ../*.h ../*.ui -ts *en.ts
