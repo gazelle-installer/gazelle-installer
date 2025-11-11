@@ -133,23 +133,23 @@ Mínimo: %2</translation>
         <translation>Instalando GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="334"/>
+        <location filename="../bootman.cpp" line="336"/>
         <source>Updating initramfs</source>
         <translation>Actualizando initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="335"/>
+        <location filename="../bootman.cpp" line="337"/>
         <source>Failed to update initramfs.</source>
         <translation>Falló la actualización de initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="365"/>
+        <location filename="../bootman.cpp" line="367"/>
         <source>System boot disk:</source>
         <translation>Disco de arranque del sistema:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="380"/>
-        <location filename="../bootman.cpp" line="390"/>
+        <location filename="../bootman.cpp" line="382"/>
+        <location filename="../bootman.cpp" line="392"/>
         <source>Partition to use:</source>
         <translation>Partición a usar:</translation>
     </message>

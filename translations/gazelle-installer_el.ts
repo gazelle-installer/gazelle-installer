@@ -133,23 +133,23 @@ Minimum: %2</source>
         <translation>Εγκατάσταση GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="334"/>
+        <location filename="../bootman.cpp" line="336"/>
         <source>Updating initramfs</source>
         <translation>Ενημέρωση του initramfs...</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="335"/>
+        <location filename="../bootman.cpp" line="337"/>
         <source>Failed to update initramfs.</source>
         <translation>Η ενημέρωση του initramfs απέτυχε.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="365"/>
+        <location filename="../bootman.cpp" line="367"/>
         <source>System boot disk:</source>
         <translation>Δίσκος εκκίνησης συστήματος:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="380"/>
-        <location filename="../bootman.cpp" line="390"/>
+        <location filename="../bootman.cpp" line="382"/>
+        <location filename="../bootman.cpp" line="392"/>
         <source>Partition to use:</source>
         <translation>Διαμέρισμα για χρήση:</translation>
     </message>

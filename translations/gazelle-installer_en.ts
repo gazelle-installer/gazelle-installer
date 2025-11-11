@@ -127,23 +127,23 @@ Minimum: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="334"/>
+        <location filename="../bootman.cpp" line="336"/>
         <source>Updating initramfs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="335"/>
+        <location filename="../bootman.cpp" line="337"/>
         <source>Failed to update initramfs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="365"/>
+        <location filename="../bootman.cpp" line="367"/>
         <source>System boot disk:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="380"/>
-        <location filename="../bootman.cpp" line="390"/>
+        <location filename="../bootman.cpp" line="382"/>
+        <location filename="../bootman.cpp" line="392"/>
         <source>Partition to use:</source>
         <translation type="unfinished"></translation>
     </message>
