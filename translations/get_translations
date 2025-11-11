@@ -21,7 +21,7 @@ source_lang = en
 type        = ts
 minimum_perc = 25
 EOF
-fi    
+fi
 
 # Migrate percent checking
 if [ -z "$(grep minimum_perc .tx/config)" ]; then
@@ -36,5 +36,21 @@ if command -v tx >/dev/null; then
    echodo tx pull -r antix-development.$APPNAME --all
 fi
 
-lupdate ../*.pro # Update en.ts file
-lupdate ../*.cpp ../*.h ../*.ui -ts *.ts
+# Find lupdate command in common locations
+LUPDATE=""
+for cmd in lupdate lupdate-qt6 /usr/lib/qt6/bin/lupdate /usr/bin/lupdate /usr/local/bin/lupdate; do
+    if command -v "$cmd" >/dev/null 2>&1; then
+        LUPDATE="$cmd"
+        break
+    fi
+done
+
+if [ -z "$LUPDATE" ]; then
+    echo "Error: lupdate command not found. Please install Qt development tools."
+    exit 1
+fi
+
+echo "Using lupdate: $LUPDATE"
+
+"$LUPDATE" ../*.pro # Update en.ts file
+"$LUPDATE" ../*.cpp ../*.h ../*.ui -ts *.ts
