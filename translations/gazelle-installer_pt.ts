@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pt">
 <context>
     <name>AutoPart</name>
     <message>
@@ -26,31 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>O sistema e a home não podem ficar no mesmo disco neste tipo de instalação.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatar e usar discos completamente para %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Disco do sistema: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Disco Home: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Formatar e usar todo o disco (%1) para %2</translation>
+        <translation>Formatar e usar todo o disco para %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -62,7 +56,7 @@ Mínimo: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>O mínimo para ter suporte à hibernação é %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -235,7 +229,7 @@ Mínimo: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation>A versão é desconhecida</translation>
     </message>
 </context>
 <context>
@@ -360,10 +354,6 @@ Usufrua do %1</translation>
         <translation>Não foi possível encontrar a unidade selecionada.</translation>
     </message>
     <message>
-        <source>Unable to prepare for replacement.</source>
-        <translation type="vanished">Não foi possível preparar a substituição.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="676"/>
         <source>The home directory for %1 already exists.</source>
         <translation>A pasta pessoal para %1 já existe.</translation>
@@ -406,12 +396,12 @@ Usufrua do %1</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Disco duplo</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation>Se houver vários discos, esta opção permite ter os ficheiros do sistema num (o disco do Sistema), enquanto mantém os dados de todos os utilizadores num disco separado (o disco Home).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -511,12 +501,12 @@ Usufrua do %1</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este recurso foi projetado para substituir uma instalação realizada usando o método de instalação regular e pode não conseguir substituir uma instalação com um esquema de armazenamento complexo. Pode corromper ou perder dados armazenados no disco.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Para substituir uma instalação com um esquema de armazenamento complexo, recomenda-se utilizar a opção de layout personalizado.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -908,7 +898,7 @@ Usufrua do %1</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation>Experimental</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1310,10 +1300,6 @@ Usufrua do %1</translation>
         <translation>Seleccionar o tipo de instalação</translation>
     </message>
     <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Usar o disco:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="414"/>
         <source>Root</source>
         <translation>Root</translation>
@@ -1348,17 +1334,17 @@ Usufrua do %1</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Drive dupla</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disco do Sistema:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disco Home:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1928,10 +1914,6 @@ Usufrua do %1</translation>
         <translation>Não foi possível desbloquear o dispositivo.</translation>
     </message>
     <message>
-        <source>Possible incorrect password .</source>
-        <translation type="vanished">Possivelmente a senha está incorreta.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="776"/>
         <source>Failed to close %1</source>
         <translation>Falha ao fechar %1</translation>
@@ -1979,7 +1961,7 @@ Usufrua do %1</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Possivelmente a senha está incorreta.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2460,17 +2442,17 @@ Não é recomendado, a menos que o suporte de instalação esteja livre de erros
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível abrir nenhum dos contentores encriptados.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation>É possível que a senha não esteja correta. Prima o botão ‘Scan’ para tentar novamente com uma senha diferente.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume %1 no disco %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2480,41 +2462,37 @@ Não é recomendado, a menos que o suporte de instalação esteja livre de erros
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Substituir a instalação em %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Desbloquear os volumes que estão encriptados</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Palavra-passe:</translation>
+        <translation>Palavra-passe:</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorar os volumes que estão encriptados</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível desbloquear a partição encriptada: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível encontrar a partição listada em crypttab: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace the installation in %1 (%2)</source>
-        <translation type="vanished">Substituir a instalação em %1 (%2)</translation>
+        <translation>Não foi possível bloquear novamente o(s) dispositivo(s) encriptado(s) %1</translation>
     </message>
 </context>
 <context>

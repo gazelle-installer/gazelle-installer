@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="fr_BE">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr_BE">
 <context>
     <name>AutoPart</name>
     <message>
@@ -26,31 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le disque du système et le disque du dossier personnel « home » ne peuvent pas être identiques pour ce type d’installation.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formater et utiliser la totalité des disques pour %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Disque système: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Disque personnel « home »: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Formater et utiliser la totalité du disque (%1) pour %2</translation>
+        <translation>Formater et utiliser entièrement le disque pour %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -62,7 +56,7 @@ Minimum: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum requis pour l’hibernation « veille prolongée »: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -235,7 +229,7 @@ Minimum: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation>Version inconnue</translation>
     </message>
 </context>
 <context>
@@ -360,10 +354,6 @@ Profitez du plaisir d’utiliser %1</translation>
         <translation>Impossible de trouver le lecteur sélectionné.</translation>
     </message>
     <message>
-        <source>Unable to prepare for replacement.</source>
-        <translation type="vanished">Impossible de trouver le lecteur sélectionné.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="676"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Le répertoire home existe déjà pour %1 .</translation>
@@ -406,12 +396,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Deux disques</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation>Si votre système comporte plusieurs disques de stockage, cette option vous permet de placer les fichiers système sur un disque (le disque système) tout en conservant les données de tous/toutes les utilisateurs•rices sur un autre disque (le disque personnel « home »).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -511,12 +501,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette fonctionnalité est conçue pour remplacer une installation effectuée avec la méthode d’installation standard et peut échouer si l’installation à remplacer utilise une configuration complexe ou un schéma de stockage particulier. Une corruption ou une perte de données peut survenir.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour remplacer une installation avec une configuration complexe ou un schéma de stockage particulier, il est recommandé d’utiliser plutôt l’option de disposition personnalisée.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -602,7 +592,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
-        <translation>En plus de ce qui précède, vous pouvez également saisir votre propre point de montage. Les points de montage personnalisés doivent commencer par une barre oblique («&#xa0;/&#xa0;»).</translation>
+        <translation>En plus de ce qui précède, vous pouvez également saisir votre propre point de montage. Les points de montage personnalisés doivent commencer par une barre oblique (« / »).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
@@ -677,7 +667,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="807"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
-        <translation>%1 requiert une partition racine «&#xa0;root&#xa0;». La partition swap est optionnelle mais fortement recommandée. Si vous voulez utiliser la fonction Hibernation de %1, vous aurez besoin d’une partition swap plus grande que la taille de votre mémoire physique.</translation>
+        <translation>%1 requiert une partition racine « root ». La partition swap est optionnelle mais fortement recommandée. Si vous voulez utiliser la fonction Hibernation de %1, vous aurez besoin d’une partition swap plus grande que la taille de votre mémoire physique.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="809"/>
@@ -692,7 +682,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="812"/>
         <source>For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.</source>
-        <translation>Pour que le système d’exploitation installé puisse démarrer, la partition appropriée (généralement la partition de démarrage «&#xa0;boot&#xa0;» ou la partition racine «&#xa0;root&#xa0;») doit être marquée comme active.</translation>
+        <translation>Pour que le système d’exploitation installé puisse démarrer, la partition appropriée (généralement la partition de démarrage « boot » ou la partition racine « root ») doit être marquée comme active.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="813"/>
@@ -722,12 +712,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="819"/>
         <source>Boot partition</source>
-        <translation>Partition d’amorçage «&#xa0;boot&#xa0;»</translation>
+        <translation>Partition d’amorçage « boot »</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="820"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
-        <translation>Cette partition n’est généralement requise que pour les partitions racines «&#xa0;root&#xa0;» sur les périphériques virtuels tels que les volumes cryptés, LVM ou logiciel RAID.</translation>
+        <translation>Cette partition n’est généralement requise que pour les partitions racines « root » sur les périphériques virtuels tels que les volumes cryptés, LVM ou logiciel RAID.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="821"/>
@@ -742,7 +732,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="823"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
-        <translation>Lors de l’utilisation d’un disque formaté GPT sur un système non-EFI, une partition de démarrage BIOS de 1 Mo «&#xa0;1 MB&#xa0;» est requise lors de l’utilisation de GRUB.</translation>
+        <translation>Lors de l’utilisation d’un disque formaté GPT sur un système non-EFI, une partition de démarrage BIOS de 1 Mo « 1 MB » est requise lors de l’utilisation de GRUB.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="824"/>
@@ -908,7 +898,7 @@ Profitez du plaisir d’utiliser %1</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation>Experimental</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1114,7 +1104,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="973"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
-        <translation>Si vous cliquez sur le bouton «&#xa0;Abandonner&#xa0;», l’installation cessera dès que possible.</translation>
+        <translation>Si vous cliquez sur le bouton « Abandonner », l’installation cessera dès que possible.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="975"/>
@@ -1194,7 +1184,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="1214"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Obtenir de l’aide&lt;/b&gt;&lt;br/&gt;Vous trouverez des informations essentielles concernant %1 sur %2.&lt;/p&gt;&lt;p&gt;Des bénévoles vous aideront sur le Forum %3, %4&lt;/p&gt;&lt;p&gt;Si vous demandez de l’aide, n’oubliez pas de décrire votre problème et votre configuration matérielle en détail. Bien entendu, les déclarations du type «&#xa0;ça n’a pas marché&#xa0;» ne sont pas très utiles.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Obtenir de l’aide&lt;/b&gt;&lt;br/&gt;Vous trouverez des informations essentielles concernant %1 sur %2.&lt;/p&gt;&lt;p&gt;Des bénévoles vous aideront sur le Forum %3, %4&lt;/p&gt;&lt;p&gt;Si vous demandez de l’aide, n’oubliez pas de décrire votre problème et votre configuration matérielle en détail. Bien entendu, les déclarations du type « ça n’a pas marché » ne sont pas très utiles.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1222"/>
@@ -1310,10 +1300,6 @@ Profitez du plaisir d’utiliser %1</translation>
         <translation>Sélection du type d’installation</translation>
     </message>
     <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Utiliser le disque:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="414"/>
         <source>Root</source>
         <translation>Root</translation>
@@ -1338,7 +1324,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1121"/>
         <source>Enable hibernation support</source>
-        <translation>Activer la prise en charge de l’hibernation «&#xa0;veille prolongée&#xa0;»</translation>
+        <translation>Activer la prise en charge de l’hibernation « veille prolongée »</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="353"/>
@@ -1348,17 +1334,17 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Deux disques</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disque système:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disque personnel « home »:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1388,7 +1374,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="625"/>
         <source>Scan for existing installations</source>
-        <translation>Scanner les installations existantes</translation>
+        <translation>Analyser les installations existantes</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="646"/>
@@ -1704,12 +1690,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1826"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
-        <translation>Les modifications du bureau effectuées dans l’environnement «&#xa0;live&#xa0;» seront reportées sur le système installé</translation>
+        <translation>Les modifications du bureau effectuées dans l’environnement « live » seront reportées sur le système installé</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1829"/>
         <source>Save live desktop changes</source>
-        <translation>Enregistrer les modifications du bureau opérées en session «&#xa0;live&#xa0;»</translation>
+        <translation>Enregistrer les modifications du bureau opérées en session « live »</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1859"/>
@@ -1890,7 +1876,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="554"/>
         <source>Scan subvolumes</source>
-        <translation>Analyse des sous-volumes</translation>
+        <translation>Analyser les sous-volumes</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="581"/>
@@ -1928,10 +1914,6 @@ Profitez du plaisir d’utiliser %1</translation>
         <translation>Impossible de déverrouiller l’appareil.</translation>
     </message>
     <message>
-        <source>Possible incorrect password .</source>
-        <translation type="vanished">Mot de passe incorrect.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="776"/>
         <source>Failed to close %1</source>
         <translation>Impossible de fermer %1</translation>
@@ -1959,7 +1941,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="842"/>
         <source>A root partition of at least %1 is required.</source>
-        <translation>Une partition racine «&#xa0;root&#xa0;» d’au moins %1 est requise.</translation>
+        <translation>Une partition racine « root » d’au moins %1 est requise.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="861"/>
@@ -1979,7 +1961,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe éventuellement incorrect.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2049,7 +2031,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="933"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
-        <translation>Vous devez choisir une partition d’amorçage «&#xa0;boot partition&#xa0;» séparée lorsque vous cryptez la racine «&#xa0;root&#xa0;».</translation>
+        <translation>Vous devez choisir une partition d’amorçage « boot partition » séparée lorsque vous cryptez/chiffrez la racine « root ».</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="971"/>
@@ -2359,7 +2341,7 @@ The installer will not write any passwords or ignored settings to the new config
 Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.</source>
         <translation>Charger un fichier de configuration tel que spécifié par &lt;config-file&gt;.
 Par défaut, le fichier /etc/minstall.conf est utilisé.
-Cette configuration peut être utilisée avec --auto pour une «&#xa0;unattended&#xa0;» installation sans contrôle.
+Cette configuration peut être utilisée avec --auto pour une « unattended » installation sans contrôle.
 Le programme d’installation crée (ou écrase) le fichier /mnt/antiX/etc/minstall.conf et enregistre une copie dans /etc/minstalled.conf pour une utilisation ultérieure.
 Le programme d’installation n’écrira pas de mots de passe ou de paramètres inconnus dans le nouveau fichier de configuration.
 Veuillez noter que ceci est expérimental. Les futures versions de l’installateur peuvent rompre la compatibilité avec les fichiers de configuration existants.</translation>
@@ -2442,7 +2424,7 @@ Non recommandé sauf si le support d’installation est garanti sans erreur.</tr
     <message>
         <location filename="../app.cpp" line="149"/>
         <source>Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
-        <translation>Veuillez le fermer si possible, ou exécutez «&#xa0;pkill minstall&#xa0;» dans le terminal.</translation>
+        <translation>Veuillez le fermer si possible, ou exécutez « pkill minstall » dans le terminal.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="155"/>
@@ -2460,17 +2442,17 @@ Non recommandé sauf si le support d’installation est garanti sans erreur.</tr
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d’ouvrir l’un des conteneurs chiffrés verrouillés.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe éventuellement incorrect. Appuyez sur le bouton « Analyser » pour réessayer avec un mot de passe différent. </translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume %1 sur le disque %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2480,41 +2462,37 @@ Non recommandé sauf si le support d’installation est garanti sans erreur.</tr
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Remplacer l’installation dans %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Déverrouiller les volumes chiffrés</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Mot de passe:</translation>
+        <translation>Mot de passe:</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorer les volumes chiffrés</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de déverrouiller la partition chiffrée: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de trouver la partition listée dans crypttab: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace the installation in %1 (%2)</source>
-        <translation type="vanished">Remplacer l’installation dans %1 (%2)</translation>
+        <translation>Impossible de reverrouiller le(s) périphérique(s) chiffré(s): %1</translation>
     </message>
 </context>
 <context>

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="sv">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="sv">
 <context>
     <name>AutoPart</name>
     <message>
@@ -26,31 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>System och hem-diskarna kan inte vara samma för denna typ av installation.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatera och använd hela diskarna för %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemdisk: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hemdisk: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Formatera och använd hela disken (%1) för %2</translation>
+        <translation>Formatera och använd hela disken för %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -62,7 +56,7 @@ Minimum: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum för stöd av viloläge: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -235,7 +229,7 @@ Minimum: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänd utgåva</translation>
     </message>
 </context>
 <context>
@@ -360,10 +354,6 @@ Ha det så trevligt med %1</translation>
         <translation>Kan inte hitta vald disk.</translation>
     </message>
     <message>
-        <source>Unable to prepare for replacement.</source>
-        <translation type="vanished">Kan inte förbereda för utbyte.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="676"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Hemkatalogen för %1 finns redan.</translation>
@@ -406,12 +396,12 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Dubbla diskar</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation>Om ditt system har flera lagringsdiskar, låter detta alternativ dig ha systemfiler på en disk (Systemdisken), medan data för alla användare är på en separat disk (Hemdisken).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -511,12 +501,12 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna möjlighet är designad för att ersätta en installation utförd med den vanliga installationsmetoden och kan misslyckas med att ersätta en installation med en komplex layout eller lagringsschema. Korruption eller dataförlust kan förekomma.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>För att ersätta en installation med en komplex layout eller lagringsschema, rekommenderas att använda anpassat layoutalternativ istället.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -908,7 +898,7 @@ Ha det så trevligt med %1</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation>Experimentell</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1310,10 +1300,6 @@ Ha det så trevligt med %1</translation>
         <translation>Välj typ av installation</translation>
     </message>
     <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Använd disk:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="414"/>
         <source>Root</source>
         <translation>Root</translation>
@@ -1348,17 +1334,17 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Dubbla diskar</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemdisk:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hemdisk:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1928,10 +1914,6 @@ Ha det så trevligt med %1</translation>
         <translation>Kunde inte låsa upp enhet.</translation>
     </message>
     <message>
-        <source>Possible incorrect password .</source>
-        <translation type="vanished">Möjligen inkorrekt lösenord</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="776"/>
         <source>Failed to close %1</source>
         <translation>Kunde inte stänga %1</translation>
@@ -1979,7 +1961,7 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Möjligen felaktigt lösenord.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2460,17 +2442,17 @@ Ej rekommenderat om inte installationsmedia är garanterat felfri.</translation>
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte öppna någon av de låsta krypterade containerna.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Möjligen felaktigt lösenord. Tryck på &apos;Scan&apos; knappen för att försöka igen med ett annat lösenord.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Volym %1 på disk %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2480,41 +2462,37 @@ Ej rekommenderat om inte installationsmedia är garanterat felfri.</translation>
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Ersätt installationen på %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Lås upp krypterade volymer</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Lösenord:</translation>
+        <translation>Lösenord:</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorera krypterade volymer</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte låsa upp krypterad partition: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte hitta partition listad i crypttab: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace the installation in %1 (%2)</source>
-        <translation type="vanished">Ersätt installationen på %1 (%2)</translation>
+        <translation>Kunde inte låsa krypterad enhet(er) igen: %1</translation>
     </message>
 </context>
 <context>

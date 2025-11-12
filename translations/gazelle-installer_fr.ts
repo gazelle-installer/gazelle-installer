@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="fr">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr">
 <context>
     <name>AutoPart</name>
     <message>
@@ -21,48 +19,44 @@
     <message>
         <location filename="../autopart.cpp" line="177"/>
         <source>Are you sure you want to continue?</source>
-        <translation>Êtes-vous certain de vouloir continuer&#xa0;?</translation>
+        <translation>Êtes-vous certain de vouloir continuer ?</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le disque du système et le disque du dossier personnel « home » ne peuvent pas être identiques pour ce type d’installation.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formater et utiliser la totalité des disques pour %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Disque système : %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Disque personnel « home » : %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Formater et utiliser la totalité du disque (%1) pour %2</translation>
+        <translation>Formater et utiliser entièrement le disque pour %1 : %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
         <source>Recommended: %1
 Minimum: %2</source>
-        <translation>Recommandé&#xa0;: %1
-Minimum&#xa0;: %2</translation>
+        <translation>Recommandé : %1
+Minimum : %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum requis pour l’hibernation « veille prolongée » : %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -145,13 +139,13 @@ Minimum&#xa0;: %2</translation>
     <message>
         <location filename="../bootman.cpp" line="367"/>
         <source>System boot disk:</source>
-        <translation>Disque de démarrage du système&#xa0;:</translation>
+        <translation>Disque de démarrage du système :</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="382"/>
         <location filename="../bootman.cpp" line="392"/>
         <source>Partition to use:</source>
-        <translation>Partition à utiliser&#xa0;:</translation>
+        <translation>Partition à utiliser :</translation>
     </message>
 </context>
 <context>
@@ -169,7 +163,7 @@ Minimum&#xa0;: %2</translation>
     <message>
         <location filename="../checkmd5.cpp" line="77"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation>Êtes-vous certain de ne pas vouloir vérifier le support d’installation&#xa0;?</translation>
+        <translation>Êtes-vous certain de ne pas vouloir vérifier le support d’installation ?</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="204"/>
@@ -192,7 +186,7 @@ Minimum&#xa0;: %2</translation>
     <message>
         <location filename="../crypto.cpp" line="61"/>
         <source>Creating encrypted volume: %1</source>
-        <translation>Création du disque crypté&#xa0;: %1</translation>
+        <translation>Création du disque crypté : %1</translation>
     </message>
     <message>
         <location filename="../crypto.cpp" line="66"/>
@@ -235,7 +229,7 @@ Minimum&#xa0;: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation>Version inconnue</translation>
     </message>
 </context>
 <context>
@@ -258,7 +252,7 @@ Minimum&#xa0;: %2</translation>
     <message>
         <location filename="../minstall.cpp" line="179"/>
         <source>Do you want to continue the installation?</source>
-        <translation>Voulez-vous poursuivre l’installation&#xa0;?</translation>
+        <translation>Voulez-vous poursuivre l’installation ?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="216"/>
@@ -268,7 +262,7 @@ Minimum&#xa0;: %2</translation>
     <message>
         <location filename="../minstall.cpp" line="217"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation>Ces actions sont irréversibles. Voulez-vous continuer&#xa0;?</translation>
+        <translation>Ces actions sont irréversibles. Voulez-vous continuer ?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="228"/>
@@ -360,10 +354,6 @@ Profitez du plaisir d’utiliser %1</translation>
         <translation>Impossible de trouver le lecteur sélectionné.</translation>
     </message>
     <message>
-        <source>Unable to prepare for replacement.</source>
-        <translation type="vanished">Impossible de trouver le lecteur sélectionné.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="676"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Le répertoire home existe déjà pour %1 .</translation>
@@ -406,12 +396,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Deux disques</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation>Si votre système comporte plusieurs disques de stockage, cette option vous permet de placer les fichiers système sur un disque (le disque système) tout en conservant les données de tous les utilisateurs sur un autre disque (le disque personnel « home »).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -511,12 +501,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette fonctionnalité est conçue pour remplacer une installation effectuée avec la méthode d’installation standard et peut échouer si l’installation à remplacer utilise une configuration complexe ou un schéma de stockage particulier. Une corruption ou une perte de données peut survenir.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour remplacer une installation avec une configuration complexe ou un schéma de stockage particulier, il est recommandé d’utiliser plutôt l’option de disposition personnalisée.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -602,7 +592,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
-        <translation>En plus de ce qui précède, vous pouvez également saisir votre propre point de montage. Les points de montage personnalisés doivent commencer par une barre oblique («&#xa0;/&#xa0;»).</translation>
+        <translation>En plus de ce qui précède, vous pouvez également saisir votre propre point de montage. Les points de montage personnalisés doivent commencer par une barre oblique (« / »).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
@@ -677,7 +667,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="807"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
-        <translation>%1 requiert une partition racine «&#xa0;root&#xa0;». La partition swap est optionnelle mais fortement recommandée. Si vous voulez utiliser la fonction Hibernation de %1, vous aurez besoin d’une partition swap plus grande que la taille de votre mémoire physique.</translation>
+        <translation>%1 requiert une partition racine « root ». La partition swap est optionnelle mais fortement recommandée. Si vous voulez utiliser la fonction Hibernation de %1, vous aurez besoin d’une partition swap plus grande que la taille de votre mémoire physique.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="809"/>
@@ -692,7 +682,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="812"/>
         <source>For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.</source>
-        <translation>Pour que le système d’exploitation installé puisse démarrer, la partition appropriée (généralement la partition de démarrage «&#xa0;boot&#xa0;» ou la partition racine «&#xa0;root&#xa0;») doit être marquée comme active.</translation>
+        <translation>Pour que le système d’exploitation installé puisse démarrer, la partition appropriée (généralement la partition de démarrage « boot » ou la partition racine « root ») doit être marquée comme active.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="813"/>
@@ -722,12 +712,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="819"/>
         <source>Boot partition</source>
-        <translation>Partition d’amorçage «&#xa0;boot&#xa0;»</translation>
+        <translation>Partition d’amorçage « boot »</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="820"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
-        <translation>Cette partition n’est généralement requise que pour les partitions racines «&#xa0;root&#xa0;» sur les périphériques virtuels tels que les volumes cryptés, LVM ou logiciel RAID.</translation>
+        <translation>Cette partition n’est généralement requise que pour les partitions racines « root » sur les périphériques virtuels tels que les volumes cryptés, LVM ou logiciel RAID.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="821"/>
@@ -742,12 +732,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="823"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
-        <translation>Lors de l’utilisation d’un disque formaté GPT sur un système non-EFI, une partition de démarrage BIOS de 1 Mo «&#xa0;1 MB&#xa0;» est requise lors de l’utilisation de GRUB.</translation>
+        <translation>Lors de l’utilisation d’un disque formaté GPT sur un système non-EFI, une partition de démarrage BIOS de 1 Mo « 1 MB » est requise lors de l’utilisation de GRUB.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="824"/>
         <source>Need help creating a layout?</source>
-        <translation>Besoin d’aide pour créer une configuration&#xa0;?</translation>
+        <translation>Besoin d’aide pour créer une configuration ?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="825"/>
@@ -908,12 +898,12 @@ Profitez du plaisir d’utiliser %1</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation>Experimental</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation>Un fichier swap est plus flexible qu’une partition swap&#xa0;; il est beaucoup plus facile de redimensionner un fichier swap pour l’adapter aux changements d’utilisation du système.</translation>
+        <translation>Un fichier swap est plus flexible qu’une partition swap ; il est beaucoup plus facile de redimensionner un fichier swap pour l’adapter aux changements d’utilisation du système.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="887"/>
@@ -988,7 +978,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="917"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
-        <translation>La plupart des utilisateurs ne devraient pas modifier les valeurs par défaut. Les utilisateurs disposant d’ordinateurs à faibles ressources souhaitent parfois désactiver les services inutiles afin de limiter au maximum l’utilisation de la RAM. Assurez-vous de savoir ce que vous faites&#xa0;!</translation>
+        <translation>La plupart des utilisateurs ne devraient pas modifier les valeurs par défaut. Les utilisateurs disposant d’ordinateurs à faibles ressources souhaitent parfois désactiver les services inutiles afin de limiter au maximum l’utilisation de la RAM. Assurez-vous de savoir ce que vous faites !</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="923"/>
@@ -1114,7 +1104,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="973"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
-        <translation>Si vous cliquez sur le bouton «&#xa0;Abandonner&#xa0;», l’installation cessera dès que possible.</translation>
+        <translation>Si vous cliquez sur le bouton « Abandonner », l’installation cessera dès que possible.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="975"/>
@@ -1134,7 +1124,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="985"/>
         <source>Congratulations!</source>
-        <translation>Félicitations&#xa0;!</translation>
+        <translation>Félicitations !</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="986"/>
@@ -1189,17 +1179,17 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../minstall.cpp" line="1137"/>
         <source>Do you really want to stop now?</source>
-        <translation>Voulez-vous vraiment arrêter maintenant&#xa0;?</translation>
+        <translation>Voulez-vous vraiment arrêter maintenant ?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1214"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Obtenir de l’aide&lt;/b&gt;&lt;br/&gt;Vous trouverez des informations essentielles concernant %1 sur %2.&lt;/p&gt;&lt;p&gt;Des bénévoles vous aideront sur le Forum %3, %4&lt;/p&gt;&lt;p&gt;Si vous demandez de l’aide, n’oubliez pas de décrire votre problème et votre configuration matérielle en détail. Bien entendu, les déclarations du type «&#xa0;ça n’a pas marché&#xa0;» ne sont pas très utiles.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Obtenir de l’aide&lt;/b&gt;&lt;br/&gt;Vous trouverez des informations essentielles concernant %1 sur %2.&lt;/p&gt;&lt;p&gt;Des bénévoles vous aideront sur le Forum %3, %4&lt;/p&gt;&lt;p&gt;Si vous demandez de l’aide, n’oubliez pas de décrire votre problème et votre configuration matérielle en détail. Bien entendu, les déclarations du type « ça n’a pas marché » ne sont pas très utiles.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1222"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Réparer votre installation&lt;/b&gt;&lt;br/&gt;Si %1 arrête de fonctionner depuis le disque dur, il est parfois possible de corriger le problème en démarrant depuis le LiveDVD ou LiveUSB et en exécutant l’un des utilitaires de %1 ou un autre outil Linux pour réparer le système. &lt;/p&gt;&lt;p&gt;Vous pouvez également utiliser le LiveDVD ou LiveUSB de %1 pour récupérer des données d’un système MS-Windows&#xa0;!&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Réparer votre installation&lt;/b&gt;&lt;br/&gt;Si %1 arrête de fonctionner depuis le disque dur, il est parfois possible de corriger le problème en démarrant depuis le LiveDVD ou LiveUSB et en exécutant l’un des utilitaires de %1 ou un autre outil Linux pour réparer le système. &lt;/p&gt;&lt;p&gt;Vous pouvez également utiliser le LiveDVD ou LiveUSB de %1 pour récupérer des données d’un système MS-Windows !&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1228"/>
@@ -1287,12 +1277,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="247"/>
         <source>Model:</source>
-        <translation>Modèle&#xa0;:</translation>
+        <translation>Modèle :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="262"/>
         <source>Variant:</source>
-        <translation>Variante&#xa0;:</translation>
+        <translation>Variante :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="282"/>
@@ -1302,16 +1292,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="294"/>
         <source>Layout:</source>
-        <translation>Configuration&#xa0;:</translation>
+        <translation>Configuration :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
         <source>Select type of installation</source>
         <translation>Sélection du type d’installation</translation>
-    </message>
-    <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Utiliser le disque&#xa0;:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="414"/>
@@ -1338,7 +1324,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1121"/>
         <source>Enable hibernation support</source>
-        <translation>Activer la prise en charge de l’hibernation «&#xa0;veille prolongée&#xa0;»</translation>
+        <translation>Activer la prise en charge de l’hibernation « veille prolongée »</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="353"/>
@@ -1348,17 +1334,17 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Deux disques</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disque système :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disque personnel « home » :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1388,7 +1374,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="625"/>
         <source>Scan for existing installations</source>
-        <translation>Scanner les installations existantes</translation>
+        <translation>Analyser les installations existantes</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="646"/>
@@ -1453,12 +1439,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="797"/>
         <source>Encryption password:</source>
-        <translation>Mot de passe de chiffrement&#xa0;:</translation>
+        <translation>Mot de passe de chiffrement :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="814"/>
         <source>Confirm password:</source>
-        <translation>Confirmer le mot de passe&#xa0;:</translation>
+        <translation>Confirmer le mot de passe :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="842"/>
@@ -1473,7 +1459,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="900"/>
         <source>System boot disk:</source>
-        <translation>Disque de démarrage du système&#xa0;:</translation>
+        <translation>Disque de démarrage du système :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="942"/>
@@ -1513,7 +1499,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1011"/>
         <source>Location to install on:</source>
-        <translation>Emplacement de l’installation&#xa0;:</translation>
+        <translation>Emplacement de l’installation :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1018"/>
@@ -1534,12 +1520,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1091"/>
         <source>Size:</source>
-        <translation>Taille&#xa0;:</translation>
+        <translation>Taille :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1114"/>
         <source>Location:</source>
-        <translation>Emplacement&#xa0;:</translation>
+        <translation>Emplacement :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1131"/>
@@ -1549,17 +1535,17 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1143"/>
         <source>Allocate based on RAM:</source>
-        <translation>Allouer en fonction de la RAM&#xa0;:</translation>
+        <translation>Allouer en fonction de la RAM :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1172"/>
         <source>Recommended maximum: 100%</source>
-        <translation>Maxi recommandé&#xa0;: 100%</translation>
+        <translation>Maxi recommandé : 100%</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1179"/>
         <source>Allocate fixed size:</source>
-        <translation>Allouer une taille fixe&#xa0;:</translation>
+        <translation>Allouer une taille fixe :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1223"/>
@@ -1589,7 +1575,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1308"/>
         <source>Workgroup:</source>
-        <translation>Groupe de travail&#xa0;:</translation>
+        <translation>Groupe de travail :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1321"/>
@@ -1604,12 +1590,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1350"/>
         <source>Computer domain:</source>
-        <translation>Nom de domaine&#xa0;:</translation>
+        <translation>Nom de domaine :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1373"/>
         <source>Computer name:</source>
-        <translation>Nom de l’ordinateur&#xa0;:</translation>
+        <translation>Nom de l’ordinateur :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1416"/>
@@ -1619,7 +1605,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1437"/>
         <source>Locale:</source>
-        <translation>Variable locale&#xa0;:</translation>
+        <translation>Variable locale :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1456"/>
@@ -1629,12 +1615,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1491"/>
         <source>Format:</source>
-        <translation>Format&#xa0;:</translation>
+        <translation>Format :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1519"/>
         <source>Timezone:</source>
-        <translation>Fuseau horaire&#xa0;:</translation>
+        <translation>Fuseau horaire :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1558"/>
@@ -1664,7 +1650,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1662"/>
         <source>Default user login name:</source>
-        <translation>Nom d’utilisateur par défaut&#xa0;:</translation>
+        <translation>Nom d’utilisateur par défaut :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1678"/>
@@ -1674,12 +1660,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1691"/>
         <source>Default user password:</source>
-        <translation>Mot de passe utilisateur par défaut&#xa0;:</translation>
+        <translation>Mot de passe utilisateur par défaut :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1717"/>
         <source>Confirm user password:</source>
-        <translation>Confirmer le mot de passe utilisateur&#xa0;:</translation>
+        <translation>Confirmer le mot de passe utilisateur :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1746"/>
@@ -1689,12 +1675,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1764"/>
         <source>Root password:</source>
-        <translation>Mot de passe administrateur&#xa0;:</translation>
+        <translation>Mot de passe administrateur :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1790"/>
         <source>Confirm root password:</source>
-        <translation>Confirmer le mot de passe administrateur&#xa0;: </translation>
+        <translation>Confirmer le mot de passe administrateur : </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1819"/>
@@ -1704,12 +1690,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1826"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
-        <translation>Les modifications du bureau effectuées dans l’environnement «&#xa0;live&#xa0;» seront reportées sur le système installé</translation>
+        <translation>Les modifications du bureau effectuées dans l’environnement « live » seront reportées sur le système installé</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1829"/>
         <source>Save live desktop changes</source>
-        <translation>Enregistrer les modifications du bureau opérées en session «&#xa0;live&#xa0;»</translation>
+        <translation>Enregistrer les modifications du bureau opérées en session « live »</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1859"/>
@@ -1719,7 +1705,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../meinstall.ui" line="1868"/>
         <source>What would you like to do with the old directory?</source>
-        <translation>Que voudriez-vous faire avec l’ancien répertoire&#xa0;?</translation>
+        <translation>Que voudriez-vous faire avec l’ancien répertoire ?</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1875"/>
@@ -1804,7 +1790,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../oobe.cpp" line="535"/>
         <source>Are you sure you want to continue?</source>
-        <translation>Êtes-vous certain de vouloir continuer&#xa0;?</translation>
+        <translation>Êtes-vous certain de vouloir continuer ?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="540"/>
@@ -1890,7 +1876,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="554"/>
         <source>Scan subvolumes</source>
-        <translation>Analyse des sous-volumes</translation>
+        <translation>Analyser les sous-volumes</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="581"/>
@@ -1920,16 +1906,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="714"/>
         <source>Password:</source>
-        <translation>Mot de passe&#xa0;:</translation>
+        <translation>Mot de passe :</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="746"/>
         <source>Could not unlock device.</source>
         <translation>Impossible de déverrouiller l’appareil.</translation>
-    </message>
-    <message>
-        <source>Possible incorrect password .</source>
-        <translation type="vanished">Mot de passe incorrect.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="776"/>
@@ -1949,17 +1931,17 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="821"/>
         <source>Invalid use for %1: %2</source>
-        <translation>Utilisation non valide pour %1 : %2</translation>
+        <translation>Utilisation non valide pour %1 : %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="829"/>
         <source>%1 is already selected for: %2</source>
-        <translation>%1 est déjà sélectionné pour&#xa0;: %2</translation>
+        <translation>%1 est déjà sélectionné pour : %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="842"/>
         <source>A root partition of at least %1 is required.</source>
-        <translation>Une partition racine «&#xa0;root&#xa0;» d’au moins %1 est requise.</translation>
+        <translation>Une partition racine « root » d’au moins %1 est requise.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="861"/>
@@ -1979,7 +1961,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe éventuellement incorrect.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2049,7 +2031,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="933"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
-        <translation>Vous devez choisir une partition d’amorçage «&#xa0;boot partition&#xa0;» séparée lorsque vous cryptez la racine «&#xa0;root&#xa0;».</translation>
+        <translation>Vous devez choisir une partition d’amorçage « boot partition » séparée lorsque vous cryptez/chiffrez la racine « root ».</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="971"/>
@@ -2059,17 +2041,17 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="997"/>
         <source>The installation may fail because the following volumes are too small:</source>
-        <translation>L’installation peut échouer parce que les volumes suivants sont trop petits&#xa0;:</translation>
+        <translation>L’installation peut échouer parce que les volumes suivants sont trop petits :</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="999"/>
         <source>Are you sure you want to continue?</source>
-        <translation>Êtes-vous certain de vouloir continuer&#xa0;?</translation>
+        <translation>Êtes-vous certain de vouloir continuer ?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>This setup may produce an unbootable system. Do you want to continue?</source>
-        <translation>Cette configuration peut rendre le système non amorçable. Voulez-vous continuer&#xa0;?</translation>
+        <translation>Cette configuration peut rendre le système non amorçable. Voulez-vous continuer ?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1016"/>
@@ -2084,7 +2066,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="1046"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
-        <translation>Les disques suivants sont, ou seront, configurés avec GPT, mais n’ont pas de partition BIOS-GRUB&#xa0;:</translation>
+        <translation>Les disques suivants sont, ou seront, configurés avec GPT, mais n’ont pas de partition BIOS-GRUB :</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1048"/>
@@ -2094,12 +2076,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="1087"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
-        <translation>Les disques contenant les partitions choisies pour l’installation sont défectueux&#xa0;:</translation>
+        <translation>Les disques contenant les partitions choisies pour l’installation sont défectueux :</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1091"/>
         <source>Smartmon tool output:</source>
-        <translation>Résultat de l’outil Smartmon&#xa0;: </translation>
+        <translation>Résultat de l’outil Smartmon : </translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1092"/>
@@ -2114,12 +2096,12 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="1103"/>
         <source>Do you want to abort the installation?</source>
-        <translation>Voulez-vous abandonner l’installation&#xa0;?</translation>
+        <translation>Voulez-vous abandonner l’installation ?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1109"/>
         <source>Do you want to continue?</source>
-        <translation>Voulez-vous continuer&#xa0;?</translation>
+        <translation>Voulez-vous continuer ?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1178"/>
@@ -2144,7 +2126,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="1321"/>
         <source>Formatting: %1</source>
-        <translation>Formatage&#xa0;: %1</translation>
+        <translation>Formatage : %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1397"/>
@@ -2164,17 +2146,17 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../partman.cpp" line="1535"/>
         <source>Mounting: %1</source>
-        <translation>Montage&#xa0;: %1</translation>
+        <translation>Montage : %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1710"/>
         <source>Model: %1</source>
-        <translation>Modèle&#xa0;: %1</translation>
+        <translation>Modèle : %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1718"/>
         <source>Free space: %1</source>
-        <translation>Espace libre&#xa0;: %1</translation>
+        <translation>Espace libre : %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1818"/>
@@ -2305,7 +2287,7 @@ Profitez du plaisir d’utiliser %1</translation>
     <message>
         <location filename="../passedit.cpp" line="148"/>
         <source>Password strength: %1</source>
-        <translation>Fiabilité du mot de passe&#xa0;: %1</translation>
+        <translation>Fiabilité du mot de passe : %1</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="181"/>
@@ -2340,14 +2322,14 @@ Profitez du plaisir d’utiliser %1</translation>
         <source>Installs automatically using the configuration file (more information below).
 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.</source>
         <translation>S’installe automatiquement en utilisant le fichier de configuration (plus d’informations ci-dessous).
--- AVERTISSEMENT&#xa0;: option potentiellement dangereuse, elle effacera automatiquement la ou les partition(s).</translation>
+-- AVERTISSEMENT : option potentiellement dangereuse, elle effacera automatiquement la ou les partition(s).</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>
         <source>Overrules sanity checks on partitions and drives, causing them to be displayed.
 -- WARNING: this can break things, use it only if you don&apos;t care about data on drive.</source>
         <translation>Annule les contrôles d’intégrité des partitions et des disques, ce qui les fait apparaître.
--- AVERTISSEMENT&#xa0;: cela peut casser des choses, ne l’utilisez que si vous ne vous souciez pas des données sur le disque.</translation>
+-- AVERTISSEMENT : cela peut casser des choses, ne l’utilisez que si vous ne vous souciez pas des données sur le disque.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="105"/>
@@ -2359,7 +2341,7 @@ The installer will not write any passwords or ignored settings to the new config
 Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.</source>
         <translation>Charger un fichier de configuration tel que spécifié par &lt;config-file&gt;.
 Par défaut, le fichier /etc/minstall.conf est utilisé.
-Cette configuration peut être utilisée avec --auto pour une «&#xa0;unattended&#xa0;» installation sans contrôle.
+Cette configuration peut être utilisée avec --auto pour une « unattended » installation sans contrôle.
 Le programme d’installation crée (ou écrase) le fichier /mnt/antiX/etc/minstall.conf et enregistre une copie dans /etc/minstalled.conf pour une utilisation ultérieure.
 Le programme d’installation n’écrira pas de mots de passe ou de paramètres inconnus dans le nouveau fichier de configuration.
 Veuillez noter que ceci est expérimental. Les futures versions de l’installateur peuvent rompre la compatibilité avec les fichiers de configuration existants.</translation>
@@ -2442,7 +2424,7 @@ Non recommandé sauf si le support d’installation est garanti sans erreur.</tr
     <message>
         <location filename="../app.cpp" line="149"/>
         <source>Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
-        <translation>Veuillez le fermer si possible, ou exécutez «&#xa0;pkill minstall&#xa0;» dans le terminal.</translation>
+        <translation>Veuillez le fermer si possible, ou exécutez « pkill minstall » dans le terminal.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="155"/>
@@ -2460,17 +2442,17 @@ Non recommandé sauf si le support d’installation est garanti sans erreur.</tr
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d’ouvrir l’un des conteneurs chiffrés verrouillés.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe éventuellement incorrect. Appuyez sur le bouton « Analyser » pour réessayer avec un mot de passe différent. </translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume %1 sur le disque %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2480,41 +2462,37 @@ Non recommandé sauf si le support d’installation est garanti sans erreur.</tr
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Remplacer l’installation dans %1 : %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Déverrouiller les volumes chiffrés</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Mot de passe&#xa0;:</translation>
+        <translation>Mot de passe :</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorer les volumes chiffrés</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de déverrouiller la partition chiffrée : %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de trouver la partition listée dans crypttab : %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace the installation in %1 (%2)</source>
-        <translation type="vanished">Remplacer l’installation dans %1 (%2)</translation>
+        <translation>Impossible de reverrouiller le(s) périphérique(s) chiffré(s) : %1</translation>
     </message>
 </context>
 <context>
@@ -2522,7 +2500,7 @@ Non recommandé sauf si le support d’installation est garanti sans erreur.</tr
     <message>
         <location filename="../swapman.cpp" line="57"/>
         <source>Recommended maximum: %1 MB</source>
-        <translation>Maximum recommandé&#xa0;: %1 Mo</translation>
+        <translation>Maximum recommandé : %1 Mo</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="60"/>
@@ -2537,7 +2515,7 @@ Non recommandé sauf si le support d’installation est garanti sans erreur.</tr
     <message>
         <location filename="../swapman.cpp" line="87"/>
         <source>Maximum: %1 MB</source>
-        <translation>Maximum&#xa0;: %1 Mo</translation>
+        <translation>Maximum : %1 Mo</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="104"/>

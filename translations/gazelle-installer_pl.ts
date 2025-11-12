@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pl">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pl">
 <context>
     <name>AutoPart</name>
     <message>
@@ -26,31 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>W przypadku tego typu instalacji dysk systemowy i dysk domowy nie mogą być takie same.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sformatuj i użyj dysków w całości dla %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Dysk systemowy: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Dysk domowy: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Sformatuj i użyj całego dysku (%1) dla %2</translation>
+        <translation>Sformatuj i użyj całego dysku dla %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -62,7 +56,7 @@ Minimum: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum do obsługi hibernacji: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -235,7 +229,7 @@ Minimum: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieznane wydanie</translation>
     </message>
 </context>
 <context>
@@ -360,10 +354,6 @@ Miłego korzystania z %1</translation>
         <translation>Nie można znaleźć wybranego dysku.</translation>
     </message>
     <message>
-        <source>Unable to prepare for replacement.</source>
-        <translation type="vanished">Nie można przygotować wymiany.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="676"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Katalog domowy dla %1 już istnieje.</translation>
@@ -406,12 +396,12 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Dysk podwójny</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeśli ten system ma wiele dysków pamięci masowej, ta opcja umożliwia przechowywanie plików systemowych na jednym dysku (dysku systemowym) i jednoczesne przechowywanie danych wszystkich użytkowników na osobnym dysku (dysku domowym).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -511,12 +501,12 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta funkcja ma na celu zastąpienie instalacji wykonanej standardową metodą instalacji i może nie zadziałać w przypadku instalacji o złożonym układzie lub schemacie przechowywania. Może to spowodować uszkodzenie lub utratę danych.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aby zastąpić instalację o skomplikowanym układzie lub schemacie przechowywania, zaleca się skorzystanie z opcji układu niestandardowego.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -742,7 +732,7 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../minstall.cpp" line="823"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
-        <translation>Korzystając z napędu sformatowanego jako GPT w systemie non-EFI, do używania GRUB  wymagana jest partycja rozruchowa BIOS o wielkości 1 MB.</translation>
+        <translation>Korzystając z dysku sformatowanego jako GPT w systemie non-EFI, do używania GRUB  wymagana jest partycja rozruchowa BIOS o wielkości 1 MB.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="824"/>
@@ -782,7 +772,7 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../minstall.cpp" line="832"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
-        <translation>Dostępne są dodatkowe opcje kompresji dla napędów korzystających z btrfs. Lzo jest szybki, ale kompresja jest niższa. Zlib jest wolniejszy, z wyższą kompresją.</translation>
+        <translation>Dostępne są dodatkowe opcje kompresji dla dysków korzystających z btrfs. Lzo jest szybki, ale kompresja jest niższa. Zlib jest wolniejszy, z wyższą kompresją.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="834"/>
@@ -862,7 +852,7 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../minstall.cpp" line="865"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation>Proszę dokładnie przejrzeć tę listę. Jest to ostatnia okazja, aby sprawdzić, przejrzeć i&#xa0;potwierdzić działania procesu instalacji przed kontynuowaniem.</translation>
+        <translation>Proszę dokładnie przejrzeć tę listę. Jest to ostatnia okazja, aby sprawdzić, przejrzeć i potwierdzić działania procesu instalacji przed kontynuowaniem.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="875"/>
@@ -908,7 +898,7 @@ Miłego korzystania z %1</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation>Eksperymentalne</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1310,10 +1300,6 @@ Miłego korzystania z %1</translation>
         <translation>Wybierz typ instalacji</translation>
     </message>
     <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Użyj dysku:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="414"/>
         <source>Root</source>
         <translation>Root</translation>
@@ -1348,17 +1334,17 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Dysk podwójny</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dysk systemowy:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dysk domowy:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1388,7 +1374,7 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../meinstall.ui" line="625"/>
         <source>Scan for existing installations</source>
-        <translation>Przeskanuj istniejące instalacje</translation>
+        <translation>Skanuj istniejące instalacje</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="646"/>
@@ -1928,10 +1914,6 @@ Miłego korzystania z %1</translation>
         <translation>Nie udało się odblokować urządzenia.</translation>
     </message>
     <message>
-        <source>Possible incorrect password .</source>
-        <translation type="vanished">Możliwe, że hasło jest nieprawidłowe.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="776"/>
         <source>Failed to close %1</source>
         <translation>Nie udało się zamknąć %1</translation>
@@ -1979,7 +1961,7 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Możliwe, że hasło jest nieprawidłowe.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2084,7 +2066,7 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../partman.cpp" line="1046"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
-        <translation>Poniższe napędy są lub będą skonfigurowane z GPT, ale nie posiadają partycji BIOS-GRUB:</translation>
+        <translation>Poniższe dyski są lub będą skonfigurowane z GPT, ale nie posiadają partycji BIOS-GRUB:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1048"/>
@@ -2460,17 +2442,17 @@ Niezalecane, chyba że gwarantuje się, że nośnik instalacyjny jest wolny od b
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się otworzyć żadnego z zablokowanych i zaszyfrowanych kontenerów.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Możliwe, że hasło jest nieprawidłowe. Naciśnij przycisk „Skanuj”, aby spróbować ponownie z innym hasłem.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Wolumin %1 na dysku %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2480,41 +2462,37 @@ Niezalecane, chyba że gwarantuje się, że nośnik instalacyjny jest wolny od b
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastąp instalację w %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Odblokuj zaszyfrowane woluminy</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Hasło:</translation>
+        <translation>Hasło:</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignoruj ​​zaszyfrowane woluminy</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można odblokować zaszyfrowanej partycji: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można znaleźć partycji wymienionej w crypttab: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace the installation in %1 (%2)</source>
-        <translation type="vanished">Zastąp instalację w %1 (%2)</translation>
+        <translation>Nie udało się ponownie zablokować zaszyfrowanych urządzeń: %1</translation>
     </message>
 </context>
 <context>

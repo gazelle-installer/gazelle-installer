@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ca">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="ca">
 <context>
     <name>AutoPart</name>
     <message>
@@ -26,31 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>El disc del sistema i el de la carpeta de l&apos;usuari no poden ser el mateix per a aquest tipus d&apos;instal·lació.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formata i usa els discs sencers per a %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Disc del sistema: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Disc de la carpeta de l&apos;usuari: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Formata i usa tot el disc sencer (%1) per %2</translation>
+        <translation>Formata i usa tot el disc sencer per a %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -62,7 +56,7 @@ Mínim: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Suport mínim per a la hibernació: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -235,7 +229,7 @@ Mínim: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation>Versió desconeguda</translation>
     </message>
 </context>
 <context>
@@ -360,10 +354,6 @@ Gaudiu usant %1</translation>
         <translation>No s&apos;ha pogut trobar la unitat seleccionada.</translation>
     </message>
     <message>
-        <source>Unable to prepare for replacement.</source>
-        <translation type="vanished">No es pot preparar per a la substitució.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="676"/>
         <source>The home directory for %1 already exists.</source>
         <translation>El directori d&apos;usuari per a %1 ja hi és.</translation>
@@ -406,12 +396,12 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Disc dual</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation>Si el sistema té diverses unitats d&apos;emmagatzematge, aquesta opció us permet tenir els fitxers del sistema en una unitat (el disc del sistema), mentre que les dades de tots els usuaris són en un disc independent (el de la carpeta de l&apos;usuari).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -453,24 +443,24 @@ Gaudiu usant %1</translation>
         <location filename="../minstall.cpp" line="838"/>
         <location filename="../minstall.cpp" line="858"/>
         <source>Encryption</source>
-        <translation>Xifratge</translation>
+        <translation>Encriptació</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="741"/>
         <location filename="../minstall.cpp" line="839"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
-        <translation>Es pot xifrar amb LUKS. Caldrà una contrasenya.</translation>
+        <translation>Es pot encriptar amb LUKS. Caldrà una contrasenya.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="742"/>
         <location filename="../minstall.cpp" line="840"/>
         <source>A separate unencrypted boot partition is required.</source>
-        <translation>Cal una partició d&apos;arrencada diferent, no xifrada.</translation>
+        <translation>Cal una partició d&apos;arrencada diferent, no encriptada.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="743"/>
         <source>When encryption is used with autoinstall, the separate boot partition will be automatically created.</source>
-        <translation>Quan s&apos;usa encriptació amb autoinstall, es crea automàticament una partició separada sense xifrar.</translation>
+        <translation>Quan s&apos;usa encriptació amb autoinstall, es crea automàticament una partició separada sense encriptar.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="744"/>
@@ -511,12 +501,12 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquesta funció està dissenyada per substituir una instal·lació feta mitjançant el mètode d&apos;instal·lació normal i pot fallar la substitució d&apos;una instal·lació per una disposició o un esquema d&apos;emmagatzematge complexos. Es pot produir corrupció o pèrdua de dades.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Per substituir una instal·lació per una disposició o un esquema d&apos;emmagatzematge complexos, es recomana usar l&apos;opció de disseny personalitzat.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -612,7 +602,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="789"/>
         <source>&lt;i&gt;Encrypt&lt;/i&gt; - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.</source>
-        <translation>&lt;i&gt;Xifrat&lt;/i&gt; - Usa el xifratge LUKS per aquesta partició. La contrasenya s&apos;aplica a totes les particions xifrades.</translation>
+        <translation>&lt;i&gt;Encriptació&lt;/i&gt; - Usa l&apos;encriptació de LUKS per a aquesta partició. La contrasenya s&apos;aplica a totes les particions encriptades.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="790"/>
@@ -727,12 +717,12 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="820"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
-        <translation>Aquesta partició normalment només és necessària per particions arrel en dispositius virtuals com els xifrats, LVM o volums RAID per programari.</translation>
+        <translation>Aquesta partició normalment només és necessària per particions arrel en dispositius virtuals com els encriptats, LVM o volums RAID per programari.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="821"/>
         <source>It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.</source>
-        <translation>Conté un kernel bàsic i els controladors usats per accedir a un disc xifrat o dispositius virtuals.</translation>
+        <translation>Conté un nucli bàsic i els controladors usats per accedir a un disc encriptat o dispositius virtuals.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="822"/>
@@ -797,12 +787,12 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="841"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
-        <translation>Per preservar una partició xifrada, feu-hi clic dret i seleccioneu &lt;b&gt;Desbloqueja&lt;/b&gt;. Al diàleg que apareix, entreu el nom i la contrasenya del dispositiu virtual. Quan es desbloqueja el dispositiu, el nom que heu triat apareixerà a  &lt;i&gt;Dispositius Virtuals&lt;/i&gt;, amb opcions semblants a una partició normal.</translation>
+        <translation>Per preservar una partició encriptada, feu-hi clic dret i seleccioneu &lt;b&gt;Desbloca&lt;/b&gt;. Al diàleg que apareix, escriviu el nom i la contrasenya del dispositiu virtual. Quan es desbloca el dispositiu, el nom que heu triat apareixerà a  &lt;i&gt;Dispositius Virtuals&lt;/i&gt;, amb opcions semblants a una partició normal.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="843"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
-        <translation>Per tal que una partició xifrada es desbloquegi en arrencar,  cal que l&apos;afegiu al fitxer crypttab. Useu l&apos;acció del menú&lt;b&gt;Afegeix a crypttab&lt;/b&gt; per fer-ho. </translation>
+        <translation>Per tal que una partició encriptada es desbloqui en arrencar,  cal que l&apos;afegiu al fitxer crypttab. Useu l&apos;acció del menú&lt;b&gt;Afegeix a crypttab&lt;/b&gt; per fer-ho. </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="844"/>
@@ -852,7 +842,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="859"/>
         <source>You have chosen to encrypt at least one volume, and more information is required before continuing.</source>
-        <translation>Heu triat xifrar com a mínim un volum i cal més informació abans de continuar.</translation>
+        <translation>Heu triat encriptar com a mínim un volum i cal més informació abans de continuar.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="864"/>
@@ -908,7 +898,7 @@ Gaudiu usant %1</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation>Experimental</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1310,10 +1300,6 @@ Gaudiu usant %1</translation>
         <translation>Trieu el tipus d&apos;instal·lació</translation>
     </message>
     <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Usa el disc:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="414"/>
         <source>Root</source>
         <translation>Arrel</translation>
@@ -1333,7 +1319,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../meinstall.ui" line="534"/>
         <source>Encrypt</source>
-        <translation>Xifra</translation>
+        <translation>Encripta</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1121"/>
@@ -1348,17 +1334,17 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Disc dual</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disc del sistema:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disc de la carpeta de l&apos;usuari:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1448,12 +1434,12 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../meinstall.ui" line="791"/>
         <source>Encryption options</source>
-        <translation>Opcions de xifratge</translation>
+        <translation>Opcions d&apos;encriptació</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="797"/>
         <source>Encryption password:</source>
-        <translation>Contrasenya de xifratge: </translation>
+        <translation>Contrasenya d&apos;encriptació: </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="814"/>
@@ -1915,7 +1901,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../partman.cpp" line="710"/>
         <source>Unlock Drive</source>
-        <translation>Desbloqueja la unitat</translation>
+        <translation>Desbloca la unitat</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="714"/>
@@ -1926,10 +1912,6 @@ Gaudiu usant %1</translation>
         <location filename="../partman.cpp" line="746"/>
         <source>Could not unlock device.</source>
         <translation>No s&apos;ha pogut desblocar el dispositiu.</translation>
-    </message>
-    <message>
-        <source>Possible incorrect password .</source>
-        <translation type="vanished">Possible contrasenya incorrecta.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="776"/>
@@ -1979,7 +1961,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Possible contrasenya incorrecta.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2049,7 +2031,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../partman.cpp" line="933"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
-        <translation>Cal triar una partició d&apos;arrencada separada quan es xifra l&apos;arrel.</translation>
+        <translation>Cal triar una partició d&apos;arrencada separada quan s&apos;encripta l&apos;arrel.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="971"/>
@@ -2209,7 +2191,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../partman.cpp" line="1824"/>
         <source>Encrypt</source>
-        <translation>Xifra</translation>
+        <translation>Encripta</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1825"/>
@@ -2405,7 +2387,7 @@ Arrencarà automàticament si s&apos;ha instal·lat amb l&apos;opció --oem.</tr
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Instal·lació amb rsync  en comptes de cp en fer particions a mida. 
--- No formata /root i no funciona amb xifratge.</translation>
+-- No formata /root i no funciona amb encriptació.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>
@@ -2460,17 +2442,17 @@ No es recomana, llevat que el suport d&apos;instal·lació garanteixi estar lliu
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation>No s&apos;ha pogut obrir cap dels contenidors encriptats blocats.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Possible contrasenya incorrecta. Premeu el botó d&apos;escanejar per tornar-ho a provar amb una contrasenya diferent.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Volum %1 al disc %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2480,41 +2462,37 @@ No es recomana, llevat que el suport d&apos;instal·lació garanteixi estar lliu
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Substitueix la instal·lació %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Desbloca els volums encriptats</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Contrasenya: </translation>
+        <translation>Contrasenya: </translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignora els volums encriptats</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No es pot desblocar la partició encriptada: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No es pot trobar la partició llistada a crypttab: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace the installation in %1 (%2)</source>
-        <translation type="vanished">Substitueix la instal·lació a %1 (%2)</translation>
+        <translation>No s&apos;han pogut tornar a blocar els discs encriptats: %1</translation>
     </message>
 </context>
 <context>

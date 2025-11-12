@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="sq">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="sq">
 <context>
     <name>AutoPart</name>
     <message>
@@ -26,31 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Për këtë lloj instalimi, pjesët sistem dhe shtëpi s’mund të jenë të njëjta.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato dhe përdor plotësisht disqe për %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pjesë sistemi: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pjesë shtëpi: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Formato dhe përdor krejt diskun (%1) për %2</translation>
+        <translation>Formato dhe përdor tërë pjesën për %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -62,7 +56,7 @@ Minimumi: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum për mbulim dimërimi: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -235,7 +229,7 @@ Shtëpia e %2%</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation>Hedhje e panjohur në qarkullim</translation>
     </message>
 </context>
 <context>
@@ -360,10 +354,6 @@ Shijoni përdorimin e %1-it</translation>
         <translation>S’gjendet dot disku i përzgjedhur.</translation>
     </message>
     <message>
-        <source>Unable to prepare for replacement.</source>
-        <translation type="vanished">S’arrihet të përgatitet për zëvendësim.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="676"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Drejtoria shtëpi për %1 ekziston tashmë.</translation>
@@ -406,12 +396,12 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Dypjesësh</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation>Nëse sistemi juaj ka disa pjesë depozitë, kjo mundësi ju lejon të keni kartelat e sistemit në një pjesë (pjesa e Sistemit), teksa mbahen të dhënat e krejt përdoruesve në një pjesë më vete (pjesa Shtëpi).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -511,12 +501,12 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjo veçori është hartuar për të zëvendësuar një instalim të kryer me metodën e rregullt të instalimit dhe mund të mos arrijë të zëvendësojë një instalim me një skemë komplekse pjesësh apo depozitash. Mund të ndodhë dëmtim ose humbje të dhënash.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Që të zëvendësoni një instalim me një skemë komplekse pjesësh apo depozitash, rekomandohet të përdoret mundësia “skemë vetjake”.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -908,7 +898,7 @@ Shijoni përdorimin e %1-it</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation>Eksperimentale</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1227,7 +1217,7 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../meinstall.ui" line="51"/>
         <source>Live Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="72"/>
@@ -1310,10 +1300,6 @@ Shijoni përdorimin e %1-it</translation>
         <translation>Përzgjidhni lloj instalimi</translation>
     </message>
     <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Përdor diskun:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="414"/>
         <source>Root</source>
         <translation>Rrënjë</translation>
@@ -1348,17 +1334,17 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Dypjesësh</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pjesë sistemi:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pjesë Shtëpi:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1928,10 +1914,6 @@ Shijoni përdorimin e %1-it</translation>
         <translation>S’u shkyç dot pajisje.</translation>
     </message>
     <message>
-        <source>Possible incorrect password .</source>
-        <translation type="vanished">Me gjasa fjalëkalim i pasaktë .</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="776"/>
         <source>Failed to close %1</source>
         <translation>S’u arrit të mbyllet %1</translation>
@@ -1979,7 +1961,7 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Me gjasa fjalëkalim i pasaktë.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2229,12 +2211,12 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../partman.cpp" line="1828"/>
         <source>Dump</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1829"/>
         <source>Pass</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1837"/>
@@ -2460,17 +2442,17 @@ Nuk rekomandohet, veç nëse është e garantuar se media e instalimit është p
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation>S’u arrit të hapet ndonjë nga kontejnerët e fshehtëzuar të kyçur.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Me gjasa fjalëkalim i pasaktë. Shtypni butonin “Kontrollo” që të riprovoni me një fjalëkalim tjetër.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vëllimi %1 te pjesa %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2480,41 +2462,37 @@ Nuk rekomandohet, veç nëse është e garantuar se media e instalimit është p
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Zëvendëso instalimin te %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Shkyç vëllimet e fshehtëzuar</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Fjalëkalim:</translation>
+        <translation>Fjalëkalim:</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Shpërfilli vëllimet e fshehtëzuar</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>S’shkyçet dot pjesë e fshehtëzuar: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>S’gjendet dot pjesë e radhitur te crypttab: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace the installation in %1 (%2)</source>
-        <translation type="vanished">Zëvendëso instalimin te %1 (%2)</translation>
+        <translation>S’u rikyç dot pajisje() e fshehtëzuar: %1</translation>
     </message>
 </context>
 <context>

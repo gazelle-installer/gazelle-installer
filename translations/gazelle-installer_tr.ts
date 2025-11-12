@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="tr">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="tr">
 <context>
     <name>AutoPart</name>
     <message>
@@ -16,7 +14,7 @@
     <message>
         <location filename="../autopart.cpp" line="175"/>
         <source>The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../autopart.cpp" line="177"/>
@@ -26,31 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Tüm diski (%1) %2 için biçimlendirin ve kullanın.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -62,7 +56,7 @@ En az: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -164,7 +158,7 @@ En az: %2</translation>
     <message>
         <location filename="../checkmd5.cpp" line="76"/>
         <source>The installation media is still being checked.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="77"/>
@@ -235,7 +229,7 @@ En az: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -248,17 +242,17 @@ En az: %2</translation>
     <message>
         <location filename="../minstall.cpp" line="176"/>
         <source>You are running 32-bit OS started in 64-bit UEFI mode.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="177"/>
         <source>The system will not be able to boot unless you restart the system in Legacy Boot (or similar mode) before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="179"/>
         <source>Do you want to continue the installation?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="216"/>
@@ -273,12 +267,12 @@ En az: %2</translation>
     <message>
         <location filename="../minstall.cpp" line="228"/>
         <source>Support %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="229"/>
         <source>%1 is supported by people like you. Some help others at the support forum, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="266"/>
@@ -341,12 +335,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="504"/>
         <source>Invalid settings found in configuration file (%1).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="505"/>
         <source>Please review marked fields as you encounter them.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="591"/>
@@ -357,7 +351,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="634"/>
         <source>Cannot find selected drive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="676"/>
@@ -402,12 +396,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -482,37 +476,37 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="748"/>
         <location filename="../minstall.cpp" line="753"/>
         <source>Replace existing installation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="748"/>
         <source>Replace existing installation option will attempt to replace an existing installation with the same disk configuration as the existing installation.  Home directories are preserved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="754"/>
         <source>If you have an existing installation, you can use this function to replace it with a fresh installation.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="755"/>
         <source>This is particularly useful if you are upgrading from a previous version and want to preserve your data.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="757"/>
         <source>There is no guarantee of this working successfully. Ensure you have a good working backup of all important data before continuing.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -848,7 +842,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="859"/>
         <source>You have chosen to encrypt at least one volume, and more information is required before continuing.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="864"/>
@@ -888,12 +882,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="880"/>
         <source>Generate host-specific initramfs will try to create an initramfs tailored for the particular device rather than a generic all-purpose initramfs. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="888"/>
         <source>Zram swap is a method of putting swap space in RAM.  A compressed swap device is placed in RAM.  It may be used in conjunction with other forms of swap, or on its own.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="885"/>
@@ -904,7 +898,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -924,32 +918,32 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="894"/>
         <source>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="899"/>
         <source>Computer Identity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="900"/>
         <source>The computer name is a common unique name which will identify your computer if it is on a network.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="901"/>
         <source>The computer domain is unlikely to be used unless your ISP or local network requires it.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="902"/>
         <source>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="904"/>
         <source>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="909"/>
@@ -994,27 +988,27 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="924"/>
         <source>Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="926"/>
         <source>Root (administrator) account</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="927"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="929"/>
         <source>The root account is disabled on MX Linux, as administrative tasks are performed with an elevation prompt for the default user.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="930"/>
         <source>Enabling the root account is strongly recommended for antiX Linux.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="931"/>
@@ -1130,27 +1124,27 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="985"/>
         <source>Congratulations!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="986"/>
         <source>You have completed the installation of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="987"/>
         <source>Finding Applications</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="988"/>
         <source>There are hundreds of excellent applications installed with %1. The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="992"/>
         <source>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="994"/>
@@ -1180,12 +1174,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="1136"/>
         <source>The installation and configuration is incomplete.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1137"/>
         <source>Do you really want to stop now?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1214"/>
@@ -1306,10 +1300,6 @@ Enjoy using %1</source>
         <translation>Kurulum türünü seçin</translation>
     </message>
     <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Şu diski kullan:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="414"/>
         <source>Root</source>
         <translation>Kök</translation>
@@ -1344,17 +1334,17 @@ Enjoy using %1</source>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1364,12 +1354,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../meinstall.ui" line="551"/>
         <source>Replace existing installation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="590"/>
         <source>Replace an existing installation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="612"/>
@@ -1379,22 +1369,22 @@ Enjoy using %1</source>
     <message>
         <location filename="../meinstall.ui" line="617"/>
         <source>Installation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="625"/>
         <source>Scan for existing installations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="646"/>
         <source>Replacement options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="652"/>
         <source>Attempt to upgrade packages</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="663"/>
@@ -1439,7 +1429,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../meinstall.ui" line="761"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="791"/>
@@ -1514,7 +1504,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../meinstall.ui" line="1018"/>
         <source>Generate host-specific initramfs image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1051"/>
@@ -1540,22 +1530,22 @@ Enjoy using %1</source>
     <message>
         <location filename="../meinstall.ui" line="1131"/>
         <source>Enable zram swap</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1143"/>
         <source>Allocate based on RAM:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1172"/>
         <source>Recommended maximum: 100%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1179"/>
         <source>Allocate fixed size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1223"/>
@@ -1763,14 +1753,14 @@ Enjoy using %1</source>
     <message>
         <location filename="../oobe.cpp" line="336"/>
         <source>The computer name contains invalid characters.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../oobe.cpp" line="337"/>
         <location filename="../oobe.cpp" line="348"/>
         <location filename="../oobe.cpp" line="511"/>
         <source>Please choose a different name before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../oobe.cpp" line="343"/>
@@ -1780,7 +1770,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../oobe.cpp" line="347"/>
         <source>The computer domain contains invalid characters.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../oobe.cpp" line="356"/>
@@ -1790,12 +1780,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../oobe.cpp" line="516"/>
         <source>The user name cannot contain special characters or spaces.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../oobe.cpp" line="526"/>
         <source>The chosen user name is in use.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../oobe.cpp" line="535"/>
@@ -1810,7 +1800,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../oobe.cpp" line="545"/>
         <source>You did not provide a password for the root account.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../oobe.cpp" line="558"/>
@@ -1921,7 +1911,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../partman.cpp" line="746"/>
         <source>Could not unlock device.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="776"/>
@@ -1966,12 +1956,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../partman.cpp" line="874"/>
         <source>Re-use partition table on %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2061,7 +2051,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>This setup may produce an unbootable system. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1016"/>
@@ -2181,7 +2171,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../partman.cpp" line="1820"/>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1821"/>
@@ -2315,7 +2305,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../app.cpp" line="94"/>
         <source>Gazelle Installer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../app.cpp" line="97"/>
@@ -2325,7 +2315,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../app.cpp" line="100"/>
         <source>Enable advanced settings, even in regular installation mode.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../app.cpp" line="101"/>
@@ -2429,12 +2419,12 @@ Kurulum ortamının hatasız olduğu garanti edilmedikçe önerilmez.</translati
     <message>
         <location filename="../app.cpp" line="148"/>
         <source>The installer appears to be running already.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../app.cpp" line="149"/>
         <source>Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../app.cpp" line="155"/>
@@ -2452,57 +2442,57 @@ Kurulum ortamının hatasız olduğu garanti edilmedikçe önerilmez.</translati
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
         <source>No existing installation selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Parola:</translation>
+        <translation>Parola:</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2510,12 +2500,12 @@ Kurulum ortamının hatasız olduğu garanti edilmedikçe önerilmez.</translati
     <message>
         <location filename="../swapman.cpp" line="57"/>
         <source>Recommended maximum: %1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../swapman.cpp" line="60"/>
         <source>Unable to query RAM size.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../swapman.cpp" line="84"/>
@@ -2530,7 +2520,7 @@ Kurulum ortamının hatasız olduğu garanti edilmedikçe önerilmez.</translati
     <message>
         <location filename="../swapman.cpp" line="104"/>
         <source>Failed to configure zram swap.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../swapman.cpp" line="114"/>

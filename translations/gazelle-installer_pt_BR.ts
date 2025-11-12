@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt_BR">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pt_BR">
 <context>
     <name>AutoPart</name>
     <message>
@@ -16,7 +14,7 @@
     <message>
         <location filename="../autopart.cpp" line="175"/>
         <source>The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
-        <translation>A unidade que foi selecionada tem a capacidade mínima de 2 TB e deve ser formatada utilizando o GPT. Em alguns computadores, um disco (Sata, SSD, NVMe, etc.) quando é formatado com o GPT o sistema operacional não consegue inicializar.</translation>
+        <translation>A unidade de armazenamento que foi selecionada tem a capacidade mínima de 2 TB e deve ser formatada utilizando o GPT. Em alguns computadores, uma  de armazenamento (disco rígido Sata, SSD, NVMe, etc.) quando é formatado com o GPT o sistema operacional não consegue inicializar.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="177"/>
@@ -26,43 +24,39 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Para este tipo de instalação, a unidade de armazenamento do sistema operacional e a unidade de armazenamento da pasta pessoal não podem ser os mesmos</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatar e utilizar a unidades de armazenamento exclusivamente para %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidade de armazenamento do sistema operacional %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidade de armazenamento da pasta pessoal %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="vanished">Formatar e utilizar o disco todo (%1) para %2</translation>
+        <translation>Formatar e utilizar toda a unidade de armazenamento para %1 de %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
         <source>Recommended: %1
 Minimum: %2</source>
-        <translation>Recomendado: %1
-Mínimo: %2</translation>
+        <translation>É recomendado %1
+E no mínimo %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>O mínimo para ativar o suporte à hibernação é %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -235,7 +229,7 @@ Mínimo: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"></translation>
+        <translation>A versão não é conhecida</translation>
     </message>
 </context>
 <context>
@@ -357,11 +351,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="634"/>
         <source>Cannot find selected drive.</source>
-        <translation>Não foi possível encontrar a unidade selecionada.</translation>
-    </message>
-    <message>
-        <source>Unable to prepare for replacement.</source>
-        <translation type="vanished">Não foi possível preparar a substituição da instalação.</translation>
+        <translation>Não foi possível encontrar a unidade de armazenamento selecionada.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="676"/>
@@ -406,12 +396,12 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Duas ou mais unidades de armazenamento</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"></translation>
+        <translation>Se você tiver várias unidades de armazenamento, esta opção permite que você tenha os arquivos do sistema operacional em uma unidade de armazenamento (a unidade do sistema operacional), enquanto mantém os dados de todos os usuários em uma unidade de armazenamento separada (a unidade de armazenamento pessoal).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -446,7 +436,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="738"/>
         <source>Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier. This can also improve overall performance by constraining the system files to a defined portion of the drive.</source>
-        <translation>Manter a pasta ‘home’ em uma partição separada aumenta a confiabilidade nas atualizações do sistema operacional. Também torna a cópia de segurança e a recuperação dos dados mais fáceis. Este recurso também pode melhorar o desempenho geral, restringindo os arquivos do sistema operacional em uma partição definida do dispositivo de armazenamento.</translation>
+        <translation>Manter a pasta ‘home’ em uma partição separada aumenta a confiabilidade nas atualizações do sistema operacional. Também torna a cópia de segurança e a recuperação dos dados mais fáceis. Este recurso também pode melhorar o desempenho geral, restringindo os arquivos do sistema operacional em uma partição definida no dispositivo de armazenamento.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="740"/>
@@ -511,12 +501,12 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este recurso foi projetado para substituir uma instalação que utilizou o método de instalação regular e pode não conseguir substituir uma instalação com um leiaute ou um esquema de armazenamento complexo. Pode corromper os dados ou ocorrer a perda dos dados na unidade de armazenamento.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Para substituir uma instalação com um leiaute ou um esquema de armazenamento complexo, recomenda-se utilizar a opção do leiaute personalizado.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -657,7 +647,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="801"/>
         <source>A variety of actions are available by right-clicking any drive or partition item in the list.</source>
-        <translation>Uma variedade de ações estão disponíveis clicando com o botão direito do rato/mouse em qualquer unidade ou item de partição da lista.</translation>
+        <translation>Uma variedade de ações estão disponíveis clicando com o botão direito em cima de qualquer unidade de armazenamento ou em um item de uma partição da lista.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="802"/>
@@ -667,7 +657,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="803"/>
         <source>The installer cannot modify the layout already on the drive. To create a custom layout, mark the drive for a new layout with the &lt;b&gt;New layout&lt;/b&gt; menu action or button (%1). This clears the existing layout.</source>
-        <translation>O instalador não pode modificar o leiaute já existente em uma unidade. Para criar um leiaute personalizado, marque a unidade para um novo leiaute com a ação de menu &lt;b&gt;Novo Leiaute&lt;/b&gt; ou com o botão (%1). Isto limpará o leiaute existente.</translation>
+        <translation>O instalador não pode modificar o leiaute já existente em uma unidade de armazenamento. Para criar um leiaute personalizado, marque ou selecione a unidade de armazenamento para um novo leiaute com a ação de menu &lt;b&gt;Novo Leiaute&lt;/b&gt; ou com o botão (%1). Isto limpará o leiaute existente.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="806"/>
@@ -697,7 +687,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="813"/>
         <source>The active partition of a drive can be chosen using the &lt;b&gt;Active partition&lt;/b&gt; menu action.</source>
-        <translation>A partição ativa de uma unidade pode ser escolhida utilizando a ação do menu &lt;b&gt;Partição Ativa&lt;/b&gt;</translation>
+        <translation>A partição ativa de uma unidade de armazenamento pode ser escolhida utilizando a ação do menu &lt;b&gt;Partição Ativa&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="814"/>
@@ -742,7 +732,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="823"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
-        <translation>Ao utilizar uma unidade com formato GPT (GUID Partition Table ou Tabela de Partição GUID) em um sistema não ESP (EFI System Partition ou Partição do Sistema EFI), uma partição de inicialização do BIOS de 1MB é necessária ao utilizar o GRUB (GNU GRand Unified Bootloader ou Carregador de Inicialização Unificado GRand).</translation>
+        <translation>Ao utilizar uma unidade de armazenamento com formato GPT (GUID Partition Table ou Tabela de Partição GUID) em um sistema não ESP (EFI System Partition ou Partição do Sistema EFI), uma partição de inicialização do BIOS de 1 MB é necessária ao utilizar o GRUB (GNU GRand Unified Bootloader ou Carregador de Inicialização Unificado GRand).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="824"/>
@@ -752,7 +742,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="825"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
-        <translation>Basta clicar com o botão direito em uma unidade e selecionar &lt;b&gt;Criador de Leiautes&lt;/b&gt; no menu. Esta opção pode criar um leiaute semelhante ao da instalação normal.</translation>
+        <translation>Basta clicar com o botão direito em uma unidade de armazenamento e selecionar &lt;b&gt;Criador de Leiautes&lt;/b&gt; no menu. Esta opção pode criar um leiaute semelhante ao da instalação normal.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="826"/>
@@ -792,7 +782,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="835"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
-        <translation>Para obter mais controle sobre os leiautes da unidade (como modificar o leiaute existente em um disco), clique no botão do gerenciador de partições (%1). Esta opção executará a ferramenta de gerenciamento de partições do sistema operacional, que permitirá que você crie o leiaute exato de que precisa.</translation>
+        <translation>Para obter mais controle sobre os leiautes da unidade de armazenamento (como modificar o leiaute existente em um dispositivo de armazenamento), clique no botão do gerenciador de partições (%1). Esta opção executará a ferramenta de gerenciamento de partições do sistema operacional, que permitirá que você crie o leiaute exato de que precisa.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="841"/>
@@ -802,7 +792,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="843"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
-        <translation>Para que a partição criptografada/encriptada seja desbloqueada na inicialização, ela precisa ser adicionada ao arquivo crypttab. Utilize a ação do menu &lt;b&gt;Adicionar ao crypttab&lt;/b&gt; para fazer isto.</translation>
+        <translation>Para que a partição criptografada/encriptada seja desbloqueada na inicialização, ela precisa ser adicionada ao arquivo ‘crypttab’. Utilize a ação do menu &lt;b&gt;Adicionar ao crypttab&lt;/b&gt; para fazer isto.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="844"/>
@@ -812,7 +802,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="845"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
-        <translation>O instalador permite que outras partições sejam criadas ou utilizadas para outros fins, no entanto, esteja ciente de que os sistemas mais antigos não podem lidar com acionamentos de unidades com mais de 4 partições.</translation>
+        <translation>O instalador permite que outras partições sejam criadas ou utilizadas para outros fins, no entanto, esteja ciente de que os computadores mais antigos não podem lidar com acionamentos de unidades de armazenamento com mais de 4 partições.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="846"/>
@@ -908,7 +898,7 @@ Divirta-se utilizando o %1.</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"></translation>
+        <translation>Este é um recurso experimental</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1310,10 +1300,6 @@ Divirta-se utilizando o %1.</translation>
         <translation>Selecionar o tipo de instalação</translation>
     </message>
     <message>
-        <source>Use disk:</source>
-        <translation type="vanished">Utilizar o disco:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="414"/>
         <source>Root</source>
         <translation>Root</translation>
@@ -1348,17 +1334,17 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Acionamento duplo</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidade de armazenamento do sistema operacional:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidade de armazenamento da pasta pessoal:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1408,7 +1394,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../meinstall.ui" line="672"/>
         <source>Mark the selected drive to be cleared for a new layout.</source>
-        <translation>Marque a unidade selecionada para ser limpa para um novo leiaute.</translation>
+        <translation>Marque ou selecione a unidade de armazenamento para ser limpa e para ser criado um novo leiaute.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="683"/>
@@ -1433,7 +1419,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../meinstall.ui" line="725"/>
         <source>Query the operating system and reload the layouts of all drives.</source>
-        <translation>Consulte o sistema operacional e recarregue os leiautes de todas as unidades.</translation>
+        <translation>Consulte o sistema operacional e recarregue os leiautes de todas as unidades de armazenamento.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1880,7 +1866,7 @@ Divirta-se utilizando o %1.</translation>
         <location filename="../partman.cpp" line="546"/>
         <location filename="../partman.cpp" line="716"/>
         <source>Add to crypttab</source>
-        <translation>Adicionar o crypttab (tabela de dispositivos criptografados)</translation>
+        <translation>Adicionar o crypttab</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="553"/>
@@ -1926,10 +1912,6 @@ Divirta-se utilizando o %1.</translation>
         <location filename="../partman.cpp" line="746"/>
         <source>Could not unlock device.</source>
         <translation>Não foi possível desbloquear o dispositivo.</translation>
-    </message>
-    <message>
-        <source>Possible incorrect password .</source>
-        <translation type="vanished">Possivelmente a senha não está correta.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="776"/>
@@ -1979,7 +1961,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation>É possível que a senha não esteja correta.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -1989,7 +1971,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../partman.cpp" line="886"/>
         <source>Format %1</source>
-        <translation>Formato %1</translation>
+        <translation>Formatar %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="887"/>
@@ -2084,12 +2066,12 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../partman.cpp" line="1046"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
-        <translation>As seguintes unidades são, ou serão, configuradas com GPT (GUID Partition Table ou Tabela de Partição GUID), mas não têm uma partição BIOS-GRUB:</translation>
+        <translation>As seguintes unidades de armazenamento são, ou serão, configuradas com GPT (GUID Partition Table ou Tabela de Partição GUID), mas não têm uma partição do tipo BIOS-GRUB:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1048"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
-        <translation>Este sistema não pode inicializar a partir de unidades GPT sem uma partição BIOS-GRUB.</translation>
+        <translation>Este sistema não pode inicializar a partir de unidades de armazenamento GPT sem uma partição do tipo BIOS-GRUB.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1087"/>
@@ -2346,8 +2328,8 @@ Divirta-se utilizando o %1.</translation>
         <location filename="../app.cpp" line="103"/>
         <source>Overrules sanity checks on partitions and drives, causing them to be displayed.
 -- WARNING: this can break things, use it only if you don&apos;t care about data on drive.</source>
-        <translation>Anula as verificações de integridade em partições e unidades, fazendo com que sejam exibidas.
-- ATENÇÃO: esta opção pode danificar os seus dados, utilize-a somente se você não se importar com os dados contidos na unidade.</translation>
+        <translation>Anula as verificações de integridade em partições e unidades de armazenamento fazendo com que sejam exibidas.
+- ATENÇÃO: esta opção pode danificar os seus dados, utilize-a somente se você não se importar com os dados contidos na unidade de armazenamento.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="105"/>
@@ -2459,17 +2441,17 @@ Not recommended unless the installation media is guaranteed to be free from erro
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível abrir nenhum dos contêineres que estão bloqueados por criptografia.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"></translation>
+        <translation>É possível que a senha não esteja correta. Por favor, clique no botão ‘Verificar os subvolumes’ para tentar novamente com uma senha diferente.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume %1 na unidade %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2479,41 +2461,37 @@ Not recommended unless the installation media is guaranteed to be free from erro
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Substituir a instalação %1 em %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Desbloquear os volumes que estão criptografados</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
         <source>Password:</source>
-        <translation type="unfinished">Senha:</translation>
+        <translation>Senha:</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorar os volumes que estão criptografados</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível desbloquear a partição criptografada %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível encontrar a partição listada no arquivo ‘crypttab’ (tabela de dispositivos criptografados) %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replace the installation in %1 (%2)</source>
-        <translation type="vanished">Substituir a instalação em %1 de %2</translation>
+        <translation>Não foi possível bloquear novamente o(s) dispositivo(s) criptografado(s) %1</translation>
     </message>
 </context>
 <context>
