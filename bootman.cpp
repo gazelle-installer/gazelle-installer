@@ -180,10 +180,12 @@ void BootMan::install(const QStringList &cmdextra)
 
             // Copy fallback files (not copied above because of --no-nvram switch).
             if (espdev != nullptr) {
-                const QString &espdst = espdev->mountPoint() + "/EFI/"_L1;
-                const QString &espsrc = espdst + loaderID;
-                if (QFile(espsrc + "/fbx64.efi").exists()) {
-                    proc.exec(u"cp"_s, {u"-p"_s, espsrc + "/fbx64.efi"_L1, espdst + "BOOT/"_L1});
+                QString espdst = espdev->mountPoint() + "/EFI/"_L1;
+                QString espsrc = espdst + loaderID;
+                QString fbx64efi = espsrc + "/fbx64.efi";
+                //file check is on /mnt/antiX as this command does not act in the chroot
+                if (QFile("/mnt/antiX" + fbx64efi).exists()) {
+                    proc.exec(u"cp"_s, {u"-p"_s, fbx64efi, espdst + "BOOT/"_L1});
                 }
                 core.mkpath("/mnt/antiX"_L1 + espdst + "debian/"_L1);
                 proc.exec(u"cp"_s, {u"-p"_s, espsrc + "/grub.cfg"_L1, espdst + "debian/"_L1});
