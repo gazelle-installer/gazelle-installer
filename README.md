@@ -47,6 +47,18 @@ Versioning
 ----------
 Because both MX Linux and antiX Linux use packages with slightly different version numbers, both of which are date-based, this versioning scheme identifies the state of the common code base in this repository.
 
+### Version 6 (MX and antiX 25)
+Now uses Qt 6, and will no longer compile with Qt 5.
+Build system migrated from qmake to CMake.
+Significant changes to minstall(ed).conf configuration files, incompatible with previous versions.
+Major performance improvements to MD5 check, which now runs concurrently with information gathering.
+Support for dual drives (system and home) setup in regular installation.
+Added tool to replace an existing MX Linux or antiX Linux installation (designed for regular installs).
+Swap space configuration moved to separate page, which now includes zram swap settings.
+Improved secure boot support for GRUB.
+Added boot loader optimization settings.
+Added --advanced option to display boot loader page (and other settings) even on regular installs.
+
 ### Version 5 (MX and antiX 23)
 Many partition manager fixes and improvements. Support for virtual devices (eg LUKS or LVM).
 Swap file and hibernation support, and Btrfs improvements.
