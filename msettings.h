@@ -39,7 +39,7 @@ class MIni
         Group *parent;
         Group(Group *parent, const QString &name) noexcept;
         ~Group() noexcept;
-        QString path() const noexcept;
+        QString path(bool full) const noexcept;
         // Copy and move constructors will cause dangling pointers here.
         Group(const Group &) = delete;
         Group &operator=(const Group &) = delete;
@@ -58,9 +58,8 @@ class MIni
         int level() noexcept;
     };
     std::vector<Group *> sections;
-    std::vector<int> groupPath;
     int curSectionIndex = 0;
-    Group *currentGroup() const noexcept;
+    Group *currentGroup = nullptr;
 public:
     enum OpenMode {
         NotOpen = QIODeviceBase::NotOpen, // 0x0000

@@ -53,11 +53,11 @@ MIni::~MIni() noexcept
 
 void MIni::clear() noexcept
 {
-    groupPath.clear();
     sections.clear();
     // Implicit default unnamed section at the beginning.
     sections.emplace_back(new Group(nullptr, u""_s));
     curSectionIndex = 0;
+    currentGroup = sections[0];
 }
 bool MIni::load() noexcept
 {
@@ -72,22 +72,22 @@ bool MIni::load() noexcept
     Group *gpos = sections[0];
     while (!file.atEnd()) {
         const QByteArray &line = file.readLine().trimmed();
+        assert(gpos != nullptr);
         if (line.isEmpty() || line.startsWith(';') || line.startsWith('#')) {
             // Empty lines or comment lines to be ignored.
             continue;
         } else if (line.startsWith('[')) {
             // Section
-            if (line.size() < 3 || !line.endsWith(']') || !groupPath.empty()) {
+            if (line.size() < 3 || !line.endsWith(']') || gpos->parent != nullptr) {
                 return false; // Incomplete bracket set, empty section, or section inside a group.
             }
             sections.emplace_back(new Group(nullptr, line.mid(1, line.size()-2)));
             ++curSectionIndex;
             gpos = sections[curSectionIndex];
         } else if (line == "}") {
-            if (groupPath.size() <= 1) {
+            if (gpos->parent == nullptr) {
                 return false; // Mismatched group ending.
             }
-            groupPath.pop_back();
             gpos = gpos->parent;
         } else {
             const int delimpos = line.indexOf('=');
@@ -96,16 +96,15 @@ bool MIni::load() noexcept
                 gpos->settings.emplace_back(line.left(delimpos).trimmed(), line.mid(delimpos+1).trimmed());
             } else if (delimpos < 0 && line.endsWith('{')) {
                 // Group
-                assert(!groupPath.empty() && gpos != nullptr);
                 const QString name = line.chopped(1).trimmed();
-                groupPath.emplace_back(gpos->children.size()); // new index = size-1
                 gpos = new Group(gpos, name);
             } else {
                 return false; // Line starts with '=' or invalid group starter.
             }
         }
     }
-    return groupPath.empty(); // All groups must be closed at this point.
+    assert(gpos != nullptr);
+    return (gpos->parent == nullptr); // All groups must be closed at this point.
 }
 bool MIni::save() noexcept
 {
@@ -198,10 +197,10 @@ QString MIni::section() const noexcept
 }
 bool MIni::setSection(const QString &name, bool create) noexcept
 {
-    groupPath.clear();
     for (size_t ixi = 0; ixi < sections.size(); ++ixi) {
         if (name.compare(sections[ixi]->name, Qt::CaseInsensitive) == 0) {
             curSectionIndex = ixi;
+            currentGroup = sections[ixi];
             return true;
         }
     }
@@ -210,70 +209,59 @@ bool MIni::setSection(const QString &name, bool create) noexcept
         sections.emplace_back(new Group(nullptr, name));
         curSectionIndex = sections.size() - 1;
     }
+    currentGroup = sections[curSectionIndex];
     return false;
 }
 
 QString MIni::group() const noexcept
 {
-    assert(curSectionIndex < sections.size());
-    const Group *pos = sections[curSectionIndex];
-    QString path;
-    for (const int index : groupPath) {
-        assert(index < pos->children.size());
-        if (!path.isEmpty()) {
-            path.append('/');
-        }
-        path += pos->name;
-        pos = pos->children[index];
-    }
-    return path;
+    assert(currentGroup != nullptr);
+    return currentGroup->path(false);
 }
 bool MIni::setGroup(const QString &path, bool create) noexcept
 {
     bool found = false;
-    groupPath.clear();
     assert(curSectionIndex < sections.size());
-    Group *pgroup = sections[curSectionIndex];
+    currentGroup = sections[curSectionIndex];
     const QStringList &segments = path.split('/', Qt::SkipEmptyParts);
     for (const QString &name : segments) {
         found = false;
-        for (size_t ixi = 0; ixi < pgroup->children.size(); ++ixi) {
-            if (name.compare(pgroup->name, Qt::CaseInsensitive) == 0) {
-                groupPath.emplace_back(ixi);
-                pgroup = pgroup->children[ixi];
+        for (size_t ixi = 0; ixi < currentGroup->children.size(); ++ixi) {
+            if (name.compare(currentGroup->name, Qt::CaseInsensitive) == 0) {
+                currentGroup = currentGroup->children[ixi];
                 found = true;
                 break;
             }
         }
         // Group not found at this point.
         if (!found && create) {
-            new Group(pgroup, name);
-            groupPath.emplace_back(pgroup->children.size() - 1);
+            currentGroup = new Group(currentGroup, name);
         }
     }
     return found;
 }
 bool MIni::beginGroup(const QString &name, bool create) noexcept
 {
-    Group *pgroup = currentGroup();
-    for (size_t ixi = 0; ixi < pgroup->children.size(); ++ixi) {
-        const Group *g = pgroup->children[ixi];
+    for (size_t ixi = 0; ixi < currentGroup->children.size(); ++ixi) {
+        Group *g = currentGroup->children[ixi];
         assert (g != nullptr);
         if (name.compare(g->name, Qt::CaseInsensitive) == 0) {
-            groupPath.emplace_back(ixi);
+            currentGroup = g;
             return true;
         }
     }
     // Group not found at this point.
     if (create) {
-        new Group(pgroup, name);
-        groupPath.push_back(pgroup->children.size() - 1);
+        currentGroup = new Group(currentGroup, name);
     }
     return false;
 }
 void MIni::endGroup() noexcept
 {
-    groupPath.pop_back();
+    assert(currentGroup != nullptr);
+    if (currentGroup->parent) {
+        currentGroup = currentGroup->parent;
+    }
 }
 
 QStringList MIni::getSections() const noexcept
@@ -286,20 +274,18 @@ QStringList MIni::getSections() const noexcept
 }
 QStringList MIni::getGroups() const noexcept
 {
-    const Group *gp = currentGroup();
-    assert(gp != nullptr);
+    assert(currentGroup != nullptr);
     QStringList list;
-    for (const Group *g : gp->children) {
+    for (const Group *g : currentGroup->children) {
         list.append(g->name);
     }
     return list;
 }
 QStringList MIni::getKeys() const noexcept
 {
-    const Group *g = currentGroup();
-    assert(g != nullptr);
+    assert(currentGroup != nullptr);
     QStringList list;
-    for (const Setting &setting : g->settings) {
+    for (const Setting &setting : currentGroup->settings) {
         list.append(setting.key);
     }
     return list;
@@ -307,9 +293,8 @@ QStringList MIni::getKeys() const noexcept
 
 bool MIni::contains(const QString &key) const noexcept
 {
-    const Group *g = currentGroup();
-    assert(g != nullptr);
-    for (const Setting &setting : g->settings) {
+    assert(currentGroup != nullptr);
+    for (const Setting &setting : currentGroup->settings) {
         if (key.compare(setting.key, Qt::CaseInsensitive) == 0) {
             return true;
         }
@@ -318,9 +303,8 @@ bool MIni::contains(const QString &key) const noexcept
 }
 QString MIni::getRaw(const QString &key, const QString &defaultValue) const noexcept
 {
-    const Group *g = currentGroup();
-    assert(g != nullptr);
-    for (const Setting &setting : g->settings) {
+    assert(currentGroup != nullptr);
+    for (const Setting &setting : currentGroup->settings) {
         if (key.compare(setting.key, Qt::CaseInsensitive) == 0) {
             return setting.value;
         }
@@ -329,16 +313,15 @@ QString MIni::getRaw(const QString &key, const QString &defaultValue) const noex
 }
 void MIni::setRaw(const QString &key, const QString &value) noexcept
 {
-    Group *g = currentGroup();
-    assert(g != nullptr);
-    for (Setting &setting : g->settings) {
+    assert(currentGroup != nullptr);
+    for (Setting &setting : currentGroup->settings) {
         if (key.compare(setting.key, Qt::CaseInsensitive) == 0) {
             setting.value = value;
             return;
         }
     }
     // Setting not found at this point.
-    g->settings.emplace_back(key, value);
+    currentGroup->settings.emplace_back(key, value);
 }
 
 QString MIni::getString(const QString &key, const QString &defaultValue) const noexcept
@@ -410,17 +393,6 @@ void MIni::setFloat(const QString &key, const double value, const char format, c
     setRaw(key, QString::number(value, format, precision));
 }
 
-MIni::Group *MIni::currentGroup() const noexcept
-{
-    assert(curSectionIndex < sections.size());
-    Group *pos = sections[curSectionIndex];
-    for (const int index : groupPath) {
-        assert(index < pos->children.size());
-        pos = pos->children[index];
-    }
-    return pos;
-}
-
 /* Group management */
 MIni::Group::Group(Group *parent, const QString &name) noexcept
     : name(name), parent(parent)
@@ -435,11 +407,16 @@ MIni::Group::~Group() noexcept
         if (g) delete g;
     }
 }
-QString MIni::Group::path() const noexcept
+QString MIni::Group::path(bool full) const noexcept
 {
     QString result(name);
     for (const Group *gp = parent; gp != nullptr; gp = gp->parent) {
-        result.prepend(gp->name + '/');
+        if (full || gp->parent != nullptr) {
+            result.prepend(gp->name + '/');
+        }
+    }
+    if (full || parent != nullptr) {
+        result.append(name);
     }
     return result;
 }
@@ -521,7 +498,7 @@ void MSettings::dumpDebug() const noexcept
             indent.append("  "_L1);
             for (const Setting &setting : gpos->settings) {
                 const bool show = (setting.key.isEmpty()
-                    || !filter.contains(gpos->path() + '/' + setting.key));
+                    || !filter.contains(gpos->path(true) + '/' + setting.key));
                 qDebug().noquote().nospace() << indent << " - " << setting.key
                     << ": " << (show ? setting.value : u"<filter>"_s);
             }
