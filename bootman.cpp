@@ -183,7 +183,7 @@ void BootMan::install(const QStringList &cmdextra)
                 QString espdst = espdev->mountPoint() + "/EFI/"_L1;
                 QString espsrc = espdst + loaderID;
                 QString fbx64efi = espsrc + "/fbx64.efi";
-                QString debianGrub = espdst + "/debian/grub.cfg";
+                QString debianGrub = espsrc + "/grub.cfg";
                 //file check is on /mnt/antiX as this command does not act in the chroot
                 if (QFile("/mnt/antiX" + fbx64efi).exists()) {
                     proc.exec(u"cp"_s, {u"-p"_s, fbx64efi, espdst + "BOOT/"_L1});
