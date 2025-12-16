@@ -127,23 +127,23 @@ Minimum: %2</translation>
         <translation>Installera GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Updaterar initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>Misslyckades med att uppdatera initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>System boot disk:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Partition att använda:</translation>
     </message>

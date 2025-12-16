@@ -127,23 +127,23 @@ Shtëpia e %2%</translation>
         <translation>Po instalohet GRUB-i</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Po përditësohet initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>S’u arrit të përditësohej initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>Disk nisjeje sistemi:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Pjesë për t’u përdorur:</translation>
     </message>

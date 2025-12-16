@@ -127,23 +127,23 @@ Minimum: %2</source>
         <translation>Устанавливается GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Обновление initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>Не удалось обновить initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>Системный загрузочный диск:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Использовать раздел:</translation>
     </message>

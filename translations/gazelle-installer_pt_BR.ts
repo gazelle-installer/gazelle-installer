@@ -127,23 +127,23 @@ E no mínimo %2</translation>
         <translation>Instalando o GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Atualizando o initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>Ocorreu uma falha ao atualizar o initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>Disco de inicialização do sistema operacional:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Partição para ser utilizada:</translation>
     </message>

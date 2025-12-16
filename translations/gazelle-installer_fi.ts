@@ -24,27 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"/>
+        <translation>Järjestelmä- ja kotiasema ei voi olla sama tällaisessa asennuksessa.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"/>
+        <translation>Alusta ja käytä levyjä kokonaan kohteelle %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"/>
+        <translation>Järjestelmäasema: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"/>
+        <translation>Kotiasema: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"/>
+        <translation>Alusta ja käytä koko levyä kohteelle %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -56,7 +56,7 @@ Minimi: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"/>
+        <translation>Lepotilan minimimäärä: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -127,23 +127,23 @@ Minimi: %2</translation>
         <translation>Asennetaan GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Päivitetään initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>Initramfs:n päivitys epäonnistui.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>Järjestelmän käynnistyslevy:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Osio jota käytetään:</translation>
     </message>
@@ -229,7 +229,7 @@ Minimi: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"/>
+        <translation>Tuntematon julkaisu</translation>
     </message>
 </context>
 <context>
@@ -396,12 +396,12 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"/>
+        <translation>Kaksi kiintolevyä</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"/>
+        <translation>Jos tietokoneessa on useita kiintolevyjä, vaihtoehto mahdollistaa järjestelmän sijoittamisen yhdelle asemalle (järjestelmäasema) ja käyttäjien tietojen säilyttämisen erilliselle asemalle (kotiasema).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -501,12 +501,12 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"/>
+        <translation>Ominaisuus on suunniteltu korvaamaan normaalin asennustavan, eikä se välttämättä korvaa manuaalista asettelua tai eri tallennusjärjestelmiä. Tietoja voi vioittua tai kadota.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"/>
+        <translation>Jos haluat korvata asennuksen manuaalisella asettelulla, on suositeltavaa käyttää valintaa mukautettu asennus.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -898,7 +898,7 @@ Pidä hauskaa käyttäessäsi %1</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"/>
+        <translation>Kokeellinen</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1334,17 +1334,17 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"/>
+        <translation>Kaksi kiintolevyä</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"/>
+        <translation>Järjestelmäasema:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"/>
+        <translation>Kotiasema: %1</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1961,7 +1961,7 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"/>
+        <translation>Mahdollisesti väärä salasana.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2439,17 +2439,17 @@ Not recommended unless the installation media is guaranteed to be free from erro
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"/>
+        <translation>Salauksella lukittuja säilöiä ei voida avata.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"/>
+        <translation>Mahdollisesti väärä salasana. Paina &quot;Skannaa&quot;-painiketta ja yritä uudelleen eri salasanalla.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"/>
+        <translation>Osio %1 asemalla %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2459,12 +2459,12 @@ Not recommended unless the installation media is guaranteed to be free from erro
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"/>
+        <translation>Korvaa asennus kohteessa %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"/>
+        <translation>Avaa salatut osiot</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
@@ -2474,22 +2474,22 @@ Not recommended unless the installation media is guaranteed to be free from erro
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"/>
+        <translation>Ohita salatut osiot</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"/>
+        <translation>Salauksen sisältävää osiota ei voida avata: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"/>
+        <translation>Crypttab-lueteltua osiota ei löydy: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"/>
+        <translation>Salattuja asemia ei voitu lukita uudelleen: (%1)</translation>
     </message>
 </context>
 <context>

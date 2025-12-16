@@ -14,7 +14,7 @@
     <message>
         <location filename="../autopart.cpp" line="175"/>
         <source>The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
-        <translation type="unfinished"/>
+        <translation>Выбранный диск имеет ёмкость не менее 2 ТБ и должен быть отформатирован в GPT. В некоторых системах диск, отформатированный в GPT, не загрузится.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="177"/>
@@ -24,22 +24,22 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"/>
+        <translation>Для этого типа установки системный и домашний диски не могут быть одинаковыми.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"/>
+        <translation>Форматировать и использовать весь диск %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"/>
+        <translation>Системный диск: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"/>
+        <translation>Домашний раздел: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
@@ -127,23 +127,23 @@ Minimum: %2</source>
         <translation>Устанавливается GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Обновление initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>Не удалось обновить initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>Системный загрузочный диск:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Использовать раздел:</translation>
     </message>
@@ -158,7 +158,7 @@ Minimum: %2</source>
     <message>
         <location filename="../checkmd5.cpp" line="76"/>
         <source>The installation media is still being checked.</source>
-        <translation type="unfinished"/>
+        <translation>Проверка установочного носителя продолжается.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="77"/>
@@ -214,7 +214,7 @@ Minimum: %2</source>
     <message>
         <location filename="../partman.cpp" line="2240"/>
         <source>Preserve</source>
-        <translation type="unfinished"/>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2241"/>
@@ -242,7 +242,7 @@ Minimum: %2</source>
     <message>
         <location filename="../minstall.cpp" line="176"/>
         <source>You are running 32-bit OS started in 64-bit UEFI mode.</source>
-        <translation type="unfinished"/>
+        <translation>Вы используете 32-битную ОС, запущенную в 64-битном режиме UEFI.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="177"/>

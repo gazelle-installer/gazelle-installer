@@ -24,27 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"/>
+        <translation>Sistemski in domači pogon ne moreta biti ista za tovrstno namestitev.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"/>
+        <translation>Formatiraj in uporabi celotne pogone za %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"/>
+        <translation>Sistemski pogon: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"/>
+        <translation>Domači pogon: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"/>
+        <translation>Formatiraj in uporabi celoten disk za %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -56,7 +56,7 @@ Najmanj: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"/>
+        <translation>Minimum za podporo hibernaciji: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -127,23 +127,23 @@ Najmanj: %2</translation>
         <translation>Nameščam GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Posodabljam initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>Ni bilo mogoče posodopbiti initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>Zagonski disk sistema:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Razdelek za uporabo:</translation>
     </message>
@@ -229,7 +229,7 @@ Najmanj: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"/>
+        <translation>Neznana izdaja</translation>
     </message>
 </context>
 <context>
@@ -396,12 +396,12 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"/>
+        <translation>Dvojni pogon</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"/>
+        <translation>Če ima sistem več podatkovnih pogonov, ta možnost omogoča, da so sistemske datoteke na enem pogonu (sistemski pogon), medtem ko se podatkih vseh uporabnikov nahajajo na drugem pogonu (domači pogon).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -501,12 +501,12 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"/>
+        <translation>Ta funkcionalnost je narejena za nadomestitev namestitve, ki je bila izvedena na običajen način in je lahko neuspešna, če namestitev uporablja zapleteno razporeditev ali shemo razdelkov. Podatki se lahko pokvarijo ali izgubijo.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"/>
+        <translation>Za nadomestitev namestitve z zahtevno razporeditvijo ali shemo razdelkov je priporočljivo uporabiti možnost ustvarjanja razporedov po meri.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -898,7 +898,7 @@ Uživajte v sistemu %1!</translation>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"/>
+        <translation>Eksperimentalno</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1334,17 +1334,17 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"/>
+        <translation>Dvojni pogon</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"/>
+        <translation>Sistemski pogon: </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"/>
+        <translation>Domači pogon: </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1961,7 +1961,7 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"/>
+        <translation>Geslo je verjetno napačno.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2442,17 +2442,17 @@ Ni priporočljivo, razen v primerih, ko je nosilec zagotovo brez napak.</transla
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"/>
+        <translation>Zaklenjenih šifriranih vsebnikov ni bilo mogoče odpreti.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"/>
+        <translation>Verjetno je geslo napačno. Pritisnite gumb &apos;Skeniraj&apos; in poskusite znova z drugim geslom.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"/>
+        <translation>Pogon %1 na pogonu %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2462,12 +2462,12 @@ Ni priporočljivo, razen v primerih, ko je nosilec zagotovo brez napak.</transla
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"/>
+        <translation>Zamenjaj namestitev v %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"/>
+        <translation>Odkleni šifrirane pogone</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
@@ -2477,22 +2477,22 @@ Ni priporočljivo, razen v primerih, ko je nosilec zagotovo brez napak.</transla
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"/>
+        <translation>Prezri šifrirane pogone</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"/>
+        <translation>Ne morem odpreti šifriranega razdelka %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"/>
+        <translation>Ne morem najti razdelka navedenega v crypttab: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"/>
+        <translation>Ne morem ponovno zakleniti šifrirane naprave: %1</translation>
     </message>
 </context>
 <context>

@@ -24,27 +24,27 @@
     <message>
         <location filename="../autopart.cpp" line="183"/>
         <source>The system and home drives cannot be the same for this type of installation.</source>
-        <translation type="unfinished"/>
+        <translation>Las unidades del sistema y de home no pueden ser las mismas para este tipo de instalación.</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="187"/>
         <source>Format and use drives entirely for %1</source>
-        <translation type="unfinished"/>
+        <translation>Formatear y utilizar unidades exclusivamente para %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="189"/>
         <source>System drive: %1</source>
-        <translation type="unfinished"/>
+        <translation>Unidad del sistema: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="191"/>
         <source>Home drive: %1</source>
-        <translation type="unfinished"/>
+        <translation>Unidad de home: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="194"/>
         <source>Format and use the entire drive for %1: %2</source>
-        <translation type="unfinished"/>
+        <translation>Formatear y usar todo el disco para %1: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="224"/>
@@ -56,7 +56,7 @@ Mínimo: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="226"/>
         <source>Minimum for hibernation support: %1</source>
-        <translation type="unfinished"/>
+        <translation>Mínimo para soporte de hibernación: %1</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="268"/>
@@ -127,23 +127,23 @@ Mínimo: %2</translation>
         <translation>Instalando GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Actualizando initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>Fallo al actualizar initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>Disco de arranque del sistema:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Partición a utilizar:</translation>
     </message>
@@ -229,7 +229,7 @@ Mínimo: %2</translation>
     <message>
         <location filename="../replacer.cpp" line="396"/>
         <source>Unknown release</source>
-        <translation type="unfinished"/>
+        <translation>Versión desconocida</translation>
     </message>
 </context>
 <context>
@@ -396,12 +396,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="729"/>
         <source>Dual drive</source>
-        <translation type="unfinished"/>
+        <translation>Doble unidad</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
         <source>If your system has multiple storage drives, this option allows you to have the system files on one drive (the System drive), while keeping the data of all users on a separate drive (the Home drive).</source>
-        <translation type="unfinished"/>
+        <translation>Si su sistema tiene varias unidades de almacenamiento, esta opción le permite tener los archivos del sistema en una unidad (la unidad del sistema), mientras que los datos de todos los usuarios se guardan en una unidad separada (la unidad Home)</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
@@ -501,12 +501,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>This feature is designed to replace an installation performed using the regular install method, and may fail to replace an installation with a complex layout or storage scheme. Corruption or data loss may occur.</source>
-        <translation type="unfinished"/>
+        <translation>Esta función está diseñada para sustituir una instalación realizada mediante el método de instalación habitual y es posible que no pueda sustituir una instalación con una estructura o un esquema de almacenamiento complejos. Se pueden producir daños o pérdidas de datos.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="760"/>
         <source>To replace an installation with a complex layout or storage scheme, it is recommended to use the custom layout option instead.</source>
-        <translation type="unfinished"/>
+        <translation>Para sustituir una instalación con un diseño o esquema de almacenamiento complejo, se recomienda utilizar la opción de diseño personalizado.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
@@ -898,7 +898,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="214"/>
         <source>Experimental</source>
         <comment>As In feature is not polished and may not work properly</comment>
-        <translation type="unfinished"/>
+        <translation>Experimental</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
@@ -1334,17 +1334,17 @@ Enjoy using %1</source>
     <message>
         <location filename="../meinstall.ui" line="360"/>
         <source>Dual drive</source>
-        <translation type="unfinished"/>
+        <translation>Doble unidad</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="370"/>
         <source>System drive:</source>
-        <translation type="unfinished"/>
+        <translation>Unidad del sistema:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="380"/>
         <source>Home drive:</source>
-        <translation type="unfinished"/>
+        <translation>Unidad de home:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="544"/>
@@ -1961,7 +1961,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../partman.cpp" line="747"/>
         <source>Possible incorrect password.</source>
-        <translation type="unfinished"/>
+        <translation>Posible contraseña incorrecta.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
@@ -2442,17 +2442,17 @@ No se recomienda a menos que se garantice que los medios de instalación están 
     <message>
         <location filename="../replacer.cpp" line="141"/>
         <source>Could not open any of the locked encrypted containers.</source>
-        <translation type="unfinished"/>
+        <translation>No se pudo abrir ninguno de los contenedores cifrados bloqueados.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="142"/>
         <source>Possible incorrect password. Press the &apos;Scan&apos; button to try again with a different password.</source>
-        <translation type="unfinished"/>
+        <translation>Es posible que la contraseña sea incorrecta. Pulse el botón “Escanear” para volver a intentarlo con otra contraseña.</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="158"/>
         <source>Volume %1 on drive %2</source>
-        <translation type="unfinished"/>
+        <translation>Volumen %1 en unidad %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="185"/>
@@ -2462,12 +2462,12 @@ No se recomienda a menos que se garantice que los medios de instalación están 
     <message>
         <location filename="../replacer.cpp" line="262"/>
         <source>Replace the installation in %1: %2</source>
-        <translation type="unfinished"/>
+        <translation>Reemplazar la instalación en %1: %2</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="271"/>
         <source>Unlock encrypted volumes</source>
-        <translation type="unfinished"/>
+        <translation>Desbloquear volúmenes cifrados</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="275"/>
@@ -2477,22 +2477,22 @@ No se recomienda a menos que se garantice que los medios de instalación están 
     <message>
         <location filename="../replacer.cpp" line="277"/>
         <source>Ignore encrypted volumes</source>
-        <translation type="unfinished"/>
+        <translation>Ignorar volúmenes cifrados</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="342"/>
         <source>Cannot unlock encrypted partition: %1</source>
-        <translation type="unfinished"/>
+        <translation>No se puede desbloquear la partición cifrada: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="349"/>
         <source>Cannot find partition listed in crypttab: %1</source>
-        <translation type="unfinished"/>
+        <translation>No se encuentra la partición en crypttab: %1</translation>
     </message>
     <message>
         <location filename="../replacer.cpp" line="370"/>
         <source>Could not re-lock encrypted device(s): %1</source>
-        <translation type="unfinished"/>
+        <translation>No se pudo volver a bloquear el/los dispositivo(s) cifrados: %1</translation>
     </message>
 </context>
 <context>

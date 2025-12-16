@@ -19,7 +19,7 @@
     <message>
         <location filename="../autopart.cpp" line="177"/>
         <source>Are you sure you want to continue?</source>
-        <translation>Esteu segurs de voler continuar?</translation>
+        <translation>Segur que voleu continuar?</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="183"/>
@@ -127,23 +127,23 @@ Mínim: %2</translation>
         <translation>Instal·lant GRUB </translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="336"/>
+        <location filename="../bootman.cpp" line="338"/>
         <source>Updating initramfs</source>
         <translation>Actualitzant initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="337"/>
+        <location filename="../bootman.cpp" line="339"/>
         <source>Failed to update initramfs.</source>
         <translation>Ha fallat en actualitzar initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="367"/>
+        <location filename="../bootman.cpp" line="369"/>
         <source>System boot disk:</source>
         <translation>Disc d&apos;arrencada: </translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="382"/>
-        <location filename="../bootman.cpp" line="392"/>
+        <location filename="../bootman.cpp" line="384"/>
+        <location filename="../bootman.cpp" line="394"/>
         <source>Partition to use:</source>
         <translation>Partició a usar: </translation>
     </message>
@@ -310,7 +310,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Finished</source>
-        <translation>Finalitzat</translation>
+        <translation>Acabat</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="432"/>
@@ -1099,7 +1099,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="971"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
-        <translation>S&apos;està instal·lant %1. Per una instal·lació nova, calen entre 3 i 20 minuts, depenent de la velocitat del vostre sistema i la mida de les particions que esteu reformatant.</translation>
+        <translation>S&apos;instal·la %1. Per a una instal·lació nova, calen entre 3 i 20 minuts, segons la velocitat del sistema i la mida de les particions que es reformaten.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="973"/>
@@ -1790,7 +1790,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../oobe.cpp" line="535"/>
         <source>Are you sure you want to continue?</source>
-        <translation>Esteu segurs de voler continuar?</translation>
+        <translation>Segur que voleu continuar?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="540"/>
@@ -1886,7 +1886,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../partman.cpp" line="582"/>
         <source>&amp;Reset layout</source>
-        <translation>&amp;Reinicia la disposició</translation>
+        <translation>&amp;Restableix la disposició</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="584"/>
@@ -2046,7 +2046,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../partman.cpp" line="999"/>
         <source>Are you sure you want to continue?</source>
-        <translation>Esteu segurs de voler continuar?</translation>
+        <translation>Segur que voleu continuar?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1010"/>
@@ -2091,7 +2091,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../partman.cpp" line="1099"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
-        <translation>Si no n&apos;esteu segurs, sortiu de l&apos;instal·lador i executeu GSmartControl per tenir més informació.</translation>
+        <translation>Si no en teniu la seguretat, sortiu de l&apos;instal·lador i executeu GSmartControl per a més informació.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1103"/>
@@ -2414,7 +2414,7 @@ No es recomana, llevat que el suport d&apos;instal·lació garanteixi estar lliu
     <message>
         <location filename="../app.cpp" line="139"/>
         <source>%1 Installer</source>
-        <translation>%1 Installer</translation>
+        <translation>Instal·lador per a %1</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="148"/>
