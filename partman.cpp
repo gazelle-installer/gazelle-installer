@@ -239,7 +239,8 @@ void PartMan::scanVirtualDevices(bool rescan)
             }
         }
     }
-    proc.shell(u"lsblk -T -bJo TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/*"_s, nullptr, true);
+    // /dev/mapper/control is not a block device; silence its warning.
+    proc.shell(u"lsblk -T -bJo TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/* 2>/dev/null || true"_s, nullptr, true);
     const QString &bdRaw = proc.readOut(true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD[u"blockdevices"_s].toArray();
@@ -694,8 +695,13 @@ void PartMan::partReloadClick()
 void PartMan::partManRunClick()
 {
     gui.boxMain->setEnabled(false);
-    if (QFile::exists(u"/usr/sbin/gparted"_s)) proc.exec(u"/usr/sbin/gparted"_s);
-    else proc.exec(u"partitionmanager"_s);
+    if (QFile::exists(u"/usr/sbin/gparted"_s)) {
+        proc.exec(u"/usr/sbin/gparted"_s);
+    } else if (QFile::exists(u"/usr/bin/gparted"_s)) {
+        proc.exec(u"/usr/bin/gparted"_s);
+    } else {
+        proc.exec(u"partitionmanager"_s);
+    }
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     scan();
     gui.boxMain->setEnabled(true);

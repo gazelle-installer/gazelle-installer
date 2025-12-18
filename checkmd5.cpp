@@ -88,12 +88,39 @@ void CheckMD5::check(QPromise<CheckResult> &promise) const noexcept
 {
     promise.setProgressRange(0, 100);
     promise.setProgressValue(0);
-    const MIni liveInfo(u"/live/config/initrd.out"_s, MIni::ReadOnly);
-    const QString &sqtoram = liveInfo.getString(u"TORAM_MP"_s, u"/live/to-ram"_s)
-        + '/' + liveInfo.getString(u"SQFILE_PATH"_s, u"antiX"_s);
-    const QString &sqfile = liveInfo.getString(u"SQFILE_NAME"_s, u"linuxfs"_s);
-    const QString &path = QFile::exists(sqtoram+'/'+sqfile)
-        ? sqtoram : liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
+    QString archIsoBase;
+    QString archSqName;
+    const QStringList archBases = {
+        u"/run/archiso/bootmnt/arhc/x86_64"_s, // user-specified path
+        u"/run/archiso/bootmnt/arch/x86_64"_s  // common Arch iso path
+    };
+    const QStringList archNames = {u"airootfs.sfs"_s, u"airootfs.img"_s};
+    for (const QString &candidate : archBases) {
+        for (const QString &fname : archNames) {
+            if (QFileInfo::exists(candidate + u'/' + fname)) {
+                archIsoBase = candidate;
+                archSqName = fname;
+                break;
+            }
+        }
+        if (!archIsoBase.isEmpty()) break;
+    }
+    const bool archMedia = !archIsoBase.isEmpty();
+
+    QString path;
+    QString sqfile;
+    if (archMedia) {
+        // Arch ISO layout uses airootfs.sfs alongside its checksum.
+        path = archIsoBase;
+        sqfile = archSqName.isEmpty() ? u"airootfs.sfs"_s : archSqName;
+    } else {
+        const MIni liveInfo(u"/live/config/initrd.out"_s, MIni::ReadOnly);
+        const QString &sqtoram = liveInfo.getString(u"TORAM_MP"_s, u"/live/to-ram"_s)
+            + '/' + liveInfo.getString(u"SQFILE_PATH"_s, u"antiX"_s);
+        sqfile = liveInfo.getString(u"SQFILE_NAME"_s, u"linuxfs"_s);
+        path = QFile::exists(sqtoram+'/'+sqfile)
+            ? sqtoram : liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
+    }
 
     off_t btotal = 0;
     struct HashTarget {
@@ -106,7 +133,7 @@ void CheckMD5::check(QPromise<CheckResult> &promise) const noexcept
     // Obtain a list of MD5 hashes and their files.
     QDirIterator it(path, {u"*.md5"_s}, QDir::Files);
     QStringList missing(sqfile);
-    if (!QFile::exists(u"/live/config/did-toram"_s) || QFile::exists(u"/live/config/toram-all"_s)) {
+    if (!archMedia && (!QFile::exists(u"/live/config/did-toram"_s) || QFile::exists(u"/live/config/toram-all"_s))) {
         missing << u"vmlinuz"_s << u"initrd.gz"_s;
     }
     size_t bufsize = 0;

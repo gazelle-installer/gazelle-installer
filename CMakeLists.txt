@@ -7,6 +7,8 @@ project(minstall
 	LANGUAGES CXX
 )
 
+option(USE_ZXCVBN "Use zxcvbn for password strength estimation" ON)
+
 find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Concurrent LinguistTools)
 set(CMAKE_AUTORCC ON)
 
@@ -47,8 +49,12 @@ target_link_libraries(minstall PRIVATE
 	Qt::Gui
 	Qt::Widgets
 	Qt::Concurrent
-	zxcvbn
 )
+
+if(USE_ZXCVBN)
+	target_link_libraries(minstall PRIVATE zxcvbn)
+	target_compile_definitions(minstall PRIVATE WITH_ZXCVBN)
+endif()
 
 build_compilation_setup(minstall)
 build_version_definition(minstall VERSION)

@@ -22,6 +22,14 @@ case "${1:-all}" in
 		cmake --build --preset default
 		;;
 
+	arch)
+		echo "Building Arch Linux package..."
+		rm -rf _build_/arch
+		mkdir -p _build_/arch
+		PKGDEST="$(pwd)/_build_/arch" BUILDDIR="$(pwd)/_build_/arch" makepkg -f --cleanbuild --syncdeps --noconfirm --needed
+		echo "Package (and build artifacts) are in _build_/arch"
+		;;
+
 	all)
 		echo "Configuring and building project..."
 		cmake --workflow --preset default
@@ -39,6 +47,7 @@ case "${1:-all}" in
 		echo "  configure    - Configure only"
 		echo "  make-clean   - Clean build artifacts only"
 		echo "  make         - Build only"
+		echo "  arch         - Build using the Arch preset and create an Arch package"
 		echo "  all          - Configure and build (default)"
 		echo "  fresh        - Clean first then configure and build"
 		exit 1

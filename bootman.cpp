@@ -165,6 +165,15 @@ void BootMan::install(const QStringList &cmdextra)
             QStringList grubinstargs({u"--no-nvram"_s, u"--force-extra-removable"_s,
                 (efisize==32 ? u"--target=i386-efi"_s : u"--target=x86_64-efi"_s),
                 "--bootloader-id="_L1 + loaderID, u"--recheck"_s});
+            {
+                // Drop flags not supported by some grub builds (e.g. Arch) to avoid fatal errors.
+                bool supportsForceExtra = true;
+                if (proc.exec(u"grub-install"_s, {u"--help"_s}, nullptr, true)) {
+                    const QString &helpText = proc.readOut(true);
+                    supportsForceExtra = helpText.contains(u"--force-extra-removable"_s);
+                }
+                if (!supportsForceExtra) grubinstargs.removeAll(u"--force-extra-removable"_s);
+            }
             const PartMan::Device *espdev = partman.findByMount(u"/boot/efi"_s);
             if (!espdev) espdev = partman.findByMount(u"/boot"_s);
             QString efiDir;
@@ -229,9 +238,12 @@ void BootMan::install(const QStringList &cmdextra)
             sect.setRoot(nullptr);
         }
 
-        // Get non-live boot codes.
-        proc.shell(u"/live/bin/non-live-cmdline"_s, nullptr, true); // Get non-live boot codes
-        QStringList finalcmdline = proc.readOut().split(' ');
+        // Get non-live boot codes (Arch live media lacks this helper, so skip if missing).
+        QStringList finalcmdline;
+        if (QFileInfo::exists(u"/live/bin/non-live-cmdline"_s)) {
+            proc.shell(u"/live/bin/non-live-cmdline"_s, nullptr, true); // Get non-live boot codes
+            finalcmdline = proc.readOut().split(' ');
+        }
 
         {
             // Add the codes from /etc/default/grub to non-live boot codes.
@@ -311,7 +323,15 @@ void BootMan::install(const QStringList &cmdextra)
 
         sect.setRoot("/mnt/antiX");
         //update grub with new config
-        proc.exec(u"update-grub"_s);
+        const bool haveUpdateGrub = QFileInfo(u"/usr/sbin/update-grub"_s).isExecutable()
+            || QFileInfo(u"/usr/bin/update-grub"_s).isExecutable()
+            || QFileInfo(u"/sbin/update-grub"_s).isExecutable();
+        if (haveUpdateGrub) {
+            proc.exec(u"update-grub"_s);
+        } else {
+            // Arch Linux uses grub-mkconfig
+            proc.exec(u"grub-mkconfig"_s, {u"-o"_s, u"/boot/grub/grub.cfg"_s});
+        }
 
         if (!gui.radioBootESP->isChecked()) {
             /* Prevent debconf pestering the user when GRUB gets updated. Non-critical. */
@@ -330,8 +350,8 @@ void BootMan::install(const QStringList &cmdextra)
                     }
                 }
             }
-            if (!diskpath.isEmpty()) {
-                /* Setup debconf to achieve the objective of silence. */
+            if (!diskpath.isEmpty() && haveUpdateGrub) {
+                /* Setup debconf to achieve the objective of silence. Debian-only. */
                 diskpath.prepend("grub-pc grub-pc/install_devices multiselect /dev/");
                 proc.exec(u"debconf-set-selections"_s, {}, &diskpath);
             }
@@ -347,14 +367,32 @@ void BootMan::install(const QStringList &cmdextra)
     //}
 
     if (gui.checkBootHostSpecific->isChecked()) {
-        const QString ircfname = sect.root() + "/etc/initramfs-tools/initramfs.conf"_L1;
-        QFile::copy(ircfname, ircfname+".bak"_L1);
-        MIni ircfg(ircfname, MIni::ReadWrite);
-        ircfg.setString(u"MODULES"_s, u"dep"_s);
-        ircfg.save();
+        const QString debianIrcfname = sect.root() + "/etc/initramfs-tools/initramfs.conf"_L1;
+        const QString archMkcfname = sect.root() + "/etc/mkinitcpio.conf"_L1;
+        if (QFileInfo::exists(debianIrcfname)) {
+            // Debian/Ubuntu: use MODULES=dep for host-specific initramfs
+            QFile::copy(debianIrcfname, debianIrcfname+".bak"_L1);
+            MIni ircfg(debianIrcfname, MIni::ReadWrite);
+            ircfg.setString(u"MODULES"_s, u"dep"_s);
+            ircfg.save();
+        } else if (QFileInfo::exists(archMkcfname)) {
+            // Arch Linux: ensure autodetect hook is enabled (typically default)
+            // The autodetect hook already provides host-specific module detection
+            QFile::copy(archMkcfname, archMkcfname+".bak"_L1);
+            // No changes needed for Arch - autodetect hook handles this
+        }
     }
 
-    proc.exec(u"update-initramfs"_s, {u"-u"_s, u"-t"_s, u"-k"_s, u"all"_s});
+    const bool haveUpdateInitramfs = QFileInfo(u"/usr/sbin/update-initramfs"_s).isExecutable()
+        || QFileInfo(u"/usr/bin/update-initramfs"_s).isExecutable()
+        || QFileInfo(u"/sbin/update-initramfs"_s).isExecutable();
+    if (haveUpdateInitramfs) {
+        proc.exec(u"update-initramfs"_s, {u"-u"_s, u"-t"_s, u"-k"_s, u"all"_s});
+    } else if (QFileInfo(u"/usr/bin/mkinitcpio"_s).isExecutable()
+        || QFileInfo(u"/sbin/mkinitcpio"_s).isExecutable()) {
+        // Arch Linux uses mkinitcpio
+        proc.exec(u"mkinitcpio"_s, {u"-P"_s});
+    }
     proc.status();
 }
 

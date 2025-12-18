@@ -15,6 +15,6 @@ fi
 
 #now run localized oobe
 
-LC_ALL=$LANG /usr/sbin/minstall --oobe --config 2>/dev/null
+LC_ALL=$LANG /usr/bin/minstall --oobe --config 2>/dev/null
 
 exit 0

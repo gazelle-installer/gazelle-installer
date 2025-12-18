@@ -16,6 +16,16 @@
 			"binaryDir": "${sourceDir}/_build_/${presetName}"
 		},
 		{
+			"name": "arch",
+			"displayName": "Arch Linux configuration",
+			"description": "Build using Arch Linux toolchain/layout",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/_build_/arch",
+			"cacheVariables": {
+				"USE_ZXCVBN": "OFF"
+			}
+		},
+		{
 			"name": "clang",
 			"displayName": "Clang configuration",
 			"description": "Compile using clang",
@@ -52,6 +62,10 @@
 			"configurePreset": "default"
 		},
 		{
+			"name": "arch",
+			"configurePreset": "arch"
+		},
+		{
 			"name": "clang",
 			"configurePreset": "clang"
 		},
@@ -78,6 +92,13 @@
 			"steps": [
 				{ "type": "configure", "name": "default" },
 				{ "type": "build", "name": "default" }
+			]
+		},
+		{
+			"name": "arch",
+			"steps": [
+				{ "type": "configure", "name": "arch" },
+				{ "type": "build", "name": "arch" }
 			]
 		},
 		{

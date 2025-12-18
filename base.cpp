@@ -47,27 +47,33 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     bufferHome = appConf.getInteger(u"HomeBuffer"_s, 1024) * MB;
     appConf.setSection();
     liveToInstalled = appConf.getString(u"LiveToInstalledScript"_s, u"/usr/sbin/live-to-installed"_s);
+    if (!QFileInfo(liveToInstalled).isExecutable() && QFileInfo(u"/usr/bin/live-to-installed"_s).isExecutable()) {
+        liveToInstalled = u"/usr/bin/live-to-installed"_s;
+    }
 
-    bootSource = "/live/aufs/boot"_L1;
-    rootSources << u"/live/aufs/bin"_s << u"/live/aufs/dev"_s
-        << u"/live/aufs/etc"_s << u"/live/aufs/lib"_s
-        << u"/live/aufs/media"_s << u"/live/aufs/mnt"_s << u"/live/aufs/root"_s
-        << u"/live/aufs/sbin"_s << u"/live/aufs/usr"_s << u"/live/aufs/var"_s;
-    if (QFileInfo::exists(u"/live/aufs/initrd.img"_s)) {
-        rootSources << u"/live/aufs/initrd.img"_s;
-    }
-    if (QFileInfo::exists(u"/live/aufs/vmlinuz"_s)) {
-        rootSources << u"/live/aufs/vmlinuz"_s;
-    }
-    if (QFileInfo::exists(u"/live/aufs/libx32"_s)){
-        rootSources << u"/live/aufs/libx32"_s ;
-    }
-    if (QFileInfo::exists(u"/live/aufs/lib64"_s)){
-        rootSources << u"/live/aufs/lib64"_s ;
-    }
-    if (QFileInfo::exists(u"/live/aufs/opt"_s)){
-        rootSources << u"/live/aufs/opt"_s ;
-    }
+    const bool archLive = QFileInfo::exists(u"/run/archiso/airootfs"_s);
+    rootBase = archLive ? u"/run/archiso/airootfs"_s : u"/live/aufs"_s;
+    homeSource = rootBase + u"/home"_s;
+
+    bootSource = rootBase + u"/boot"_s;
+    const auto addIfExists = [this](const QString &path) {
+        if (QFileInfo::exists(path)) rootSources << path;
+    };
+    addIfExists(rootBase + u"/bin"_s);
+    addIfExists(rootBase + u"/dev"_s);
+    addIfExists(rootBase + u"/etc"_s);
+    addIfExists(rootBase + u"/lib"_s);
+    addIfExists(rootBase + u"/media"_s);
+    addIfExists(rootBase + u"/mnt"_s);
+    addIfExists(rootBase + u"/root"_s);
+    addIfExists(rootBase + u"/sbin"_s);
+    addIfExists(rootBase + u"/usr"_s);
+    addIfExists(rootBase + u"/var"_s);
+    addIfExists(rootBase + u"/initrd.img"_s);
+    addIfExists(rootBase + u"/vmlinuz"_s);
+    addIfExists(rootBase + u"/libx32"_s);
+    addIfExists(rootBase + u"/lib64"_s);
+    addIfExists(rootBase + u"/opt"_s);
 
     MProcess::Section sect(proc, QT_TR_NOOP("Cannot access installation media."));
     if (pretend) sect.setExceptionMode(nullptr);
@@ -75,10 +81,15 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     const MIni liveInfo(u"/live/config/initrd.out"_s, MIni::ReadOnly);
     const QString &sqpath = '/' + liveInfo.getString(u"SQFILE_PATH"_s, u"antiX"_s);
     const QString &sqtoram = liveInfo.getString(u"TORAM_MP"_s, u"/live/to-ram"_s) + sqpath;
-    QString infile = sqtoram + "/linuxfs.info"_L1;
-    if (!QFile::exists(infile)) {
-        const QString &sqloc = liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
-        infile = sqloc + "/linuxfs.info"_L1;
+    QString infile;
+    if (archLive) {
+        infile = u"/run/archiso/bootmnt/arhc/x86_64/airootfs.md5"_s; // fall back to du if metadata is unavailable
+    } else {
+        infile = sqtoram + "/linuxfs.info"_L1;
+        if (!QFile::exists(infile)) {
+            const QString &sqloc = liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
+            infile = sqloc + "/linuxfs.info"_L1;
+        }
     }
     MIni squashInfo(infile, MIni::ReadOnly);
 
@@ -93,9 +104,13 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     MSettings::ValState rootNumState = MSettings::VAL_NOTFOUND;
     vspecRoot.image = squashInfo.getFloat(u"UncompressedSizeKB"_s, 0.0, &rootNumState) * KB;
     if (rootNumState != MSettings::VAL_OK) {
-        rootSources.prepend(u"-scb"_s); // Arguments for command execution.
-        proc.exec(u"du"_s, rootSources, nullptr, true);
-        rootSources.removeFirst(); // Remove temporary "-scb" item.
+        QStringList duSources;
+        duSources << u"-scb"_s;
+        for (const QString &src : std::as_const(rootSources)) {
+            if (QFileInfo::exists(src)) duSources << src;
+            else qDebug() << "Skip missing source for du:" << src;
+        }
+        proc.exec(u"du"_s, duSources, nullptr, true);
         vspecRoot.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
     }
     qDebug() << "Basic image:" << vspecRoot.image << rootNumState << infile;
@@ -110,7 +125,7 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     }
     // Account for file system formatting
     struct statvfs svfs;
-    if (statvfs("/live/linux", &svfs) == 0) {
+    if (statvfs(rootBase.toUtf8().constData(), &svfs) == 0) {
         sourceInodes = svfs.f_files - svfs.f_ffree; // Will also be used for progress bar.
     }
     vspecRoot.image += (sourceInodes * BASE_BLOCK);
@@ -127,9 +142,11 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     }
 
     // Account for /home on personal snapshots
-    getVolumeSpec(squashInfo, u"/home"_s, u"/live/aufs/home"_s);
-    vspecHome.preferred += bufferHome;
-    rootSources.append(u"/live/aufs/home"_s);
+    if (QFileInfo::exists(homeSource)) {
+        getVolumeSpec(squashInfo, u"/home"_s, homeSource);
+        vspecHome.preferred += bufferHome;
+        rootSources.append(homeSource);
+    }
 
     // Subtract components from the root if obtained the "short way".
     if (rootNumState == MSettings::VAL_OK) {
@@ -148,6 +165,12 @@ void Base::getVolumeSpec(MIni &squashInfo, const QString &volume, const QString 
     squashInfo.setGroup(volume);
 
     MSettings::ValState valState = MSettings::VAL_NOTFOUND;
+    if (!QFileInfo::exists(source)) {
+        vspec.image = vspec.minimum = vspec.preferred = 0;
+        qDebug() << "Skip missing source" << source << "for volume" << volume;
+        return;
+    }
+
     vspec.image = squashInfo.getFloat(u"UncompressedSizeKB"_s, 0.0, &valState) * KB;
     if (valState != MSettings::VAL_OK) {
         proc.exec(u"du"_s, {u"-scb"_s, source}, nullptr, true);
@@ -329,7 +352,7 @@ void Base::copyLinux(bool skiphome)
     }
     QStringList sources(rootSources);
     if (skiphome && !sync) {
-        sources.removeAll(u"/live/aufs/home"_s);
+        sources.removeAll(homeSource);
     }
     args << bootSource << sources << u"/mnt/antiX"_s;
     proc.advance(80, sourceInodes);

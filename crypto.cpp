@@ -31,6 +31,9 @@ Crypto::Crypto(MProcess &mproc, Ui::MeInstall &ui, QObject *parent)
     connect(&pass, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
 
     QFileInfo cryptsetup(u"/usr/sbin/cryptsetup"_s);
+    if (!cryptsetup.exists() || !cryptsetup.isExecutable()) {
+        cryptsetup.setFile(u"/usr/bin/cryptsetup"_s);
+    }
     QFileInfo crypsetupinitramfs(u"/usr/share/initramfs-tools/conf-hooks.d/cryptsetup"_s);
     cryptsupport = (cryptsetup.exists() && cryptsetup.isExecutable() && crypsetupinitramfs.exists());
 }

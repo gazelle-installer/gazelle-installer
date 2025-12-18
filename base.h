@@ -41,6 +41,8 @@ public:
     // source medium
     QString bootSource;
     QStringList rootSources;
+    QString rootBase;
+    QString homeSource;
     QStringList homes;
 
     Base(class MProcess &mproc, class Core &mcore, class PartMan &pman,
