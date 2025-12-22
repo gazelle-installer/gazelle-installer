@@ -62,7 +62,12 @@ PartMan::PartMan(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, Crypto &cman,
     volSpecs[u"BIOS-GRUB"_s] = {u"BIOS GRUB"_s};
     volSpecs[u"/boot"_s] = {u"boot"_s};
     volSpecs[u"/boot/efi"_s] = volSpecs[u"ESP"_s] = {u"EFI-SYSTEM"_s};
-    volSpecs[u"/"_s] = {"root"_L1 + projShort + appConf.getString(u"Version"_s)};
+    const bool archLive = QFileInfo::exists(u"/run/archiso/airootfs"_s);
+    if (archLive) {
+        volSpecs[u"/"_s] = {u"rootMXarch"_s};
+    } else {
+        volSpecs[u"/"_s] = {"root"_L1 + projShort + appConf.getString(u"Version"_s)};
+    }
     volSpecs[u"/home"_s] = {"home"_L1 + projShort};
     volSpecs[u"SWAP"_s] = {"swap"_L1 + projShort};
     brave = appArgs.isSet(u"brave"_s);
