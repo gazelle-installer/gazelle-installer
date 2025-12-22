@@ -316,7 +316,7 @@ void Base::install()
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
     sect.setRoot("/mnt/antiX");
-    proc.exec(u"rm"_s, {u"/var/lib/dbus/machine-id"_s, u"/etc/machine-id"_s});
+    proc.exec(u"rm"_s, {u"-f"_s, u"/var/lib/dbus/machine-id"_s, u"/etc/machine-id"_s});
     proc.exec(u"dbus-uuidgen"_s, {u"--ensure=/etc/machine-id"_s});
     proc.exec(u"dbus-uuidgen"_s, {u"--ensure"_s});
     sect.setRoot(nullptr);
@@ -335,7 +335,13 @@ void Base::install()
         proc.shell(u"make-fstab -O --install=/mnt/antiX --mntpnt=/media"_s);
     } else {
         // Otherwise, clean /media folder - modification to preserve points that are still mounted.
-        proc.shell(u"rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*"_s);
+    QDir mediaDir(u"/mnt/antiX/media"_s);
+    if (mediaDir.exists()) {
+        const QStringList entries = mediaDir.entryList({u"sd*"_s}, QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const QString &entry : entries) {
+            proc.exec(u"rmdir"_s, {u"--ignore-fail-on-non-empty"_s, mediaDir.filePath(entry)});
+        }
+    }
     }
 }
 

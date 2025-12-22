@@ -406,8 +406,13 @@ void Oobe::setComputerName() const
     proc.shell(cmd + ' ' + etcpath + "/hosts"_L1);
     proc.shell("echo \""_L1 + compname + "\" | cat > "_L1 + etcpath + "/hostname"_L1);
     proc.shell("echo \""_L1 + compname + "\" | cat > "_L1 + etcpath + "/mailname"_L1);
-    proc.shell("sed -i 's/.*send host-name.*/send host-name \""_L1
-        + compname + "\";/g' "_L1 + etcpath + "/dhcp/dhclient.conf"_L1);
+    const QString dhclientConf = etcpath + "/dhcp/dhclient.conf"_L1;
+    if (QFileInfo::exists(dhclientConf)) {
+        proc.shell("sed -i 's/.*send host-name.*/send host-name \""_L1
+            + compname + "\";/g' "_L1 + dhclientConf);
+    } else {
+        qDebug() << "Skip dhclient.conf update (missing):" << dhclientConf;
+    }
     proc.shell("echo \""_L1 + domainname + "\" | cat > "_L1 + etcpath + "/defaultdomain"_L1);
 }
 
