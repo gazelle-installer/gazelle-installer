@@ -323,11 +323,18 @@ void Base::install()
 
     // Disable VirtualBox Guest Additions if not running in VirtualBox.
     if(!core.detectVirtualBox()) {
-        proc.shell(u"mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1"_s);
-        proc.shell(u"mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1"_s);
-        proc.shell(u"mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1"_s);
-        proc.shell(u"mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1"_s);
-        proc.shell(u"mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1"_s);
+        const QStringList vboxMoves = {
+            u"/mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils"_s,
+            u"/mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils"_s,
+            u"/mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils"_s,
+            u"/mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils"_s,
+            u"/mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11"_s
+        };
+        for (const QString &move : vboxMoves) {
+            proc.shell(u"for f in "_s + move.section(' ', 0, 0)
+                + u"; do [ -e \"$f\" ] && mv -f \"$f\" "_s
+                + move.section(' ', 1, 1) + u"; done"_s);
+        }
     }
 
     // if PopulateMediaMountPoints is true in gazelle-installer-data, then use the --mntpnt switch
