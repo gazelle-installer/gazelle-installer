@@ -286,7 +286,14 @@ void Base::install()
     proc.status();
 
     qDebug() << "Desktop menu";
-    proc.exec(u"chroot"_s, {u"/mnt/antiX"_s, u"desktop-menu"_s, u"--write-out-global"_s});
+    const bool hasDesktopMenu =
+        QFileInfo::exists(u"/mnt/antiX/usr/bin/desktop-menu"_s) ||
+        QFileInfo::exists(u"/mnt/antiX/usr/sbin/desktop-menu"_s);
+    if (hasDesktopMenu) {
+        proc.exec(u"chroot"_s, {u"/mnt/antiX"_s, u"desktop-menu"_s, u"--write-out-global"_s});
+    } else {
+        qDebug() << "Skip desktop-menu (not installed in target)";
+    }
 
     // Disable hibernation inside initramfs.
     for (PartMan::Iterator it(partman); PartMan::Device *dev = *it; it.next()) {
