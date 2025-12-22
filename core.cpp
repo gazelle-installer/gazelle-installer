@@ -137,17 +137,44 @@ void Core::setService(const QString &service, bool enabled) const
     qDebug() << "Set service:" << service << enabled;
     MProcess::Section sect(proc);
     const QString chroot(sect.root());
+    const QString unitName = service.endsWith(u".service"_s) ? service : service + u".service"_s;
+    const auto systemdUnitPath = [&](const QString &name) -> QString {
+        const QStringList bases = {
+            u"/etc/systemd/system/"_s,
+            u"/usr/lib/systemd/system/"_s,
+            u"/lib/systemd/system/"_s
+        };
+        for (const QString &base : bases) {
+            const QString path = chroot + base + name;
+            if (QFileInfo::exists(path)) return path;
+        }
+        return QString();
+    };
 
     if (containsSysVinit) {
         proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
     }
     if (containsSystemd) {
+        const QString unitPath = systemdUnitPath(unitName);
+        if (unitPath.isEmpty()) {
+            qDebug() << "Skip systemd service (unit missing):" << unitName;
+            return;
+        }
+        QString effectiveUnit = unitName;
+        const QFileInfo unitInfo(unitPath);
+        if (unitInfo.isSymLink()) {
+            const QString targetName = QFileInfo(unitInfo.symLinkTarget()).fileName();
+            if (!targetName.isEmpty()) {
+                effectiveUnit = targetName;
+                qDebug() << "Follow systemd unit alias:" << unitName << "->" << effectiveUnit;
+            }
+        }
         if (enabled) {
-            proc.exec(u"systemctl"_s, {u"unmask"_s, service});
-            proc.exec(u"systemctl"_s, {u"enable"_s, service});
+            proc.exec(u"systemctl"_s, {u"unmask"_s, effectiveUnit});
+            proc.exec(u"systemctl"_s, {u"enable"_s, effectiveUnit});
         } else {
-            proc.exec(u"systemctl"_s, {u"disable"_s, service});
-            proc.exec(u"systemctl"_s, {u"mask"_s, service});
+            proc.exec(u"systemctl"_s, {u"disable"_s, effectiveUnit});
+            proc.exec(u"systemctl"_s, {u"mask"_s, effectiveUnit});
         }
     }
     if (containsRunit) {
