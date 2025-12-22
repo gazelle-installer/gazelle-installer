@@ -331,7 +331,7 @@ void MInstall::setupAutoMount(bool enabled)
         // disable auto-mount
         if (have_sysctl) {
             // Use systemctl to prevent automount by masking currently unmasked mount points
-            proc.shell(u"systemctl list-units --full --all -t mount --no-legend 2>/dev/null"
+            proc.shell(u"systemctl list-units --full --all -t mount --no-legend --plain 2>/dev/null"
                 " | grep -v masked | cut -f1 -d' ' | grep -Ev '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc"
                     "|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'"_s, nullptr, true);
             const QStringList &maskedMounts = proc.readOutLines();
