@@ -83,7 +83,7 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     const QString &sqtoram = liveInfo.getString(u"TORAM_MP"_s, u"/live/to-ram"_s) + sqpath;
     QString infile;
     if (archLive) {
-        infile = u"/run/archiso/bootmnt/arhc/x86_64/airootfs.md5"_s; // fall back to du if metadata is unavailable
+        infile = u"/run/archiso/bootmnt/arch/x86_64/airootfs.md5"_s; // fall back to du if metadata is unavailable
     } else {
         infile = sqtoram + "/linuxfs.info"_L1;
         if (!QFile::exists(infile)) {
