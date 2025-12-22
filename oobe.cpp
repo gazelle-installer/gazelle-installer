@@ -395,6 +395,25 @@ QWidget *Oobe::validateComputerName() const noexcept
 void Oobe::setComputerName() const
 {
     QString etcpath = online ? u"/etc"_s : u"/mnt/antiX/etc"_s;
+    const auto isArchTarget = [etcpath]() -> bool {
+        QFile file(etcpath + "/os-release"_L1);
+        if (!file.open(QFile::ReadOnly | QFile::Text)) {
+            return false;
+        }
+        while (!file.atEnd()) {
+            QString line = QString::fromUtf8(file.readLine()).trimmed();
+            if (!line.startsWith("ID="_L1) && !line.startsWith("ID_LIKE="_L1)) {
+                continue;
+            }
+            QString value = line.section('=', 1).trimmed();
+            value.remove('"');
+            if (value == "arch"_L1 || value.contains("arch"_L1)) {
+                return true;
+            }
+        }
+        return false;
+    };
+    const bool archTarget = isArchTarget();
     if (haveSamba) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/samba/smb.conf");
         replaceStringInFile(u"WORKGROUP"_s, gui.textComputerGroup->text(), etcpath + "/samba/smb.conf"_L1);
@@ -402,10 +421,20 @@ void Oobe::setComputerName() const
     //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = gui.textComputerName->text();
     const QString &domainname = gui.textComputerDomain->text();
-    QString cmd("sed -E -i '/localhost/! s/^(127\\.0\\.0\\.1|127\\.0\\.1\\.1).*/\\1    "_L1 + compname + "/'"_L1);
-    proc.shell(cmd + ' ' + etcpath + "/hosts"_L1);
+    const QString hostsPath = etcpath + "/hosts"_L1;
+    const QString hostEntry = domainname.isEmpty()
+        ? compname
+        : compname + "."_L1 + domainname + " "_L1 + compname;
+    if (QFileInfo::exists(hostsPath)) {
+        proc.shell("sed -E -i 's/^127\\.0\\.1\\.1\\s+.*/127.0.1.1    "_L1
+            + hostEntry + "/' "_L1 + hostsPath);
+        proc.shell("grep -qE '^127\\.0\\.1\\.1\\s' "_L1 + hostsPath
+            + " || echo \"127.0.1.1    "_L1 + hostEntry + "\" >> "_L1 + hostsPath);
+    }
     proc.shell("echo \""_L1 + compname + "\" | cat > "_L1 + etcpath + "/hostname"_L1);
-    proc.shell("echo \""_L1 + compname + "\" | cat > "_L1 + etcpath + "/mailname"_L1);
+    if (!archTarget) {
+        proc.shell("echo \""_L1 + compname + "\" | cat > "_L1 + etcpath + "/mailname"_L1);
+    }
     const QString dhclientConf = etcpath + "/dhcp/dhclient.conf"_L1;
     if (QFileInfo::exists(dhclientConf)) {
         proc.shell("sed -i 's/.*send host-name.*/send host-name \""_L1
@@ -413,7 +442,9 @@ void Oobe::setComputerName() const
     } else {
         qDebug() << "Skip dhclient.conf update (missing):" << dhclientConf;
     }
-    proc.shell("echo \""_L1 + domainname + "\" | cat > "_L1 + etcpath + "/defaultdomain"_L1);
+    if (!archTarget) {
+        proc.shell("echo \""_L1 + domainname + "\" | cat > "_L1 + etcpath + "/defaultdomain"_L1);
+    }
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone
