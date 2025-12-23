@@ -33,6 +33,7 @@ class Base
     QString liveToInstalled;
     long long sourceInodes = 1;
     long long bufferRoot = 0, bufferHome = 0;
+    bool archLive = false;
     bool pretend = false;
     bool sync = false;
     bool populateMediaMounts = false;

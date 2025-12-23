@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
+#include <cctype>
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -60,11 +61,15 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
         if (QFileInfo::exists(path)) rootSources << path;
     };
     addIfExists(rootBase + u"/bin"_s);
-    addIfExists(rootBase + u"/dev"_s);
+    if (!archLive) {
+        addIfExists(rootBase + u"/dev"_s);
+    }
     addIfExists(rootBase + u"/etc"_s);
     addIfExists(rootBase + u"/lib"_s);
-    addIfExists(rootBase + u"/media"_s);
-    addIfExists(rootBase + u"/mnt"_s);
+    if (!archLive) {
+        addIfExists(rootBase + u"/media"_s);
+        addIfExists(rootBase + u"/mnt"_s);
+    }
     addIfExists(rootBase + u"/root"_s);
     addIfExists(rootBase + u"/sbin"_s);
     addIfExists(rootBase + u"/usr"_s);
@@ -363,9 +368,23 @@ void Base::copyLinux(bool skiphome)
     // setup and start the process
     QString prog = u"cp"_s;
     QStringList args("-av");
-    if (sync) {
+    const bool useRsync = sync || archLive;
+    const bool trackRsyncProgress = useRsync && archLive;
+    if (useRsync) {
         prog = "rsync"_L1;
-        args << u"--delete"_s;
+        if (sync) args << u"--delete"_s;
+        if (archLive) {
+            args << u"--exclude=/dev/*"_s
+                << u"--exclude=/proc/*"_s
+                << u"--exclude=/sys/*"_s
+                << u"--exclude=/run/*"_s
+                << u"--exclude=/tmp/*"_s
+                << u"--exclude=/mnt/*"_s
+                << u"--exclude=/media/*"_s
+                << u"--exclude=/lost+found"_s
+                << u"--info=progress2"_s
+                << u"--outbuf=L"_s;
+        }
         if (skiphome) {
             args << u"--filter"_s << u"protect home/*"_s;
         }
@@ -375,7 +394,8 @@ void Base::copyLinux(bool skiphome)
         sources.removeAll(homeSource);
     }
     args << bootSource << sources << u"/mnt/antiX"_s;
-    proc.advance(80, sourceInodes);
+    const long copySteps = trackRsyncProgress ? 100 : sourceInodes;
+    proc.advance(80, copySteps);
     proc.status(tr("Copying new system"));
     // Placed here so the progress bar moves to the right position before the next step.
 
@@ -386,16 +406,100 @@ void Base::copyLinux(bool skiphome)
     QEventLoop eloop;
     QObject::connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     QObject::connect(&proc, &QProcess::readyRead, &eloop, &QEventLoop::quit);
+    QObject::connect(&proc, &QProcess::readyReadStandardError, &eloop, &QEventLoop::quit);
     proc.start(prog, args);
     long ncopy = 0;
+    int rsyncPercent = -1;
+    QByteArray stderrBuffer;
+    const auto parseRsyncPercentLine = [](const QByteArray &line) {
+        const int toChkPos = line.indexOf("to-chk=");
+        if (toChkPos >= 0) {
+            const int remainStart = toChkPos + 7;
+            const int slashPos = line.indexOf('/', remainStart);
+            if (slashPos > remainStart) {
+                bool okRemain = false;
+                const int remaining = line.mid(remainStart, slashPos - remainStart).toInt(&okRemain);
+                int totalEnd = slashPos + 1;
+                while (totalEnd < line.size()
+                    && std::isdigit(static_cast<unsigned char>(line.at(totalEnd)))) {
+                    ++totalEnd;
+                }
+                bool okTotal = false;
+                const int total = line.mid(slashPos + 1, totalEnd - (slashPos + 1)).toInt(&okTotal);
+                if (okRemain && okTotal && total > 0) {
+                    const long long done = static_cast<long long>(total) - remaining;
+                    int pct = static_cast<int>((done * 100LL) / total);
+                    if (pct < 0) pct = 0;
+                    if (pct > 100) pct = 100;
+                    return pct;
+                }
+            }
+        }
+        const int pctPos = line.lastIndexOf('%');
+        if (pctPos <= 0) return -1;
+        int start = pctPos - 1;
+        while (start >= 0 && std::isdigit(static_cast<unsigned char>(line.at(start)))) {
+            --start;
+        }
+        ++start;
+        if (start >= pctPos) return -1;
+        bool ok = false;
+        const int pct = QByteArray(line.mid(start, pctPos - start)).toInt(&ok);
+        return ok ? pct : -1;
+    };
+    QByteArray rsyncStdoutBuffer;
+    QByteArray rsyncStderrBuffer;
+    const auto updateRsyncPercent = [&parseRsyncPercentLine](const QByteArray &chunk, QByteArray &buffer, int &pctOut) {
+        buffer.append(chunk);
+        buffer.replace('\r', '\n');
+        const int lastNewline = buffer.lastIndexOf('\n');
+        if (lastNewline < 0) return;
+        const QByteArray complete = buffer.left(lastNewline);
+        buffer = buffer.mid(lastNewline + 1);
+        const QList<QByteArray> lines = complete.split('\n');
+        for (const QByteArray &line : lines) {
+            const int pct = parseRsyncPercentLine(line);
+            if (pct >= 0) pctOut = pct;
+        }
+    };
+    const auto isProgressLine = [](const QByteArray &line) {
+        return line.contains('%') && (line.contains("to-chk=") || line.contains("xfr#"));
+    };
     while (proc.state() != QProcess::NotRunning) {
         eloop.exec();
-        ncopy += proc.readAllStandardOutput().count('\n');
-        proc.status(ncopy);
+        const QByteArray stdoutChunk = proc.readAllStandardOutput();
+        if (!stdoutChunk.isEmpty()) {
+            ncopy += stdoutChunk.count('\n');
+            if (trackRsyncProgress) {
+                updateRsyncPercent(stdoutChunk, rsyncStdoutBuffer, rsyncPercent);
+            }
+        }
+        const QByteArray stderrChunk = proc.readAllStandardError();
+        if (!stderrChunk.isEmpty()) {
+            if (trackRsyncProgress) {
+                updateRsyncPercent(stderrChunk, rsyncStderrBuffer, rsyncPercent);
+                QByteArray cleaned = stderrChunk;
+                cleaned.replace('\r', '\n');
+                const QList<QByteArray> lines = cleaned.split('\n');
+                for (const QByteArray &line : lines) {
+                    if (!line.isEmpty() && !isProgressLine(line)) {
+                        stderrBuffer.append(line);
+                        stderrBuffer.append('\n');
+                    }
+                }
+            } else {
+                stderrBuffer.append(stderrChunk);
+            }
+        }
+        if (trackRsyncProgress) {
+            if (rsyncPercent >= 0) proc.status(rsyncPercent);
+        } else {
+            proc.status(ncopy);
+        }
     }
     proc.disconnect(&eloop);
 
-    const QByteArray &StdErr = proc.readAllStandardError();
+    const QByteArray &StdErr = stderrBuffer;
     if (!StdErr.isEmpty()) {
         qDebug() << "SErr COPY:" << StdErr;
         QFont logFont = logEntry->font();
