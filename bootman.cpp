@@ -127,7 +127,20 @@ void BootMan::install(const QStringList &cmdextra)
     }
 
     bool efivars_ismounted = false;
-    if (gui.boxBoot->isChecked() && gui.radioBootESP->isChecked()) {
+    const bool replacementMode = gui.radioReplace->isChecked();
+    const bool espRequested = gui.boxBoot->isChecked() && gui.radioBootESP->isChecked();
+    const PartMan::Device *espdev = nullptr;
+    if (espRequested) {
+        espdev = partman.findByMount(u"/boot/efi"_s);
+        if (!espdev) espdev = partman.findByMount(u"/boot"_s);
+    }
+    const bool haveEsp = espdev && espdev->flags.sysEFI;
+    const bool fallbackToMbr = replacementMode && espRequested && !haveEsp;
+    const bool useEsp = espRequested && haveEsp;
+    if (fallbackToMbr) {
+        qDebug() << "ESP not found during replacement, falling back to BIOS/MBR install.";
+    }
+    if (useEsp) {
         const QString &efivars = u"/sys/firmware/efi/efivars"_s;
         if (QFileInfo(efivars).isDir()) {
             efivars_ismounted = proc.exec(u"mountpoint"_s, {u"-q"_s, efivars});
@@ -145,7 +158,7 @@ void BootMan::install(const QStringList &cmdextra)
         // install new Grub now
         const int efisize = core.detectEFI(true);
         const QString &bootdev = "/dev/"_L1 + gui.comboBoot->currentData().toString();
-        if (!gui.radioBootESP->isChecked()) {
+        if (!useEsp) {
             proc.exec(u"grub-install"_s, {u"--target=i386-pc"_s, u"--recheck"_s,
                 u"--no-floppy"_s, u"--force"_s, u"--boot-directory=/mnt/antiX/boot"_s, bootdev});
         } else {
@@ -165,8 +178,6 @@ void BootMan::install(const QStringList &cmdextra)
             QStringList grubinstargs({u"--no-nvram"_s, u"--force-extra-removable"_s,
                 (efisize==32 ? u"--target=i386-efi"_s : u"--target=x86_64-efi"_s),
                 "--bootloader-id="_L1 + loaderID, u"--recheck"_s});
-            const PartMan::Device *espdev = partman.findByMount(u"/boot/efi"_s);
-            if (!espdev) espdev = partman.findByMount(u"/boot"_s);
             QString efiDir;
             if (espdev) {
                 efiDir = espdev->mountPoint();
