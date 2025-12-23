@@ -52,7 +52,11 @@ if [ "$EUID" != 0 ]; then
         if command -v su-to-root >/dev/null 2>&1; then
             AUTHENTICATION="su-to-root -X -c"
         elif command -v pkexec >/dev/null 2>&1; then
-            AUTHENTICATION="pkexec --action-id org.mxlinux.minstall-launcher env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY"
+            PKEXEC_CMD="pkexec"
+            if pkexec --help 2>/dev/null | grep -q -- '--action-id'; then
+                PKEXEC_CMD="pkexec --action-id org.mxlinux.minstall-launcher"
+            fi
+            AUTHENTICATION="$PKEXEC_CMD env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY"
         elif command -v sudo >/dev/null 2>&1; then
             AUTHENTICATION="sudo -E"
         else
