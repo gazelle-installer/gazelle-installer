@@ -323,8 +323,8 @@ void BootMan::install(const QStringList &cmdextra)
 
         sect.setRoot("/mnt/antiX");
         //update grub with new config
-        const bool haveUpdateGrub = QFileInfo(u"/usr/sbin/update-grub"_s).isExecutable()
-            || QFileInfo(u"/usr/bin/update-grub"_s).isExecutable()
+        const bool haveUpdateGrub = QFileInfo(u"/usr/bin/update-grub"_s).isExecutable()
+            || QFileInfo(u"/usr/sbin/update-grub"_s).isExecutable()
             || QFileInfo(u"/sbin/update-grub"_s).isExecutable();
         if (haveUpdateGrub) {
             proc.exec(u"update-grub"_s);
@@ -383,8 +383,8 @@ void BootMan::install(const QStringList &cmdextra)
         }
     }
 
-    const bool haveUpdateInitramfs = QFileInfo(u"/usr/sbin/update-initramfs"_s).isExecutable()
-        || QFileInfo(u"/usr/bin/update-initramfs"_s).isExecutable()
+    const bool haveUpdateInitramfs = QFileInfo(u"/usr/bin/update-initramfs"_s).isExecutable()
+        || QFileInfo(u"/usr/sbin/update-initramfs"_s).isExecutable()
         || QFileInfo(u"/sbin/update-initramfs"_s).isExecutable();
     if (haveUpdateInitramfs) {
         proc.exec(u"update-initramfs"_s, {u"-u"_s, u"-t"_s, u"-k"_s, u"all"_s});

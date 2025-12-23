@@ -32,7 +32,7 @@ using namespace Qt::Literals::StringLiterals;
 Core::Core(MProcess &mproc) : proc(mproc)
 {
     // These SysVinit files are present as symlinks on systemd-only systems.
-    for (const auto &path : {u"/usr/sbin/init"_s, u"/usr/bin/init"_s, u"/live/aufs/usr/sbin/init"_s}) {
+    for (const auto &path : {u"/usr/bin/init"_s, u"/usr/sbin/init"_s, u"/live/aufs/usr/sbin/init"_s}) {
         const QFileInfo initfile(path); // Online and Offline respectively
         if (!initfile.isSymbolicLink() && initfile.isExecutable()) {
             containsSysVinit = true;

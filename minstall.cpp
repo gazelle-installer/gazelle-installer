@@ -151,9 +151,9 @@ void MInstall::runShutdown(const QString &action) noexcept
         return;
     }
 
-    const QString sbinPath = "/usr/sbin/"_L1 + action;
     const QString binPath = "/usr/bin/"_L1 + action;
-    const QString &fallback = QFileInfo(sbinPath).isExecutable() ? sbinPath : binPath;
+    const QString sbinPath = "/usr/sbin/"_L1 + action;
+    const QString &fallback = QFileInfo(binPath).isExecutable() ? binPath : sbinPath;
     proc.exec(fallback);
 }
 
@@ -447,8 +447,8 @@ void MInstall::processNextPhase() noexcept
             oobe->process();
             phase = PH_FINISHED;
             gui.labelSplash->setText(tr("Configuration complete. Restarting system."));
-            const QString rebootCmd = QFileInfo(u"/usr/sbin/reboot"_s).isExecutable()
-                ? u"/usr/sbin/reboot"_s : u"/usr/bin/reboot"_s;
+            const QString rebootCmd = QFileInfo(u"/usr/bin/reboot"_s).isExecutable()
+                ? u"/usr/bin/reboot"_s : u"/usr/sbin/reboot"_s;
             proc.exec(rebootCmd);
         }
     } catch (const char *msg) {
@@ -1120,8 +1120,8 @@ void MInstall::closeEvent(QCloseEvent *event) noexcept
         gotoPage(Step::SPLASH);
         proc.unhalt();
         if (!pretend) {
-            const QString shutdownCmd = QFileInfo(u"/usr/sbin/shutdown"_s).isExecutable()
-                ? u"/usr/sbin/shutdown"_s : u"/usr/bin/shutdown"_s;
+            const QString shutdownCmd = QFileInfo(u"/usr/bin/shutdown"_s).isExecutable()
+                ? u"/usr/bin/shutdown"_s : u"/usr/sbin/shutdown"_s;
             proc.exec(shutdownCmd, {u"-hP"_s, u"now"_s});
         }
     } else {

@@ -700,10 +700,10 @@ void PartMan::partReloadClick()
 void PartMan::partManRunClick()
 {
     gui.boxMain->setEnabled(false);
-    if (QFile::exists(u"/usr/sbin/gparted"_s)) {
-        proc.exec(u"/usr/sbin/gparted"_s);
-    } else if (QFile::exists(u"/usr/bin/gparted"_s)) {
+    if (QFile::exists(u"/usr/bin/gparted"_s)) {
         proc.exec(u"/usr/bin/gparted"_s);
+    } else if (QFile::exists(u"/usr/sbin/gparted"_s)) {
+        proc.exec(u"/usr/sbin/gparted"_s);
     } else {
         proc.exec(u"partitionmanager"_s);
     }
@@ -1362,7 +1362,9 @@ void PartMan::formatPartitions()
             QStringList cargs;
             if (format == "btrfs"_L1) {
                 cargs.append(u"-f"_s);
-                proc.exec(u"cp"_s, {u"-fp"_s, u"/usr/bin/true"_s, u"/usr/sbin/fsck.auto"_s});
+                const QString fsckAuto =
+                    QFileInfo(u"/usr/bin/fsck.auto"_s).exists() ? u"/usr/bin/fsck.auto"_s : u"/usr/sbin/fsck.auto"_s;
+                proc.exec(u"cp"_s, {u"-fp"_s, u"/usr/bin/true"_s, fsckAuto});
                 if (volume->size < 6000000000) {
                     cargs << u"-M"_s << u"-O"_s << u"skinny-metadata"_s; // Mixed mode (-M)
                 }

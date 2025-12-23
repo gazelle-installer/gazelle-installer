@@ -47,13 +47,16 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     bufferRoot = appConf.getInteger(u"RootBuffer"_s, 1024) * MB;
     bufferHome = appConf.getInteger(u"HomeBuffer"_s, 1024) * MB;
     appConf.setSection();
-    liveToInstalled = appConf.getString(u"LiveToInstalledScript"_s, u"/usr/sbin/live-to-installed"_s);
-    if (!QFileInfo(liveToInstalled).isExecutable() && QFileInfo(u"/usr/bin/live-to-installed"_s).isExecutable()) {
-        liveToInstalled = u"/usr/bin/live-to-installed"_s;
+    liveToInstalled = appConf.getString(u"LiveToInstalledScript"_s, u"/usr/bin/live-to-installed"_s);
+    if (!QFileInfo(liveToInstalled).isExecutable() && QFileInfo(u"/usr/sbin/live-to-installed"_s).isExecutable()) {
+        liveToInstalled = u"/usr/sbin/live-to-installed"_s;
     }
 
-    const bool archLive = QFileInfo::exists(u"/run/archiso/airootfs"_s);
-    rootBase = archLive ? u"/run/archiso/airootfs"_s : u"/live/aufs"_s;
+    archLive = QFileInfo::exists(u"/run/archiso/airootfs"_s);
+    if (archLive && QFileInfo(u"/usr/bin/live-to-installed"_s).isExecutable()) {
+        liveToInstalled = u"/usr/bin/live-to-installed"_s;
+    }
+    rootBase = archLive ? u"/"_s : u"/live/aufs"_s;
     homeSource = rootBase + u"/home"_s;
 
     bootSource = rootBase + u"/boot"_s;
@@ -293,7 +296,7 @@ void Base::install()
     qDebug() << "Desktop menu";
     const bool hasDesktopMenu =
         QFileInfo::exists(u"/mnt/antiX/usr/bin/desktop-menu"_s) ||
-        QFileInfo::exists(u"/mnt/antiX/usr/sbin/desktop-menu"_s);
+        (!archLive && QFileInfo::exists(u"/mnt/antiX/usr/sbin/desktop-menu"_s));
     if (hasDesktopMenu) {
         proc.exec(u"chroot"_s, {u"/mnt/antiX"_s, u"desktop-menu"_s, u"--write-out-global"_s});
     } else {

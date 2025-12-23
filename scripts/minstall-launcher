@@ -75,7 +75,11 @@ else
     # root user
 
     # restrict PATH for security
-    PATH="/usr/bin:/usr/sbin:/usr/local/bin"
+    if [ -e /run/archiso/airootfs ] || [ ! -d /usr/sbin ]; then
+        PATH="/usr/bin:/usr/local/bin"
+    else
+        PATH="/usr/bin:/usr/sbin:/usr/local/bin"
+    fi
 
     # put pattern list of environment variables we want get from users environment into array
     __ENVIRONEMENT_PATTERN__=(
@@ -118,8 +122,12 @@ else
 
     RUN="/usr/bin/minstall"
     echo Starting "$RUN"
-    # always change working directory to /usr/sbin for security
-    cd "/usr/sbin"
+    # always change working directory to a trusted system dir for security
+    if [ -d /usr/sbin ] && [ ! -e /run/archiso/airootfs ]; then
+        cd "/usr/sbin"
+    else
+        cd "/usr/bin"
+    fi
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
     exec "$RUN"
 fi

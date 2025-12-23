@@ -241,8 +241,8 @@ void Oobe::enable() const
     //setService(u"smbd"_s, false);
     //setService(u"nmbd"_s, false);
     //setService(u"samba-ad-dc"_s, false);
-    const bool haveUpdateRc = QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
-        || QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
+    const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
+        || QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
         || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
     if (haveUpdateRc) {
         proc.exec(u"update-rc.d"_s, {u"-f"_s, u"oobe"_s, u"defaults"_s});
@@ -282,8 +282,8 @@ void Oobe::process() const
     }
     if (online) {
         proc.shell(u"sed -i 's/nosplash\\b/splash/g' /boot/grub/grub.cfg"_s);
-        const bool haveUpdateRc = QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
-            || QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
+        const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
+            || QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
             || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
         if (haveUpdateRc) {
             proc.exec(u"update-rc.d"_s, {u"oobe"_s, u"disable"_s});
@@ -468,9 +468,9 @@ void Oobe::setLocale() const
     qDebug() << "Update locale";
     const QString langSetting = gui.comboLocale->currentData().toString();
     if (!langSetting.isEmpty()) {
-        QString updateLocale = u"/usr/sbin/update-locale"_s;
+        QString updateLocale = u"/usr/bin/update-locale"_s;
         if (!QFileInfo(updateLocale).isExecutable()) {
-            updateLocale = u"/usr/bin/update-locale"_s;
+            updateLocale = u"/usr/sbin/update-locale"_s;
         }
         QString cmd;
         if (!online) cmd = "chroot /mnt/antiX "_L1;
