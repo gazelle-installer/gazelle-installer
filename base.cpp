@@ -447,11 +447,19 @@ void Base::copyLinux(bool skiphome)
     int rsyncPercent = -1;
     long long rsyncTotal = (trackRsyncProgress ? copySteps : 0);
     long long rsyncRemaining = -1;
+    long long rsyncXfer = -1;
     QByteArray stderrBuffer;
-    const auto parseRsyncProgressLine = [](const QByteArray &line, long long &remainingOut, long long &totalOut) {
-        const int toChkPos = line.indexOf("to-chk=");
-        if (toChkPos >= 0) {
-            const int remainStart = toChkPos + 7;
+    const auto parseRsyncProgressLine = [](
+        const QByteArray &line,
+        long long &remainingOut,
+        long long &totalOut,
+        long long &xferOut) {
+        int chkPos = line.indexOf("to-chk=");
+        if (chkPos < 0) {
+            chkPos = line.indexOf("ir-chk=");
+        }
+        if (chkPos >= 0) {
+            const int remainStart = chkPos + 7;
             const int slashPos = line.indexOf('/', remainStart);
             if (slashPos > remainStart) {
                 bool okRemain = false;
@@ -476,6 +484,20 @@ void Base::copyLinux(bool skiphome)
                 }
             }
         }
+        const int xfrPos = line.indexOf("xfr#");
+        if (xfrPos >= 0) {
+            int numStart = xfrPos + 4;
+            int numEnd = numStart;
+            while (numEnd < line.size()
+                && std::isdigit(static_cast<unsigned char>(line.at(numEnd)))) {
+                ++numEnd;
+            }
+            if (numEnd > numStart) {
+                bool ok = false;
+                const long long xfr = line.mid(numStart, numEnd - numStart).toLongLong(&ok);
+                if (ok) xferOut = xfr;
+            }
+        }
         const int pctPos = line.lastIndexOf('%');
         if (pctPos <= 0) return -1;
         int start = pctPos - 1;
@@ -495,7 +517,8 @@ void Base::copyLinux(bool skiphome)
         QByteArray &buffer,
         int &pctOut,
         long long &remainingOut,
-        long long &totalOut) {
+        long long &totalOut,
+        long long &xferOut) {
         buffer.append(chunk);
         buffer.replace('\r', '\n');
         const int lastNewline = buffer.lastIndexOf('\n');
@@ -504,7 +527,7 @@ void Base::copyLinux(bool skiphome)
         buffer = buffer.mid(lastNewline + 1);
         const QList<QByteArray> lines = complete.split('\n');
         for (const QByteArray &line : lines) {
-            const int pct = parseRsyncProgressLine(line, remainingOut, totalOut);
+            const int pct = parseRsyncProgressLine(line, remainingOut, totalOut, xferOut);
             if (pct >= 0) pctOut = pct;
         }
     };
@@ -517,13 +540,25 @@ void Base::copyLinux(bool skiphome)
         if (!stdoutChunk.isEmpty()) {
             ncopy += stdoutChunk.count('\n');
             if (trackRsyncProgress) {
-                updateRsyncProgress(stdoutChunk, rsyncStdoutBuffer, rsyncPercent, rsyncRemaining, rsyncTotal);
+                updateRsyncProgress(
+                    stdoutChunk,
+                    rsyncStdoutBuffer,
+                    rsyncPercent,
+                    rsyncRemaining,
+                    rsyncTotal,
+                    rsyncXfer);
             }
         }
         const QByteArray stderrChunk = proc.readAllStandardError();
         if (!stderrChunk.isEmpty()) {
             if (trackRsyncProgress) {
-                updateRsyncProgress(stderrChunk, rsyncStderrBuffer, rsyncPercent, rsyncRemaining, rsyncTotal);
+                updateRsyncProgress(
+                    stderrChunk,
+                    rsyncStderrBuffer,
+                    rsyncPercent,
+                    rsyncRemaining,
+                    rsyncTotal,
+                    rsyncXfer);
                 QByteArray cleaned = stderrChunk;
                 cleaned.replace('\r', '\n');
                 const QList<QByteArray> lines = cleaned.split('\n');
@@ -538,11 +573,19 @@ void Base::copyLinux(bool skiphome)
             }
         }
         if (trackRsyncProgress) {
-            if (rsyncTotal > 0 && rsyncRemaining >= 0) {
+            if (copySteps > 0 && rsyncXfer >= 0) {
+                const long long done = std::min(rsyncXfer, copySteps);
+                proc.status(done);
+            } else if (rsyncTotal > 0 && rsyncRemaining >= 0) {
                 const long long done = rsyncTotal - rsyncRemaining;
                 proc.status(done);
             } else if (rsyncPercent >= 0) {
-                proc.status(rsyncPercent);
+                if (copySteps > 0) {
+                    const long long done = (copySteps * rsyncPercent) / 100;
+                    proc.status(done);
+                } else {
+                    proc.status(rsyncPercent);
+                }
             }
         } else {
             proc.status(ncopy);
