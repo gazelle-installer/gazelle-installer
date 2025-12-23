@@ -1,6 +1,24 @@
 #!/bin/bash
 # Build script - see below for command information.
 set -e
+
+# Parse options
+PRESET="default"
+ARCH_MODE=false
+
+while [[ $# -gt 0 ]]; do
+	case $1 in
+		--arch)
+			PRESET="arch"
+			ARCH_MODE=true
+			shift
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
 case "${1:-all}" in
 	clean)
 		echo "Performing ultimate clean..."
@@ -9,17 +27,17 @@ case "${1:-all}" in
 
 	configure)
 		echo "Configuring project..."
-		cmake --preset default
+		cmake --preset $PRESET
 		;;
 
 	make-clean)
 		echo "Cleaning build artifacts..."
-		cmake --build --preset default --target clean
+		cmake --build --preset $PRESET --target clean
 		;;
 
 	make)
 		echo "Building project..."
-		cmake --build --preset default
+		cmake --build --preset $PRESET
 		;;
 
 	arch)
@@ -32,16 +50,18 @@ case "${1:-all}" in
 
 	all)
 		echo "Configuring and building project..."
-		cmake --workflow --preset default
+		cmake --workflow --preset $PRESET
 		;;
 
 	fresh)
 		echo "Fresh build (clean first, then configure and build)..."
-		cmake --workflow --preset default --fresh
+		cmake --workflow --preset $PRESET --fresh
 		;;
 
 	*)
-		echo "Usage: $0 [command]"
+		echo "Usage: $0 [--arch] [command]"
+		echo "Options:"
+		echo "  --arch        Use Arch Linux preset (disables zxcvbn)"
 		echo "Commands:"
 		echo "  clean        - Ultimate clean (rm -rf build)"
 		echo "  configure    - Configure only"
