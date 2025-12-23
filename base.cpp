@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include "mprocess.h"
 #include "core.h"
 #include "msettings.h"
@@ -397,8 +398,39 @@ void Base::copyLinux(bool skiphome)
         sources.removeAll(homeSource);
     }
     args << bootSource << sources << u"/mnt/antiX"_s;
-    const long copySteps = trackRsyncProgress ? 100 : sourceInodes;
-    proc.advance(80, copySteps);
+
+    long long copySteps = trackRsyncProgress ? 100 : sourceInodes;
+    if (trackRsyncProgress) {
+        QStringList dryArgs(args);
+        dryArgs.removeAll(u"--info=progress2"_s);
+        dryArgs.removeAll(u"--outbuf=L"_s);
+        dryArgs.removeAll(u"-av"_s);
+        dryArgs.prepend(u"-a"_s);
+        dryArgs.prepend(u"--no-motd"_s);
+        dryArgs.prepend(u"--stats"_s);
+        dryArgs.prepend(u"--dry-run"_s);
+
+        MProcess::Section drySect(proc, nullptr);
+        drySect.setExceptionStrict(false);
+        if (proc.exec(u"rsync"_s, dryArgs, nullptr, true)) {
+            static const QRegularExpression re(u"^Number of files:\\s+([0-9,]+)"_s);
+            const QStringList lines = proc.readOutLines();
+            for (const QString &line : lines) {
+                const QRegularExpressionMatch match = re.match(line);
+                if (!match.hasMatch()) continue;
+                QString countText = match.captured(1);
+                countText.remove(',');
+                bool ok = false;
+                const long long total = countText.toLongLong(&ok);
+                if (ok && total > 0) {
+                    copySteps = total;
+                }
+                break;
+            }
+        }
+    }
+    const int copySpace = trackRsyncProgress ? 85 : 80;
+    proc.advance(copySpace, copySteps);
     proc.status(tr("Copying new system"));
     // Placed here so the progress bar moves to the right position before the next step.
 
@@ -413,23 +445,29 @@ void Base::copyLinux(bool skiphome)
     proc.start(prog, args);
     long ncopy = 0;
     int rsyncPercent = -1;
+    long long rsyncTotal = (trackRsyncProgress ? copySteps : 0);
+    long long rsyncRemaining = -1;
     QByteArray stderrBuffer;
-    const auto parseRsyncPercentLine = [](const QByteArray &line) {
+    const auto parseRsyncProgressLine = [](const QByteArray &line, long long &remainingOut, long long &totalOut) {
         const int toChkPos = line.indexOf("to-chk=");
         if (toChkPos >= 0) {
             const int remainStart = toChkPos + 7;
             const int slashPos = line.indexOf('/', remainStart);
             if (slashPos > remainStart) {
                 bool okRemain = false;
-                const int remaining = line.mid(remainStart, slashPos - remainStart).toInt(&okRemain);
+                const QByteArray remainingText = line.mid(remainStart, slashPos - remainStart);
+                const long long remaining = remainingText.toLongLong(&okRemain);
                 int totalEnd = slashPos + 1;
                 while (totalEnd < line.size()
                     && std::isdigit(static_cast<unsigned char>(line.at(totalEnd)))) {
                     ++totalEnd;
                 }
                 bool okTotal = false;
-                const int total = line.mid(slashPos + 1, totalEnd - (slashPos + 1)).toInt(&okTotal);
+                const QByteArray totalText = line.mid(slashPos + 1, totalEnd - (slashPos + 1));
+                const long long total = totalText.toLongLong(&okTotal);
                 if (okRemain && okTotal && total > 0) {
+                    remainingOut = remaining;
+                    totalOut = total;
                     const long long done = static_cast<long long>(total) - remaining;
                     int pct = static_cast<int>((done * 100LL) / total);
                     if (pct < 0) pct = 0;
@@ -452,7 +490,12 @@ void Base::copyLinux(bool skiphome)
     };
     QByteArray rsyncStdoutBuffer;
     QByteArray rsyncStderrBuffer;
-    const auto updateRsyncPercent = [&parseRsyncPercentLine](const QByteArray &chunk, QByteArray &buffer, int &pctOut) {
+    const auto updateRsyncProgress = [&parseRsyncProgressLine](
+        const QByteArray &chunk,
+        QByteArray &buffer,
+        int &pctOut,
+        long long &remainingOut,
+        long long &totalOut) {
         buffer.append(chunk);
         buffer.replace('\r', '\n');
         const int lastNewline = buffer.lastIndexOf('\n');
@@ -461,7 +504,7 @@ void Base::copyLinux(bool skiphome)
         buffer = buffer.mid(lastNewline + 1);
         const QList<QByteArray> lines = complete.split('\n');
         for (const QByteArray &line : lines) {
-            const int pct = parseRsyncPercentLine(line);
+            const int pct = parseRsyncProgressLine(line, remainingOut, totalOut);
             if (pct >= 0) pctOut = pct;
         }
     };
@@ -474,13 +517,13 @@ void Base::copyLinux(bool skiphome)
         if (!stdoutChunk.isEmpty()) {
             ncopy += stdoutChunk.count('\n');
             if (trackRsyncProgress) {
-                updateRsyncPercent(stdoutChunk, rsyncStdoutBuffer, rsyncPercent);
+                updateRsyncProgress(stdoutChunk, rsyncStdoutBuffer, rsyncPercent, rsyncRemaining, rsyncTotal);
             }
         }
         const QByteArray stderrChunk = proc.readAllStandardError();
         if (!stderrChunk.isEmpty()) {
             if (trackRsyncProgress) {
-                updateRsyncPercent(stderrChunk, rsyncStderrBuffer, rsyncPercent);
+                updateRsyncProgress(stderrChunk, rsyncStderrBuffer, rsyncPercent, rsyncRemaining, rsyncTotal);
                 QByteArray cleaned = stderrChunk;
                 cleaned.replace('\r', '\n');
                 const QList<QByteArray> lines = cleaned.split('\n');
@@ -495,7 +538,12 @@ void Base::copyLinux(bool skiphome)
             }
         }
         if (trackRsyncProgress) {
-            if (rsyncPercent >= 0) proc.status(rsyncPercent);
+            if (rsyncTotal > 0 && rsyncRemaining >= 0) {
+                const long long done = rsyncTotal - rsyncRemaining;
+                proc.status(done);
+            } else if (rsyncPercent >= 0) {
+                proc.status(rsyncPercent);
+            }
         } else {
             proc.status(ncopy);
         }
