@@ -49,6 +49,10 @@ package() {
     install -Dm644 "minstall.desktop" "${pkgdir}/usr/share/applications/minstall.desktop"
     install -Dm644 "locales.template" "${pkgdir}/usr/share/antiX/locales.template"
 
+    # Create desktop shortcut for new users
+    install -dm755 "${pkgdir}/etc/skel/Desktop"
+    ln -s /usr/share/applications/minstall.desktop "${pkgdir}/etc/skel/Desktop/Installer.desktop"
+
     # Install polkit rules
     for policy in polkit/*.policy; do
         install -Dm644 "$policy" "${pkgdir}/usr/share/polkit-1/actions/$(basename $policy)"

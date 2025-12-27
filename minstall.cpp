@@ -513,7 +513,7 @@ void MInstall::loadConfig(int stage) noexcept
         }
     }
 
-    if (!config.good) {
+    if (!config.good && !configFile.isEmpty()) {
         QMessageBox msgbox(this);
         msgbox.setIcon(QMessageBox::Critical);
         msgbox.setText(tr("Invalid settings found in configuration file (%1).").arg(configFile));
