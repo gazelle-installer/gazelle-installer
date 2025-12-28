@@ -92,7 +92,7 @@ void CheckMD5::check(QPromise<CheckResult> &promise) const noexcept
     QString archSqName;
     const QStringList archBases = {
         u"/run/archiso/bootmnt/arch/x86_64"_s, // common Arch iso path
-        u"/run/archiso/bootmnt/arch/i686"_s    // 32-bit Arch ISO layout
+        u"/run/archiso/copytoram"_s            // fallback for toram option
     };
     const QStringList archNames = {u"airootfs.sfs"_s, u"airootfs.img"_s};
     for (const QString &candidate : archBases) {
