@@ -390,7 +390,30 @@ void BootMan::install(const QStringList &cmdextra)
             // Arch Linux: ensure autodetect hook is enabled (typically default)
             // The autodetect hook already provides host-specific module detection
             QFile::copy(archMkcfname, archMkcfname+".bak"_L1);
-            // No changes needed for Arch - autodetect hook handles this
+            // Check if we have LUKS devices and ensure encrypt hook is enabled
+            bool hasLuks = false;
+            for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
+                if (device->finalFormat() == "crypto_LUKS"_L1 || !device->map.isEmpty()) {
+                    hasLuks = true;
+                    break;
+                }
+            }
+            if (hasLuks) {
+                // Ensure encrypt hook is in HOOKS array for LUKS support
+                MIni mkcfg(archMkcfname, MIni::ReadWrite);
+                QString hooks = mkcfg.getString(u"HOOKS"_s);
+                if (!hooks.contains(u"encrypt"_s)) {
+                    // Insert encrypt hook before filesystems hook if it exists
+                    if (hooks.contains(u"filesystems"_s)) {
+                        hooks.replace(u"filesystems"_s, u"encrypt filesystems"_s);
+                    } else {
+                        // Append encrypt hook at the end
+                        hooks += u" encrypt"_s;
+                    }
+                    mkcfg.setString(u"HOOKS"_s, hooks.trimmed());
+                    mkcfg.save();
+                }
+            }
         }
     }
 
