@@ -117,6 +117,41 @@ void BootMan::install(const QStringList &cmdextra)
     MProcess::Section sect(proc, QT_TR_NOOP("GRUB installation failed. You can reboot to"
         " the live medium and use the GRUB Rescue menu to repair the installation."));
     proc.advance(4, 4);
+    const QString targetRoot(u"/mnt/antiX"_s);
+    const QString archMkcfname = targetRoot + "/etc/mkinitcpio.conf"_L1;
+
+    struct LuksEntry {
+        QString uuid;
+        QString map;
+    };
+    QList<LuksEntry> luksEntries;
+    for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
+        if (device->type != PartMan::Device::PARTITION) continue;
+        const bool required = device->addToCrypttab || device->encrypt || !device->map.isEmpty();
+        if (!required) continue;
+        QString mapName = device->map;
+        if (mapName.isEmpty()) {
+            const QString mappedPath = device->mappedDevice();
+            if (mappedPath.startsWith(u"/dev/mapper/"_s)) {
+                mapName = mappedPath.mid(12);
+            }
+        }
+        QString luksUuid = device->uuid;
+        if (luksUuid.isEmpty() && mapName.startsWith(u"luks-"_s, Qt::CaseInsensitive)) {
+            luksUuid = mapName.mid(5);
+        }
+        if (luksUuid.isEmpty()) continue;
+        if (mapName.isEmpty()) mapName = u"luks-"_s + luksUuid;
+        luksEntries.append({luksUuid, mapName});
+    }
+    const bool hasLuks = !luksEntries.isEmpty();
+    const bool hasMkinitcpio = QFileInfo::exists(archMkcfname);
+    bool useSystemdInitrd = false;
+    if (hasMkinitcpio) {
+        const MIni mkcfg(archMkcfname, MIni::ReadOnly);
+        const QString hooks = mkcfg.getString(u"HOOKS"_s);
+        useSystemdInitrd = hooks.contains(u"systemd"_s) || hooks.contains(u"sd-encrypt"_s);
+    }
 
     sect.setExceptionStrict(false);
     // the old initrd is not valid for this hardware
@@ -274,6 +309,37 @@ void BootMan::install(const QStringList &cmdextra)
         finalcmdline.append(cmdextra);
         qDebug() << "intermediate" << finalcmdline;
 
+        if (hasLuks && hasMkinitcpio) {
+            const QString mapperPrefix = u"/dev/mapper/"_s;
+            if (useSystemdInitrd) {
+                for (const auto &entry : std::as_const(luksEntries)) {
+                    finalcmdline.append("rd.luks.name="_L1 + entry.uuid + "="_L1 + entry.map);
+                }
+            } else {
+                QString rootMapName;
+                const PartMan::Device *rootDev = partman.findByMount(u"/"_s);
+                if (rootDev) {
+                    const QString mappedPath = rootDev->mappedDevice();
+                    if (mappedPath.startsWith(mapperPrefix)) {
+                        rootMapName = mappedPath.mid(mapperPrefix.size());
+                    }
+                }
+                const LuksEntry *rootEntry = nullptr;
+                if (!rootMapName.isEmpty()) {
+                    for (const auto &entry : std::as_const(luksEntries)) {
+                        if (entry.map == rootMapName) {
+                            rootEntry = &entry;
+                            break;
+                        }
+                    }
+                }
+                if (!rootEntry && !luksEntries.isEmpty()) rootEntry = &luksEntries.front();
+                if (rootEntry) {
+                    finalcmdline.append("cryptdevice=UUID="_L1 + rootEntry->uuid + ":"_L1 + rootEntry->map);
+                }
+            }
+        }
+
         {
             // Add built-in config_cmdline.
             proc.exec(u"uname"_s, {u"-r"_s});
@@ -377,43 +443,30 @@ void BootMan::install(const QStringList &cmdextra)
         //proc.shell("grep -q crypto-crc32 /etc/initramfs-tools/modules || echo crypto-crc32 >> /etc/initramfs-tools/modules");
     //}
 
+    const QString debianIrcfname = sect.root() + "/etc/initramfs-tools/initramfs.conf"_L1;
     if (gui.checkBootHostSpecific->isChecked()) {
-        const QString debianIrcfname = sect.root() + "/etc/initramfs-tools/initramfs.conf"_L1;
-        const QString archMkcfname = sect.root() + "/etc/mkinitcpio.conf"_L1;
         if (QFileInfo::exists(debianIrcfname)) {
             // Debian/Ubuntu: use MODULES=dep for host-specific initramfs
             QFile::copy(debianIrcfname, debianIrcfname+".bak"_L1);
             MIni ircfg(debianIrcfname, MIni::ReadWrite);
             ircfg.setString(u"MODULES"_s, u"dep"_s);
             ircfg.save();
-        } else if (QFileInfo::exists(archMkcfname)) {
-            // Arch Linux: ensure autodetect hook is enabled (typically default)
-            // The autodetect hook already provides host-specific module detection
+        }
+    }
+    if (hasMkinitcpio && hasLuks) {
+        MIni mkcfg(archMkcfname, MIni::ReadWrite);
+        QString hooks = mkcfg.getString(u"HOOKS"_s);
+        const bool systemdInitrd = hooks.contains(u"systemd"_s) || hooks.contains(u"sd-encrypt"_s);
+        const QString neededHook = systemdInitrd ? u"sd-encrypt"_s : u"encrypt"_s;
+        if (!hooks.contains(neededHook)) {
             QFile::copy(archMkcfname, archMkcfname+".bak"_L1);
-            // Check if we have LUKS devices and ensure encrypt hook is enabled
-            bool hasLuks = false;
-            for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
-                if (device->finalFormat() == "crypto_LUKS"_L1 || !device->map.isEmpty()) {
-                    hasLuks = true;
-                    break;
-                }
+            if (hooks.contains(u"filesystems"_s)) {
+                hooks.replace(u"filesystems"_s, neededHook + " filesystems"_L1);
+            } else {
+                hooks += " "_L1 + neededHook;
             }
-            if (hasLuks) {
-                // Ensure encrypt hook is in HOOKS array for LUKS support
-                MIni mkcfg(archMkcfname, MIni::ReadWrite);
-                QString hooks = mkcfg.getString(u"HOOKS"_s);
-                if (!hooks.contains(u"encrypt"_s)) {
-                    // Insert encrypt hook before filesystems hook if it exists
-                    if (hooks.contains(u"filesystems"_s)) {
-                        hooks.replace(u"filesystems"_s, u"encrypt filesystems"_s);
-                    } else {
-                        // Append encrypt hook at the end
-                        hooks += u" encrypt"_s;
-                    }
-                    mkcfg.setString(u"HOOKS"_s, hooks.trimmed());
-                    mkcfg.save();
-                }
-            }
+            mkcfg.setString(u"HOOKS"_s, hooks.trimmed());
+            mkcfg.save();
         }
     }
 
