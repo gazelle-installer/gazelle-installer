@@ -1587,6 +1587,15 @@ void PartMan::clearWorkArea()
     }
     // Unmount everything in /mnt/antiX which is only to be for working on the target system.
     if (QFileInfo::exists(u"/mnt/antiX"_s)) proc.exec(u"umount"_s, {u"-qR"_s, u"/mnt/antiX"_s});
+    // Clean up empty mount directories
+    QDir antiXDir(u"/mnt/antiX"_s);
+    if (antiXDir.exists() && antiXDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden).count() == 0) {
+        antiXDir.removeRecursively();
+    }
+    QDir scratchDir(u"/mnt/scratch"_s);
+    if (scratchDir.exists() && scratchDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden).count() == 0) {
+        scratchDir.removeRecursively();
+    }
     // Close encrypted containers that were opened by the installer.
     QStringList closedMaps;
     for (Iterator it(*this); Device *device = *it; it.next()) {
