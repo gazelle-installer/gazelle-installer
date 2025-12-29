@@ -214,6 +214,11 @@ void MInstall::startup()
             proc.log("Live boot: " + data.simplified());
             fileCLine.close();
         }
+        // Skip media check when Arch ISO is started with copytoram
+        if (QFile::exists(u"/run/archiso/copytoram"_s)) {
+            nocheck = true;
+            proc.log(u"Arch ISO copytoram detected, skipping media check"_s);
+        }
         // Check the installation media for errors (skip if not required).
         if (appArgs.isSet(u"media-check"_s)) nocheck = false;
         else if (appArgs.isSet(u"no-media-check"_s)) nocheck = true;
