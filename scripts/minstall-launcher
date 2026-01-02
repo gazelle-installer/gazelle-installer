@@ -101,10 +101,10 @@ else
         chown 0:0 $XDG_RUNTIME_DIR
     fi
 
-    RUN="/usr/sbin/minstall"
+    RUN="/usr/bin/minstall"
     echo Starting "$RUN"
     # always change working directory to /usr/sbin for security
-    cd "/usr/sbin"
+    cd "/usr/bin"
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
     exec "$RUN"
 fi
