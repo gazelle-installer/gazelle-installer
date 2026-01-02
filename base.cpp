@@ -48,10 +48,12 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     bufferRoot = appConf.getInteger(u"RootBuffer"_s, 1024) * MB;
     bufferHome = appConf.getInteger(u"HomeBuffer"_s, 1024) * MB;
     appConf.setSection();
-    liveToInstalled = appConf.getString(u"LiveToInstalledScript"_s, u"/usr/bin/live-to-installed"_s);
-    if (!QFileInfo(liveToInstalled).isExecutable() && QFileInfo(u"/usr/sbin/live-to-installed"_s).isExecutable()) {
-        liveToInstalled = u"/usr/sbin/live-to-installed"_s;
-    }
+    liveToInstalled = appConf.getString(
+        u"LiveToInstalledScript"_s,
+        QFileInfo(u"/usr/sbin/live-to-installed"_s).exists()
+            ? u"/usr/sbin/live-to-installed"_s
+            : u"/usr/bin/live-to-installed"_s
+        );
 
     archLive = QFileInfo::exists(u"/run/archiso/airootfs"_s);
     if (archLive && QFileInfo(u"/usr/bin/live-to-installed"_s).isExecutable()) {
