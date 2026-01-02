@@ -46,7 +46,12 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     bufferRoot = appConf.getInteger(u"RootBuffer"_s, 1024) * MB;
     bufferHome = appConf.getInteger(u"HomeBuffer"_s, 1024) * MB;
     appConf.setSection();
-    liveToInstalled = appConf.getString(u"LiveToInstalledScript"_s, u"/usr/sbin/live-to-installed"_s);
+    liveToInstalled = appConf.getString(
+        u"LiveToInstalledScript"_s,
+        QFileInfo(u"/usr/sbin/live-to-installed"_s).exists()
+            ? u"/usr/sbin/live-to-installed"_s
+            : u"/usr/bin/live-to-installed"_s
+        );
 
     bootSource = "/live/aufs/boot"_L1;
     rootSources << u"/live/aufs/bin"_s << u"/live/aufs/dev"_s
