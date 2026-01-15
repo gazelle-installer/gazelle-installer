@@ -666,6 +666,8 @@ void Oobe::setUserInfo() const
     QString skelpath = rootpath + "/etc/skel"_L1;
     const QString &username = gui.textUserName->text();
     QString dpath = rootpath + "/home/"_L1 + username;
+    //ensure home exists
+    proc.exec(u"mkdir"_s,{u"-p"_s, rootpath + "/home/"_L1});
 
     if (QFileInfo::exists(dpath)) {
         if (gui.radioOldHomeSave->isChecked()) {
