@@ -134,7 +134,7 @@ void PartMan::scan(Device *drvstart)
     // Partitions listed in order of their physical locations.
     QStringList order;
     QString curdev;
-    proc.shell(u"parted -lm 2>/dev/null"_s, nullptr, true);
+    proc.exec(u"parted"_s, {u"-lm"_s}, nullptr, true);
     for(const QStringList &lines = proc.readOutLines(); const QString &line : lines) {
         const QString &sect = line.section(':', 0, 0);
         const int part = sect.toInt();
