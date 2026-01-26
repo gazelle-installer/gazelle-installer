@@ -1,6 +1,6 @@
 # Maintainer: dolphinoracle <dolphinoracle@gmail.com>
 pkgname=gazelle-installer
-pkgver=6.0
+pkgver=26.1.5
 pkgrel=1
 pkgdesc="Customizable GUI installer for MX Linux and antiX Linux"
 arch=('x86_64' 'i686')
@@ -28,6 +28,10 @@ optdepends=(
 )
 source=()
 sha256sums=()
+
+pkgver() {
+    sed -n '1s/.*(\([^)]*\)).*/\1/p' "${startdir}/debian/changelog" | sed 's/mx.*//'
+}
 
 build() {
     cd "${startdir}"
