@@ -11,7 +11,7 @@
 # Description:       Debian init script for the Out-of-Box Experience
 ### END INIT INFO
 
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
+PATH=/sbin:/bin:/usr/bin:/usr/sbin
 
 #don't start on rpi first boot
 FILE="/etc/rpi_skip_first_boot"

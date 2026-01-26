@@ -117,6 +117,41 @@ void BootMan::install(const QStringList &cmdextra)
     MProcess::Section sect(proc, QT_TR_NOOP("GRUB installation failed. You can reboot to"
         " the live medium and use the GRUB Rescue menu to repair the installation."));
     proc.advance(4, 4);
+    const QString targetRoot(u"/mnt/antiX"_s);
+    const QString archMkcfname = targetRoot + "/etc/mkinitcpio.conf"_L1;
+
+    struct LuksEntry {
+        QString uuid;
+        QString map;
+    };
+    QList<LuksEntry> luksEntries;
+    for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
+        if (device->type != PartMan::Device::PARTITION) continue;
+        const bool required = device->addToCrypttab || device->encrypt || !device->map.isEmpty();
+        if (!required) continue;
+        QString mapName = device->map;
+        if (mapName.isEmpty()) {
+            const QString mappedPath = device->mappedDevice();
+            if (mappedPath.startsWith(u"/dev/mapper/"_s)) {
+                mapName = mappedPath.mid(12);
+            }
+        }
+        QString luksUuid = device->uuid;
+        if (luksUuid.isEmpty() && mapName.startsWith(u"luks-"_s, Qt::CaseInsensitive)) {
+            luksUuid = mapName.mid(5);
+        }
+        if (luksUuid.isEmpty()) continue;
+        if (mapName.isEmpty()) mapName = u"luks-"_s + luksUuid;
+        luksEntries.append({luksUuid, mapName});
+    }
+    const bool hasLuks = !luksEntries.isEmpty();
+    const bool hasMkinitcpio = QFileInfo::exists(archMkcfname);
+    bool useSystemdInitrd = false;
+    if (hasMkinitcpio) {
+        const MIni mkcfg(archMkcfname, MIni::ReadOnly);
+        const QString hooks = mkcfg.getString(u"HOOKS"_s);
+        useSystemdInitrd = hooks.contains(u"systemd"_s) || hooks.contains(u"sd-encrypt"_s);
+    }
 
     sect.setExceptionStrict(false);
     // the old initrd is not valid for this hardware
@@ -138,7 +173,7 @@ void BootMan::install(const QStringList &cmdextra)
     const bool fallbackToMbr = replacementMode && espRequested && !haveEsp;
     const bool useEsp = espRequested && haveEsp;
     if (fallbackToMbr) {
-        qDebug() << "ESP not found during replacement, falling back to BIOS/MBR install.";
+        qDebug() << "ESP not found during replacement scan, falling back to MBR install.";
     }
     if (useEsp) {
         const QString &efivars = u"/sys/firmware/efi/efivars"_s;
@@ -178,6 +213,15 @@ void BootMan::install(const QStringList &cmdextra)
             QStringList grubinstargs({u"--no-nvram"_s, u"--force-extra-removable"_s,
                 (efisize==32 ? u"--target=i386-efi"_s : u"--target=x86_64-efi"_s),
                 "--bootloader-id="_L1 + loaderID, u"--recheck"_s});
+            {
+                // Drop flags not supported by some grub builds (e.g. Arch) to avoid fatal errors.
+                bool supportsForceExtra = true;
+                if (proc.exec(u"grub-install"_s, {u"--help"_s}, nullptr, true)) {
+                    const QString &helpText = proc.readOut(true);
+                    supportsForceExtra = helpText.contains(u"--force-extra-removable"_s);
+                }
+                if (!supportsForceExtra) grubinstargs.removeAll(u"--force-extra-removable"_s);
+            }
             QString efiDir;
             if (espdev) {
                 efiDir = espdev->mountPoint();
@@ -240,9 +284,12 @@ void BootMan::install(const QStringList &cmdextra)
             sect.setRoot(nullptr);
         }
 
-        // Get non-live boot codes.
-        proc.shell(u"/live/bin/non-live-cmdline"_s, nullptr, true); // Get non-live boot codes
-        QStringList finalcmdline = proc.readOut().split(' ');
+        // Get non-live boot codes (Arch live media lacks this helper, so skip if missing).
+        QStringList finalcmdline;
+        if (QFileInfo::exists(u"/live/bin/non-live-cmdline"_s)) {
+            proc.shell(u"/live/bin/non-live-cmdline"_s, nullptr, true); // Get non-live boot codes
+            finalcmdline = proc.readOut().split(' ');
+        }
 
         {
             // Add the codes from /etc/default/grub to non-live boot codes.
@@ -261,6 +308,37 @@ void BootMan::install(const QStringList &cmdextra)
 
         finalcmdline.append(cmdextra);
         qDebug() << "intermediate" << finalcmdline;
+
+        if (hasLuks && hasMkinitcpio) {
+            const QString mapperPrefix = u"/dev/mapper/"_s;
+            if (useSystemdInitrd) {
+                for (const auto &entry : std::as_const(luksEntries)) {
+                    finalcmdline.append("rd.luks.name="_L1 + entry.uuid + "="_L1 + entry.map);
+                }
+            } else {
+                QString rootMapName;
+                const PartMan::Device *rootDev = partman.findByMount(u"/"_s);
+                if (rootDev) {
+                    const QString mappedPath = rootDev->mappedDevice();
+                    if (mappedPath.startsWith(mapperPrefix)) {
+                        rootMapName = mappedPath.mid(mapperPrefix.size());
+                    }
+                }
+                const LuksEntry *rootEntry = nullptr;
+                if (!rootMapName.isEmpty()) {
+                    for (const auto &entry : std::as_const(luksEntries)) {
+                        if (entry.map == rootMapName) {
+                            rootEntry = &entry;
+                            break;
+                        }
+                    }
+                }
+                if (!rootEntry && !luksEntries.isEmpty()) rootEntry = &luksEntries.front();
+                if (rootEntry) {
+                    finalcmdline.append("cryptdevice=UUID="_L1 + rootEntry->uuid + ":"_L1 + rootEntry->map);
+                }
+            }
+        }
 
         {
             // Add built-in config_cmdline.
@@ -322,7 +400,15 @@ void BootMan::install(const QStringList &cmdextra)
 
         sect.setRoot("/mnt/antiX");
         //update grub with new config
-        proc.exec(u"update-grub"_s);
+        const bool haveUpdateGrub = QFileInfo(u"/usr/bin/update-grub"_s).isExecutable()
+            || QFileInfo(u"/usr/sbin/update-grub"_s).isExecutable()
+            || QFileInfo(u"/sbin/update-grub"_s).isExecutable();
+        if (haveUpdateGrub) {
+            proc.exec(u"update-grub"_s);
+        } else {
+            // Arch Linux uses grub-mkconfig
+            proc.exec(u"grub-mkconfig"_s, {u"-o"_s, u"/boot/grub/grub.cfg"_s});
+        }
 
         if (!gui.radioBootESP->isChecked()) {
             /* Prevent debconf pestering the user when GRUB gets updated. Non-critical. */
@@ -341,8 +427,8 @@ void BootMan::install(const QStringList &cmdextra)
                     }
                 }
             }
-            if (!diskpath.isEmpty()) {
-                /* Setup debconf to achieve the objective of silence. */
+            if (!diskpath.isEmpty() && haveUpdateGrub) {
+                /* Setup debconf to achieve the objective of silence. Debian-only. */
                 diskpath.prepend("grub-pc grub-pc/install_devices multiselect /dev/");
                 proc.exec(u"debconf-set-selections"_s, {}, &diskpath);
             }
@@ -357,15 +443,43 @@ void BootMan::install(const QStringList &cmdextra)
         //proc.shell("grep -q crypto-crc32 /etc/initramfs-tools/modules || echo crypto-crc32 >> /etc/initramfs-tools/modules");
     //}
 
+    const QString debianIrcfname = sect.root() + "/etc/initramfs-tools/initramfs.conf"_L1;
     if (gui.checkBootHostSpecific->isChecked()) {
-        const QString ircfname = sect.root() + "/etc/initramfs-tools/initramfs.conf"_L1;
-        QFile::copy(ircfname, ircfname+".bak"_L1);
-        MIni ircfg(ircfname, MIni::ReadWrite);
-        ircfg.setString(u"MODULES"_s, u"dep"_s);
-        ircfg.save();
+        if (QFileInfo::exists(debianIrcfname)) {
+            // Debian/Ubuntu: use MODULES=dep for host-specific initramfs
+            QFile::copy(debianIrcfname, debianIrcfname+".bak"_L1);
+            MIni ircfg(debianIrcfname, MIni::ReadWrite);
+            ircfg.setString(u"MODULES"_s, u"dep"_s);
+            ircfg.save();
+        }
+    }
+    if (hasMkinitcpio && hasLuks) {
+        MIni mkcfg(archMkcfname, MIni::ReadWrite);
+        QString hooks = mkcfg.getString(u"HOOKS"_s);
+        const bool systemdInitrd = hooks.contains(u"systemd"_s) || hooks.contains(u"sd-encrypt"_s);
+        const QString neededHook = systemdInitrd ? u"sd-encrypt"_s : u"encrypt"_s;
+        if (!hooks.contains(neededHook)) {
+            QFile::copy(archMkcfname, archMkcfname+".bak"_L1);
+            if (hooks.contains(u"filesystems"_s)) {
+                hooks.replace(u"filesystems"_s, neededHook + " filesystems"_L1);
+            } else {
+                hooks += " "_L1 + neededHook;
+            }
+            mkcfg.setString(u"HOOKS"_s, hooks.trimmed());
+            mkcfg.save();
+        }
     }
 
-    proc.exec(u"update-initramfs"_s, {u"-u"_s, u"-t"_s, u"-k"_s, u"all"_s});
+    const bool haveUpdateInitramfs = QFileInfo(u"/usr/bin/update-initramfs"_s).isExecutable()
+        || QFileInfo(u"/usr/sbin/update-initramfs"_s).isExecutable()
+        || QFileInfo(u"/sbin/update-initramfs"_s).isExecutable();
+    if (haveUpdateInitramfs) {
+        proc.exec(u"update-initramfs"_s, {u"-u"_s, u"-t"_s, u"-k"_s, u"all"_s});
+    } else if (QFileInfo(u"/usr/bin/mkinitcpio"_s).isExecutable()
+        || QFileInfo(u"/sbin/mkinitcpio"_s).isExecutable()) {
+        // Arch Linux uses mkinitcpio
+        proc.exec(u"mkinitcpio"_s, {u"-P"_s});
+    }
     proc.status();
 }
 

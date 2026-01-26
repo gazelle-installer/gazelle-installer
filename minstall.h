@@ -109,5 +109,6 @@ private:
     void pretendNextPhase() noexcept;
     void loadConfig(int stage) noexcept;
     void saveConfig() noexcept;
+    void runShutdown(const QString &action) noexcept;
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 };

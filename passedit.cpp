@@ -26,7 +26,9 @@
 #include <QString>
 #include <QFile>
 #include <QDebug>
+#ifdef WITH_ZXCVBN
 #include <zxcvbn.h>
+#endif
 #include "passedit.h"
 
 using namespace Qt::Literals::StringLiterals;
@@ -98,7 +100,9 @@ void PassEdit::generate() noexcept
             gentext.truncate(origlen);
             break;
         }
+#ifdef WITH_ZXCVBN
         entropy = ZxcvbnMatch(gentext.toUtf8().constData(), nullptr, nullptr);
+#endif
         ++pos;
     } while (gentext.length() <= min || entropy <= 130); // Very strong
 }
@@ -132,6 +136,7 @@ void PassEdit::masterTextChanged(const QString &text) noexcept
     slave->setPalette(QPalette());
     const bool valid = (text.isEmpty() && min == 0);
 
+#ifdef WITH_ZXCVBN
     const double entropy = ZxcvbnMatch(text.toUtf8().constData(), nullptr, nullptr);
     int score;
     if (entropy <= 0) score = 0; // Negligible
@@ -140,6 +145,9 @@ void PassEdit::masterTextChanged(const QString &text) noexcept
     else if(entropy < 100) score = 3; // Moderate
     else if(entropy < 130) score = 4; // Strong
     else score = 5; // Very strong
+#else
+    int score = 0;
+#endif
     actionGauge->setIcon(QIcon(":/gauge/"_L1 + QString::number(score)));
     static const char *ratings[] = {
         QT_TR_NOOP("Negligible"), QT_TR_NOOP("Very weak"), QT_TR_NOOP("Weak"),

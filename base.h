@@ -33,6 +33,7 @@ class Base
     QString liveToInstalled;
     long long sourceInodes = 1;
     long long bufferRoot = 0, bufferHome = 0;
+    bool archLive = false;
     bool pretend = false;
     bool sync = false;
     bool populateMediaMounts = false;
@@ -41,6 +42,8 @@ public:
     // source medium
     QString bootSource;
     QStringList rootSources;
+    QString rootBase;
+    QString homeSource;
     QStringList homes;
 
     Base(class MProcess &mproc, class Core &mcore, class PartMan &pman,

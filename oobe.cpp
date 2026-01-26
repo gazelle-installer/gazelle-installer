@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include <QDebug>
 #include <QMessageBox>
+#include <QFile>
 #include <QFileInfo>
 #include <QLocale>
 #include <QTimeZone>
@@ -119,8 +120,11 @@ Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, MIni &appConf, bool 
     }
 
     //check for samba
-    QFileInfo info(u"/etc/init.d/smbd"_s);
-    if (!info.exists()) {
+    const bool hasInitSmb = QFileInfo(u"/etc/init.d/smbd"_s).exists();
+    const bool hasSystemdSmb = QFileInfo(u"/usr/lib/systemd/system/smb.service"_s).exists()
+        || QFileInfo(u"/usr/lib/systemd/system/smbd.service"_s).exists()
+        || QFileInfo(u"/lib/systemd/system/smb.service"_s).exists();
+    if (!hasInitSmb && !hasSystemdSmb) {
         gui.labelComputerGroup->setEnabled(false);
         gui.textComputerGroup->setEnabled(false);
         gui.textComputerGroup->clear();
@@ -128,9 +132,17 @@ Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, MIni &appConf, bool 
         gui.checkSamba->setEnabled(false);
     }
     // check for the Samba server
-    proc.shell(u"dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'"_s, nullptr, true);
-    QString val = proc.readOut();
-    haveSamba = (val.compare("installed"_L1) == 0);
+    QString val;
+    if (QFileInfo::exists(u"/usr/bin/dpkg"_s)) {
+        proc.shell(u"dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'"_s, nullptr, true);
+        val = proc.readOut();
+    } else if (QFileInfo::exists(u"/usr/bin/pacman"_s)) {
+        proc.shell(u"pacman -Qi samba >/dev/null 2>&1 && echo installed || echo missing"_s, nullptr, true);
+        val = proc.readOut();
+    } else if (hasInitSmb || hasSystemdSmb) {
+        val = u"installed"_s; // fall back to services present on non-Debian systems
+    }
+    haveSamba = (val.compare("installed"_L1, Qt::CaseInsensitive) == 0);
 
     buildServiceList(appConf);
 
@@ -229,7 +241,12 @@ void Oobe::enable() const
     //setService(u"smbd"_s, false);
     //setService(u"nmbd"_s, false);
     //setService(u"samba-ad-dc"_s, false);
-    proc.exec(u"update-rc.d"_s, {u"-f"_s, u"oobe"_s, u"defaults"_s});
+    const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
+        || QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
+        || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
+    if (haveUpdateRc) {
+        proc.exec(u"update-rc.d"_s, {u"-f"_s, u"oobe"_s, u"defaults"_s});
+    }
 }
 
 void Oobe::process() const
@@ -265,7 +282,12 @@ void Oobe::process() const
     }
     if (online) {
         proc.shell(u"sed -i 's/nosplash\\b/splash/g' /boot/grub/grub.cfg"_s);
-        proc.exec(u"update-rc.d"_s, {u"oobe"_s, u"disable"_s});
+        const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
+            || QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
+            || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
+        if (haveUpdateRc) {
+            proc.exec(u"update-rc.d"_s, {u"oobe"_s, u"disable"_s});
+        }
     }
 }
 
@@ -287,7 +309,12 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
         const QString &category = list.at(0).trimmed();
         const QString &description = list.at(1).trimmed();
 
-        if (QFile::exists("/etc/init.d/"_L1 + service) || QFile::exists("/etc/sv/"_L1 + service)) {
+        const bool hasService = QFile::exists("/etc/init.d/"_L1 + service)
+            || QFile::exists("/etc/sv/"_L1 + service)
+            || QFile::exists("/usr/lib/systemd/system/"_L1 + service + ".service"_L1)
+            || QFile::exists("/lib/systemd/system/"_L1 + service + ".service"_L1)
+            || QFile::exists("/etc/systemd/system/"_L1 + service + ".service"_L1);
+        if (hasService) {
             QList<QTreeWidgetItem *> found_items = gui.treeServices->findItems(category, Qt::MatchExactly, 0);
             QTreeWidgetItem *parent;
             if (found_items.size() == 0) { // add top item if no top items found
@@ -368,6 +395,25 @@ QWidget *Oobe::validateComputerName() const noexcept
 void Oobe::setComputerName() const
 {
     QString etcpath = online ? u"/etc"_s : u"/mnt/antiX/etc"_s;
+    const auto isArchTarget = [etcpath]() -> bool {
+        QFile file(etcpath + "/os-release"_L1);
+        if (!file.open(QFile::ReadOnly | QFile::Text)) {
+            return false;
+        }
+        while (!file.atEnd()) {
+            QString line = QString::fromUtf8(file.readLine()).trimmed();
+            if (!line.startsWith("ID="_L1) && !line.startsWith("ID_LIKE="_L1)) {
+                continue;
+            }
+            QString value = line.section('=', 1).trimmed();
+            value.remove('"');
+            if (value == "arch"_L1 || value.contains("arch"_L1)) {
+                return true;
+            }
+        }
+        return false;
+    };
+    const bool archTarget = isArchTarget();
     if (haveSamba) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/samba/smb.conf");
         replaceStringInFile(u"WORKGROUP"_s, gui.textComputerGroup->text(), etcpath + "/samba/smb.conf"_L1);
@@ -375,13 +421,30 @@ void Oobe::setComputerName() const
     //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = gui.textComputerName->text();
     const QString &domainname = gui.textComputerDomain->text();
-    QString cmd("sed -E -i '/localhost/! s/^(127\\.0\\.0\\.1|127\\.0\\.1\\.1).*/\\1    "_L1 + compname + "/'"_L1);
-    proc.shell(cmd + ' ' + etcpath + "/hosts"_L1);
+    const QString hostsPath = etcpath + "/hosts"_L1;
+    const QString hostEntry = domainname.isEmpty()
+        ? compname
+        : compname + "."_L1 + domainname + " "_L1 + compname;
+    if (QFileInfo::exists(hostsPath)) {
+        proc.shell("sed -E -i 's/^127\\.0\\.1\\.1\\s+.*/127.0.1.1    "_L1
+            + hostEntry + "/' "_L1 + hostsPath);
+        proc.shell("grep -qE '^127\\.0\\.1\\.1\\s' "_L1 + hostsPath
+            + " || echo \"127.0.1.1    "_L1 + hostEntry + "\" >> "_L1 + hostsPath);
+    }
     proc.shell("echo \""_L1 + compname + "\" | cat > "_L1 + etcpath + "/hostname"_L1);
-    proc.shell("echo \""_L1 + compname + "\" | cat > "_L1 + etcpath + "/mailname"_L1);
-    proc.shell("sed -i 's/.*send host-name.*/send host-name \""_L1
-        + compname + "\";/g' "_L1 + etcpath + "/dhcp/dhclient.conf"_L1);
-    proc.shell("echo \""_L1 + domainname + "\" | cat > "_L1 + etcpath + "/defaultdomain"_L1);
+    if (!archTarget) {
+        proc.shell("echo \""_L1 + compname + "\" | cat > "_L1 + etcpath + "/mailname"_L1);
+    }
+    const QString dhclientConf = etcpath + "/dhcp/dhclient.conf"_L1;
+    if (QFileInfo::exists(dhclientConf)) {
+        proc.shell("sed -i 's/.*send host-name.*/send host-name \""_L1
+            + compname + "\";/g' "_L1 + dhclientConf);
+    } else {
+        qDebug() << "Skip dhclient.conf update (missing):" << dhclientConf;
+    }
+    if (!archTarget) {
+        proc.shell("echo \""_L1 + domainname + "\" | cat > "_L1 + etcpath + "/defaultdomain"_L1);
+    }
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone
@@ -403,10 +466,25 @@ void Oobe::setLocale() const
 
     //locale
     qDebug() << "Update locale";
-    QString cmd;
-    if (!online) cmd = "chroot /mnt/antiX "_L1;
-    cmd += QStringLiteral("/usr/sbin/update-locale \"LANG=%1\"").arg(gui.comboLocale->currentData().toString());
-    proc.shell(cmd);
+    const QString langSetting = gui.comboLocale->currentData().toString();
+    if (!langSetting.isEmpty()) {
+        QString updateLocale = u"/usr/bin/update-locale"_s;
+        if (!QFileInfo(updateLocale).isExecutable()) {
+            updateLocale = u"/usr/sbin/update-locale"_s;
+        }
+        QString cmd;
+        if (!online) cmd = "chroot /mnt/antiX "_L1;
+        if (QFileInfo(updateLocale).isExecutable()) {
+            cmd += QStringLiteral("%1 \"LANG=%2\"").arg(updateLocale, langSetting);
+        } else {
+            // Arch: fall back to locale.gen update + locale-gen
+            const QString localeGen = (online ? QStringLiteral("locale-gen") : QStringLiteral("chroot /mnt/antiX locale-gen"));
+            const QString localeGenFile = (online ? QStringLiteral("/etc/locale.gen") : QStringLiteral("/mnt/antiX/etc/locale.gen"));
+            proc.shell(QStringLiteral("sed -i 's/^#*\\(%1\\)/\\1/' %2").arg(langSetting, localeGenFile));
+            cmd = localeGen;
+        }
+        proc.shell(cmd);
+    }
 
     //set paper size based on locale
     QString papersize;
@@ -447,7 +525,9 @@ void Oobe::setLocale() const
     proc.exec(u"hwclock"_s, {u"--hctosys"_s});
     if (!online) {
         proc.exec(u"cp"_s, {u"-f"_s, u"/etc/adjtime"_s, u"/mnt/antiX/etc/"_s});
-        proc.exec(u"cp"_s, {u"-f"_s, u"/etc/default/rcS"_s, u"/mnt/antiX/etc/default"_s});
+        if (QFileInfo::exists(u"/etc/default/rcS"_s)) {
+            proc.exec(u"cp"_s, {u"-f"_s, u"/etc/default/rcS"_s, u"/mnt/antiX/etc/default"_s});
+        }
     }
 
     // Set clock format
@@ -469,38 +549,42 @@ void Oobe::setLocale() const
 void Oobe::setUserClockFormat(const QString &skelpath) const noexcept
 {
     MProcess::Section sect(proc, nullptr);
+    auto sedIfExists = [this](const QString &cmd, const QString &path) {
+        if (QFileInfo::exists(path)) proc.shell(cmd + path);
+    };
+
     if (gui.radioClock12->isChecked()) {
         //mx systems
-        proc.shell("sed -i '/data0=/c\\data0=%l:%M' "_L1 + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc"_L1);
-        proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' "_L1 + skelpath + "/.config/xfce4/panel/datetime-1.rc"_L1);
-        proc.shell("sed -i 's/%H/%l/' "_L1 + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"_L1);
+        sedIfExists("sed -i '/data0=/c\\data0=%l:%M' "_L1, skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc"_L1);
+        sedIfExists("sed -i '/time_format=/c\\time_format=%l:%M' "_L1, skelpath + "/.config/xfce4/panel/datetime-1.rc"_L1);
+        sedIfExists("sed -i 's/%H/%l/' "_L1, skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"_L1);
 
         //mx kde
-        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' "_L1 + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc"_L1);
+        sedIfExists("sed -i '/use24hFormat=/c\\use24hFormat=0' "_L1, skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc"_L1);
 
         //mx fluxbox
-        proc.shell("sed -i '/time1_format/c\\time1_format=%l:%M' "_L1 + skelpath + "/.config/tint2/tint2rc"_L1);
+        sedIfExists("sed -i '/time1_format/c\\time1_format=%l:%M' "_L1, skelpath + "/.config/tint2/tint2rc"_L1);
 
         //antix systems
-        proc.shell("sed -i 's/%H:%M/%l:%M/g' "_L1 + skelpath + "/.icewm/preferences"_L1);
-        proc.shell("sed -i 's/%k:%M/%l:%M/g' "_L1 + skelpath + "/.fluxbox/init"_L1);
-        proc.shell("sed -i 's/%H:%M/%l:%M/g' "_L1 + skelpath + "/.jwm/tray"_L1);
+        sedIfExists("sed -i 's/%H:%M/%l:%M/g' "_L1, skelpath + "/.icewm/preferences"_L1);
+        sedIfExists("sed -i 's/%k:%M/%l:%M/g' "_L1, skelpath + "/.fluxbox/init"_L1);
+        sedIfExists("sed -i 's/%H:%M/%l:%M/g' "_L1, skelpath + "/.jwm/tray"_L1);
     } else {
         //mx systems
-        proc.shell("sed -i '/data0=/c\\data0=%H:%M' "_L1 + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc"_L1);
-        proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' "_L1 + skelpath + "/.config/xfce4/panel/datetime-1.rc"_L1);
-        proc.shell("sed -i 's/%l/%H/' "_L1 + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"_L1);
+        sedIfExists("sed -i '/data0=/c\\data0=%H:%M' "_L1, skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc"_L1);
+        sedIfExists("sed -i '/time_format=/c\\time_format=%H:%M' "_L1, skelpath + "/.config/xfce4/panel/datetime-1.rc"_L1);
+        sedIfExists("sed -i 's/%l/%H/' "_L1, skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"_L1);
 
         //mx kde
-        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' "_L1 + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc"_L1);
+        sedIfExists("sed -i '/use24hFormat=/c\\use24hFormat=2' "_L1, skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc"_L1);
 
         //mx fluxbox
-        proc.shell("sed -i '/time1_format/c\\time1_format=%H:%M' "_L1 + skelpath + "/.config/tint2/tint2rc"_L1);
+        sedIfExists("sed -i '/time1_format/c\\time1_format=%H:%M' "_L1, skelpath + "/.config/tint2/tint2rc"_L1);
 
         //antix systems
-        proc.shell("sed -i 's/%H:%M/%H:%M/g' "_L1 + skelpath + "/.icewm/preferences"_L1);
-        proc.shell("sed -i 's/%k:%M/%k:%M/g' "_L1 + skelpath + "/.fluxbox/init"_L1);
-        proc.shell("sed -i 's/%H:%M/%k:%M/g' "_L1 + skelpath + "/.jwm/tray"_L1);
+        sedIfExists("sed -i 's/%H:%M/%H:%M/g' "_L1, skelpath + "/.icewm/preferences"_L1);
+        sedIfExists("sed -i 's/%k:%M/%k:%M/g' "_L1, skelpath + "/.fluxbox/init"_L1);
+        sedIfExists("sed -i 's/%H:%M/%k:%M/g' "_L1, skelpath + "/.jwm/tray"_L1);
     }
 }
 
@@ -746,6 +830,8 @@ void Oobe::oldHomeToggled() const noexcept
 bool Oobe::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath) const noexcept
 {
     MProcess::Section sect(proc, nullptr);
+    // Skip silently if target file does not exist (common across differing DEs/DMs).
+    if (!QFileInfo::exists(filepath)) return true;
     return proc.exec(u"sed"_s, {u"-i"_s, QStringLiteral("s/%1/%2/g").arg(oldtext, newtext), filepath});
 }
 

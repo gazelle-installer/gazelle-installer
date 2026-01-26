@@ -136,6 +136,27 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     });
 }
 
+void MInstall::runShutdown(const QString &action) noexcept
+{
+    if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
+        proc.shell(QStringLiteral("/usr/local/bin/persist-config --shutdown --command %1 &").arg(action));
+        return;
+    }
+    if (QFile::exists(u"/usr/bin/persist-config"_s)) {
+        proc.shell(QStringLiteral("/usr/bin/persist-config --shutdown --command %1 &").arg(action));
+        return;
+    }
+    if (QFileInfo(u"/usr/bin/systemctl"_s).isExecutable()) {
+        proc.exec(u"systemctl"_s, {action});
+        return;
+    }
+
+    const QString binPath = "/usr/bin/"_L1 + action;
+    const QString sbinPath = "/usr/sbin/"_L1 + action;
+    const QString &fallback = QFileInfo(binPath).isExecutable() ? binPath : sbinPath;
+    proc.exec(fallback);
+}
+
 MInstall::~MInstall() {
     if (oobe) delete oobe;
     if (base) delete base;
@@ -192,6 +213,11 @@ void MInstall::startup()
             nocheck = data.contains("checkmd5\n");
             proc.log("Live boot: " + data.simplified());
             fileCLine.close();
+        }
+        // Skip media check when Arch ISO is started with copytoram
+        if (QFile::exists(u"/run/archiso/copytoram"_s)) {
+            nocheck = true;
+            proc.log(u"Arch ISO copytoram detected, skipping media check"_s);
         }
         // Check the installation media for errors (skip if not required).
         if (appArgs.isSet(u"media-check"_s)) nocheck = false;
@@ -310,7 +336,7 @@ void MInstall::setupAutoMount(bool enabled)
         // disable auto-mount
         if (have_sysctl) {
             // Use systemctl to prevent automount by masking currently unmasked mount points
-            proc.shell(u"systemctl list-units --full --all -t mount --no-legend 2>/dev/null"
+            proc.shell(u"systemctl list-units --full --all -t mount --no-legend --plain 2>/dev/null"
                 " | grep -v masked | cut -f1 -d' ' | grep -Ev '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc"
                     "|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'"_s, nullptr, true);
             const QStringList &maskedMounts = proc.readOutLines();
@@ -411,18 +437,10 @@ void MInstall::processNextPhase() noexcept
             phase = PH_FINISHED;
             proc.status(tr("Finished"));
             if (appArgs.isSet(u"reboot"_s)) {
-                if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
-                    proc.shell(u"/usr/local/bin/persist-config --shutdown --command reboot &"_s);
-                } else {
-                    proc.shell(u"/usr/bin/persist-config --shutdown --command reboot &"_s);
-                }
+                runShutdown(u"reboot"_s);
             }
             if (appArgs.isSet(u"poweroff"_s)) {
-                if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
-                    proc.shell(u"/usr/local/bin/persist-config --shutdown --command poweroff &"_s);
-                } else {
-                    proc.shell(u"/usr/bin/persist-config --shutdown --command poweroff &"_s);
-                }
+                runShutdown(u"poweroff"_s);
             }
             gotoPage(Step::END);
         }
@@ -434,7 +452,9 @@ void MInstall::processNextPhase() noexcept
             oobe->process();
             phase = PH_FINISHED;
             gui.labelSplash->setText(tr("Configuration complete. Restarting system."));
-            proc.exec(u"/usr/sbin/reboot"_s);
+            const QString rebootCmd = QFileInfo(u"/usr/bin/reboot"_s).isExecutable()
+                ? u"/usr/bin/reboot"_s : u"/usr/sbin/reboot"_s;
+            proc.exec(rebootCmd);
         }
     } catch (const char *msg) {
         if (!msg || !msg[0] || abortion) {
@@ -1033,11 +1053,7 @@ void MInstall::gotoPage(int next) noexcept
         // finished
         qApp->setOverrideCursor(Qt::WaitCursor);
         if (!pretend && gui.checkExitReboot->isChecked()) {
-            if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
-                proc.shell(u"/usr/local/bin/persist-config --shutdown --command reboot &"_s);
-            } else {
-                proc.shell(u"/usr/bin/persist-config --shutdown --command reboot &"_s);
-            }
+            runShutdown(u"reboot"_s);
         }
         qApp->exit(EXIT_SUCCESS);
         return;
@@ -1109,7 +1125,9 @@ void MInstall::closeEvent(QCloseEvent *event) noexcept
         gotoPage(Step::SPLASH);
         proc.unhalt();
         if (!pretend) {
-            proc.exec(u"/usr/sbin/shutdown"_s, {u"-hP"_s, u"now"_s});
+            const QString shutdownCmd = QFileInfo(u"/usr/bin/shutdown"_s).isExecutable()
+                ? u"/usr/bin/shutdown"_s : u"/usr/sbin/shutdown"_s;
+            proc.exec(shutdownCmd, {u"-hP"_s, u"now"_s});
         }
     } else {
         // Fully aborted installation (but not OOBE).

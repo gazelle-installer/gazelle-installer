@@ -5,9 +5,8 @@
 #        minstall-launcher (formerly minstall-pkexec)
 # based on mx-pkexec wrapper
 
-#exit early if not live or parameter given
-
-if [ -n "$1" ] || ! grep -sq 'lowerdir=/live/linux' /proc/mounts; then
+# exit early if not live or parameter given
+if [ -n "$1" ] || { ! grep -sq 'lowerdir=/live/linux' /proc/mounts && ! grep -sq 'lowerdir=/run/archiso/airootfs' /proc/mounts; }; then
     echo ""
     echo "INFORMATION: Non-live enviroment or options not supported"
     echo "             use alternate authentication to launch installer"
@@ -41,9 +40,29 @@ if [ "$EUID" != 0 ]; then
         export WAYLAND_DISPLAY=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
     fi
 
-    AUTHENTICATION="$(grep -i '^\s*Authentication\s*\=' /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2)"
+    AUTHENTICATION="$(grep -i '^\s*Authentication\s*=' /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2)"
+    if [ -n "$AUTHENTICATION" ]; then
+        set -- $AUTHENTICATION
+        if ! command -v "$1" >/dev/null 2>&1; then
+            AUTHENTICATION=""
+        fi
+    fi
+
     if [ -z "$AUTHENTICATION" ]; then
-        AUTHENTICATION="su-to-root -X -c"
+        if command -v su-to-root >/dev/null 2>&1; then
+            AUTHENTICATION="su-to-root -X -c"
+        elif command -v pkexec >/dev/null 2>&1; then
+            PKEXEC_CMD="pkexec"
+            if pkexec --help 2>/dev/null | grep -q -- '--action-id'; then
+                PKEXEC_CMD="pkexec --action-id org.mxlinux.minstall-launcher"
+            fi
+            AUTHENTICATION="$PKEXEC_CMD env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY"
+        elif command -v sudo >/dev/null 2>&1; then
+            AUTHENTICATION="sudo -E"
+        else
+            echo "No authentication helper found (tried su-to-root, pkexec, sudo)." >&2
+            exit 1
+        fi
     fi
 
     $AUTHENTICATION /usr/bin/minstall-launcher
@@ -60,7 +79,11 @@ else
     # root user
 
     # restrict PATH for security
-    PATH="/usr/bin:/usr/sbin:/usr/local/bin"
+    if [ -e /run/archiso/airootfs ] || [ ! -d /usr/sbin ]; then
+        PATH="/usr/bin:/usr/local/bin"
+    else
+        PATH="/usr/bin:/usr/sbin:/usr/local/bin"
+    fi
 
     # put pattern list of environment variables we want get from users environment into array
     __ENVIRONEMENT_PATTERN__=(
@@ -103,7 +126,7 @@ else
 
     RUN="/usr/bin/minstall"
     echo Starting "$RUN"
-    # always change working directory to /usr/sbin for security
+    # always change working directory to /usr/bin for security
     cd "/usr/bin"
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
     exec "$RUN"

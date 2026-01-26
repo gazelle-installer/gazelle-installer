@@ -62,7 +62,12 @@ PartMan::PartMan(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, Crypto &cman,
     volSpecs[u"BIOS-GRUB"_s] = {u"BIOS GRUB"_s};
     volSpecs[u"/boot"_s] = {u"boot"_s};
     volSpecs[u"/boot/efi"_s] = volSpecs[u"ESP"_s] = {u"EFI-SYSTEM"_s};
-    volSpecs[u"/"_s] = {"root"_L1 + projShort + appConf.getString(u"Version"_s)};
+    const bool archLive = QFileInfo::exists(u"/run/archiso/airootfs"_s);
+    if (archLive) {
+        volSpecs[u"/"_s] = {u"rootMXarch"_s};
+    } else {
+        volSpecs[u"/"_s] = {"root"_L1 + projShort + appConf.getString(u"Version"_s)};
+    }
     volSpecs[u"/home"_s] = {"home"_L1 + projShort};
     volSpecs[u"SWAP"_s] = {"swap"_L1 + projShort};
     brave = appArgs.isSet(u"brave"_s);
@@ -239,7 +244,8 @@ void PartMan::scanVirtualDevices(bool rescan)
             }
         }
     }
-    proc.shell(u"lsblk -T -bJo TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/*"_s, nullptr, true);
+    // /dev/mapper/control is not a block device; silence its warning.
+    proc.shell(u"lsblk -T -bJo TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/* 2>/dev/null || true"_s, nullptr, true);
     const QString &bdRaw = proc.readOut(true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD[u"blockdevices"_s].toArray();
@@ -694,8 +700,13 @@ void PartMan::partReloadClick()
 void PartMan::partManRunClick()
 {
     gui.boxMain->setEnabled(false);
-    if (QFile::exists(u"/usr/sbin/gparted"_s)) proc.exec(u"/usr/sbin/gparted"_s);
-    else proc.exec(u"partitionmanager"_s);
+    if (QFile::exists(u"/usr/bin/gparted"_s)) {
+        proc.exec(u"/usr/bin/gparted"_s);
+    } else if (QFile::exists(u"/usr/sbin/gparted"_s)) {
+        proc.exec(u"/usr/sbin/gparted"_s);
+    } else {
+        proc.exec(u"partitionmanager"_s);
+    }
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     scan();
     gui.boxMain->setEnabled(true);
@@ -1351,7 +1362,9 @@ void PartMan::formatPartitions()
             QStringList cargs;
             if (format == "btrfs"_L1) {
                 cargs.append(u"-f"_s);
-                proc.exec(u"cp"_s, {u"-fp"_s, u"/usr/bin/true"_s, u"/usr/sbin/fsck.auto"_s});
+                const QString fsckAuto =
+                    QFileInfo(u"/usr/bin/fsck.auto"_s).exists() ? u"/usr/bin/fsck.auto"_s : u"/usr/sbin/fsck.auto"_s;
+                proc.exec(u"cp"_s, {u"-fp"_s, u"/usr/bin/true"_s, fsckAuto});
                 if (volume->size < 6000000000) {
                     cargs << u"-M"_s << u"-O"_s << u"skinny-metadata"_s; // Mixed mode (-M)
                 }
@@ -1574,6 +1587,15 @@ void PartMan::clearWorkArea()
     }
     // Unmount everything in /mnt/antiX which is only to be for working on the target system.
     if (QFileInfo::exists(u"/mnt/antiX"_s)) proc.exec(u"umount"_s, {u"-qR"_s, u"/mnt/antiX"_s});
+    // Clean up empty mount directories
+    QDir antiXDir(u"/mnt/antiX"_s);
+    if (antiXDir.exists() && antiXDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden).count() == 0) {
+        antiXDir.removeRecursively();
+    }
+    QDir scratchDir(u"/mnt/scratch"_s);
+    if (scratchDir.exists() && scratchDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden).count() == 0) {
+        scratchDir.removeRecursively();
+    }
     // Close encrypted containers that were opened by the installer.
     QStringList closedMaps;
     for (Iterator it(*this); Device *device = *it; it.next()) {

@@ -22,9 +22,11 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
+#include <cctype>
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include "mprocess.h"
 #include "core.h"
 #include "msettings.h"
@@ -53,26 +55,36 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
             : u"/usr/bin/live-to-installed"_s
         );
 
-    bootSource = "/live/aufs/boot"_L1;
-    rootSources << u"/live/aufs/bin"_s << u"/live/aufs/dev"_s
-        << u"/live/aufs/etc"_s << u"/live/aufs/lib"_s
-        << u"/live/aufs/media"_s << u"/live/aufs/mnt"_s << u"/live/aufs/root"_s
-        << u"/live/aufs/sbin"_s << u"/live/aufs/usr"_s << u"/live/aufs/var"_s;
-    if (QFileInfo::exists(u"/live/aufs/initrd.img"_s)) {
-        rootSources << u"/live/aufs/initrd.img"_s;
+    archLive = QFileInfo::exists(u"/run/archiso/airootfs"_s);
+    if (archLive && QFileInfo(u"/usr/bin/live-to-installed"_s).isExecutable()) {
+        liveToInstalled = u"/usr/bin/live-to-installed"_s;
     }
-    if (QFileInfo::exists(u"/live/aufs/vmlinuz"_s)) {
-        rootSources << u"/live/aufs/vmlinuz"_s;
+    rootBase = archLive ? u"/"_s : u"/live/aufs"_s;
+    homeSource = rootBase + u"/home"_s;
+
+    bootSource = rootBase + u"/boot"_s;
+    const auto addIfExists = [this](const QString &path) {
+        if (QFileInfo::exists(path)) rootSources << path;
+    };
+    addIfExists(rootBase + u"/bin"_s);
+    if (!archLive) {
+        addIfExists(rootBase + u"/dev"_s);
     }
-    if (QFileInfo::exists(u"/live/aufs/libx32"_s)){
-        rootSources << u"/live/aufs/libx32"_s ;
+    addIfExists(rootBase + u"/etc"_s);
+    addIfExists(rootBase + u"/lib"_s);
+    if (!archLive) {
+        addIfExists(rootBase + u"/media"_s);
+        addIfExists(rootBase + u"/mnt"_s);
     }
-    if (QFileInfo::exists(u"/live/aufs/lib64"_s)){
-        rootSources << u"/live/aufs/lib64"_s ;
-    }
-    if (QFileInfo::exists(u"/live/aufs/opt"_s)){
-        rootSources << u"/live/aufs/opt"_s ;
-    }
+    addIfExists(rootBase + u"/root"_s);
+    addIfExists(rootBase + u"/sbin"_s);
+    addIfExists(rootBase + u"/usr"_s);
+    addIfExists(rootBase + u"/var"_s);
+    addIfExists(rootBase + u"/initrd.img"_s);
+    addIfExists(rootBase + u"/vmlinuz"_s);
+    addIfExists(rootBase + u"/libx32"_s);
+    addIfExists(rootBase + u"/lib64"_s);
+    addIfExists(rootBase + u"/opt"_s);
 
     MProcess::Section sect(proc, QT_TR_NOOP("Cannot access installation media."));
     if (pretend) sect.setExceptionMode(nullptr);
@@ -80,10 +92,15 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     const MIni liveInfo(u"/live/config/initrd.out"_s, MIni::ReadOnly);
     const QString &sqpath = '/' + liveInfo.getString(u"SQFILE_PATH"_s, u"antiX"_s);
     const QString &sqtoram = liveInfo.getString(u"TORAM_MP"_s, u"/live/to-ram"_s) + sqpath;
-    QString infile = sqtoram + "/linuxfs.info"_L1;
-    if (!QFile::exists(infile)) {
-        const QString &sqloc = liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
-        infile = sqloc + "/linuxfs.info"_L1;
+    QString infile;
+    if (archLive) {
+        infile = u"/run/archiso/bootmnt/arch/x86_64/airootfs.md5"_s; // fall back to du if metadata is unavailable
+    } else {
+        infile = sqtoram + "/linuxfs.info"_L1;
+        if (!QFile::exists(infile)) {
+            const QString &sqloc = liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
+            infile = sqloc + "/linuxfs.info"_L1;
+        }
     }
     MIni squashInfo(infile, MIni::ReadOnly);
 
@@ -98,9 +115,13 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     MSettings::ValState rootNumState = MSettings::VAL_NOTFOUND;
     vspecRoot.image = squashInfo.getFloat(u"UncompressedSizeKB"_s, 0.0, &rootNumState) * KB;
     if (rootNumState != MSettings::VAL_OK) {
-        rootSources.prepend(u"-scb"_s); // Arguments for command execution.
-        proc.exec(u"du"_s, rootSources, nullptr, true);
-        rootSources.removeFirst(); // Remove temporary "-scb" item.
+        QStringList duSources;
+        duSources << u"-scb"_s;
+        for (const QString &src : std::as_const(rootSources)) {
+            if (QFileInfo::exists(src)) duSources << src;
+            else qDebug() << "Skip missing source for du:" << src;
+        }
+        proc.exec(u"du"_s, duSources, nullptr, true);
         vspecRoot.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
     }
     qDebug() << "Basic image:" << vspecRoot.image << rootNumState << infile;
@@ -115,7 +136,8 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     }
     // Account for file system formatting
     struct statvfs svfs;
-    if (statvfs("/live/linux", &svfs) == 0) {
+    const QString statvfsPath = archLive ? rootBase : u"/live/linux"_s;
+    if (statvfs(statvfsPath.toUtf8().constData(), &svfs) == 0) {
         sourceInodes = svfs.f_files - svfs.f_ffree; // Will also be used for progress bar.
     }
     vspecRoot.image += (sourceInodes * BASE_BLOCK);
@@ -132,9 +154,11 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     }
 
     // Account for /home on personal snapshots
-    getVolumeSpec(squashInfo, u"/home"_s, u"/live/aufs/home"_s);
-    vspecHome.preferred += bufferHome;
-    rootSources.append(u"/live/aufs/home"_s);
+    if (QFileInfo::exists(homeSource)) {
+        getVolumeSpec(squashInfo, u"/home"_s, homeSource);
+        vspecHome.preferred += bufferHome;
+        rootSources.append(homeSource);
+    }
 
     // Subtract components from the root if obtained the "short way".
     if (rootNumState == MSettings::VAL_OK) {
@@ -153,6 +177,12 @@ void Base::getVolumeSpec(MIni &squashInfo, const QString &volume, const QString 
     squashInfo.setGroup(volume);
 
     MSettings::ValState valState = MSettings::VAL_NOTFOUND;
+    if (!QFileInfo::exists(source)) {
+        vspec.image = vspec.minimum = vspec.preferred = 0;
+        qDebug() << "Skip missing source" << source << "for volume" << volume;
+        return;
+    }
+
     vspec.image = squashInfo.getFloat(u"UncompressedSizeKB"_s, 0.0, &valState) * KB;
     if (valState != MSettings::VAL_OK) {
         proc.exec(u"du"_s, {u"-scb"_s, source}, nullptr, true);
@@ -268,7 +298,14 @@ void Base::install()
     proc.status();
 
     qDebug() << "Desktop menu";
-    proc.exec(u"chroot"_s, {u"/mnt/antiX"_s, u"desktop-menu"_s, u"--write-out-global"_s});
+    const bool hasDesktopMenu =
+        QFileInfo::exists(u"/mnt/antiX/usr/bin/desktop-menu"_s) ||
+        (!archLive && QFileInfo::exists(u"/mnt/antiX/usr/sbin/desktop-menu"_s));
+    if (hasDesktopMenu) {
+        proc.exec(u"chroot"_s, {u"/mnt/antiX"_s, u"desktop-menu"_s, u"--write-out-global"_s});
+    } else {
+        qDebug() << "Skip desktop-menu (not installed in target)";
+    }
 
     // Disable hibernation inside initramfs.
     for (PartMan::Iterator it(partman); PartMan::Device *dev = *it; it.next()) {
@@ -291,18 +328,25 @@ void Base::install()
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
     sect.setRoot("/mnt/antiX");
-    proc.exec(u"rm"_s, {u"/var/lib/dbus/machine-id"_s, u"/etc/machine-id"_s});
+    proc.exec(u"rm"_s, {u"-f"_s, u"/var/lib/dbus/machine-id"_s, u"/etc/machine-id"_s});
     proc.exec(u"dbus-uuidgen"_s, {u"--ensure=/etc/machine-id"_s});
     proc.exec(u"dbus-uuidgen"_s, {u"--ensure"_s});
     sect.setRoot(nullptr);
 
     // Disable VirtualBox Guest Additions if not running in VirtualBox.
     if(!core.detectVirtualBox()) {
-        proc.shell(u"mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1"_s);
-        proc.shell(u"mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1"_s);
-        proc.shell(u"mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1"_s);
-        proc.shell(u"mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1"_s);
-        proc.shell(u"mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1"_s);
+        const QStringList vboxMoves = {
+            u"/mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils"_s,
+            u"/mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils"_s,
+            u"/mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils"_s,
+            u"/mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils"_s,
+            u"/mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11"_s
+        };
+        for (const QString &move : vboxMoves) {
+            proc.shell(u"for f in "_s + move.section(' ', 0, 0)
+                + u"; do [ -e \"$f\" ] && mv -f \"$f\" "_s
+                + move.section(' ', 1, 1) + u"; done"_s);
+        }
     }
 
     // if PopulateMediaMountPoints is true in gazelle-installer-data, then use the --mntpnt switch
@@ -310,7 +354,13 @@ void Base::install()
         proc.shell(u"make-fstab -O --install=/mnt/antiX --mntpnt=/media"_s);
     } else {
         // Otherwise, clean /media folder - modification to preserve points that are still mounted.
-        proc.shell(u"rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*"_s);
+    QDir mediaDir(u"/mnt/antiX/media"_s);
+    if (mediaDir.exists()) {
+        const QStringList entries = mediaDir.entryList({u"sd*"_s}, QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const QString &entry : entries) {
+            proc.exec(u"rmdir"_s, {u"--ignore-fail-on-non-empty"_s, mediaDir.filePath(entry)});
+        }
+    }
     }
 }
 
@@ -325,19 +375,65 @@ void Base::copyLinux(bool skiphome)
     // setup and start the process
     QString prog = u"cp"_s;
     QStringList args("-av");
-    if (sync) {
+    const bool useRsync = sync || archLive;
+    const bool trackRsyncProgress = useRsync && archLive;
+    if (useRsync) {
         prog = "rsync"_L1;
-        args << u"--delete"_s;
+        if (sync) args << u"--delete"_s;
+        if (archLive) {
+            args << u"--exclude=/dev/*"_s
+                << u"--exclude=/proc/*"_s
+                << u"--exclude=/sys/*"_s
+                << u"--exclude=/run/*"_s
+                << u"--exclude=/tmp/*"_s
+                << u"--exclude=/mnt/*"_s
+                << u"--exclude=/media/*"_s
+                << u"--exclude=/lost+found"_s
+                << u"--info=progress2"_s
+                << u"--outbuf=L"_s;
+        }
         if (skiphome) {
             args << u"--filter"_s << u"protect home/*"_s;
         }
     }
     QStringList sources(rootSources);
     if (skiphome && !sync) {
-        sources.removeAll(u"/live/aufs/home"_s);
+        sources.removeAll(homeSource);
     }
     args << bootSource << sources << u"/mnt/antiX"_s;
-    proc.advance(80, sourceInodes);
+
+    long long copySteps = trackRsyncProgress ? 100 : sourceInodes;
+    if (trackRsyncProgress) {
+        QStringList dryArgs(args);
+        dryArgs.removeAll(u"--info=progress2"_s);
+        dryArgs.removeAll(u"--outbuf=L"_s);
+        dryArgs.removeAll(u"-av"_s);
+        dryArgs.prepend(u"-a"_s);
+        dryArgs.prepend(u"--no-motd"_s);
+        dryArgs.prepend(u"--stats"_s);
+        dryArgs.prepend(u"--dry-run"_s);
+
+        MProcess::Section drySect(proc, nullptr);
+        drySect.setExceptionStrict(false);
+        if (proc.exec(u"rsync"_s, dryArgs, nullptr, true)) {
+            static const QRegularExpression re(u"^Number of files:\\s+([0-9,]+)"_s);
+            const QStringList lines = proc.readOutLines();
+            for (const QString &line : lines) {
+                const QRegularExpressionMatch match = re.match(line);
+                if (!match.hasMatch()) continue;
+                QString countText = match.captured(1);
+                countText.remove(',');
+                bool ok = false;
+                const long long total = countText.toLongLong(&ok);
+                if (ok && total > 0) {
+                    copySteps = total;
+                }
+                break;
+            }
+        }
+    }
+    const int copySpace = trackRsyncProgress ? 85 : 80;
+    proc.advance(copySpace, copySteps);
     proc.status(tr("Copying new system"));
     // Placed here so the progress bar moves to the right position before the next step.
 
@@ -348,16 +444,159 @@ void Base::copyLinux(bool skiphome)
     QEventLoop eloop;
     QObject::connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     QObject::connect(&proc, &QProcess::readyRead, &eloop, &QEventLoop::quit);
+    QObject::connect(&proc, &QProcess::readyReadStandardError, &eloop, &QEventLoop::quit);
     proc.start(prog, args);
     long ncopy = 0;
+    int rsyncPercent = -1;
+    long long rsyncTotal = (trackRsyncProgress ? copySteps : 0);
+    long long rsyncRemaining = -1;
+    long long rsyncXfer = -1;
+    QByteArray stderrBuffer;
+    const auto parseRsyncProgressLine = [](
+        const QByteArray &line,
+        long long &remainingOut,
+        long long &totalOut,
+        long long &xferOut) {
+        int chkPos = line.indexOf("to-chk=");
+        if (chkPos < 0) {
+            chkPos = line.indexOf("ir-chk=");
+        }
+        if (chkPos >= 0) {
+            const int remainStart = chkPos + 7;
+            const int slashPos = line.indexOf('/', remainStart);
+            if (slashPos > remainStart) {
+                bool okRemain = false;
+                const QByteArray remainingText = line.mid(remainStart, slashPos - remainStart);
+                const long long remaining = remainingText.toLongLong(&okRemain);
+                int totalEnd = slashPos + 1;
+                while (totalEnd < line.size()
+                    && std::isdigit(static_cast<unsigned char>(line.at(totalEnd)))) {
+                    ++totalEnd;
+                }
+                bool okTotal = false;
+                const QByteArray totalText = line.mid(slashPos + 1, totalEnd - (slashPos + 1));
+                const long long total = totalText.toLongLong(&okTotal);
+                if (okRemain && okTotal && total > 0) {
+                    remainingOut = remaining;
+                    totalOut = total;
+                    const long long done = static_cast<long long>(total) - remaining;
+                    int pct = static_cast<int>((done * 100LL) / total);
+                    if (pct < 0) pct = 0;
+                    if (pct > 100) pct = 100;
+                    return pct;
+                }
+            }
+        }
+        const int xfrPos = line.indexOf("xfr#");
+        if (xfrPos >= 0) {
+            int numStart = xfrPos + 4;
+            int numEnd = numStart;
+            while (numEnd < line.size()
+                && std::isdigit(static_cast<unsigned char>(line.at(numEnd)))) {
+                ++numEnd;
+            }
+            if (numEnd > numStart) {
+                bool ok = false;
+                const long long xfr = line.mid(numStart, numEnd - numStart).toLongLong(&ok);
+                if (ok) xferOut = xfr;
+            }
+        }
+        const int pctPos = line.lastIndexOf('%');
+        if (pctPos <= 0) return -1;
+        int start = pctPos - 1;
+        while (start >= 0 && std::isdigit(static_cast<unsigned char>(line.at(start)))) {
+            --start;
+        }
+        ++start;
+        if (start >= pctPos) return -1;
+        bool ok = false;
+        const int pct = QByteArray(line.mid(start, pctPos - start)).toInt(&ok);
+        return ok ? pct : -1;
+    };
+    QByteArray rsyncStdoutBuffer;
+    QByteArray rsyncStderrBuffer;
+    const auto updateRsyncProgress = [&parseRsyncProgressLine](
+        const QByteArray &chunk,
+        QByteArray &buffer,
+        int &pctOut,
+        long long &remainingOut,
+        long long &totalOut,
+        long long &xferOut) {
+        buffer.append(chunk);
+        buffer.replace('\r', '\n');
+        const int lastNewline = buffer.lastIndexOf('\n');
+        if (lastNewline < 0) return;
+        const QByteArray complete = buffer.left(lastNewline);
+        buffer = buffer.mid(lastNewline + 1);
+        const QList<QByteArray> lines = complete.split('\n');
+        for (const QByteArray &line : lines) {
+            const int pct = parseRsyncProgressLine(line, remainingOut, totalOut, xferOut);
+            if (pct >= 0) pctOut = pct;
+        }
+    };
+    const auto isProgressLine = [](const QByteArray &line) {
+        return line.contains('%') && (line.contains("to-chk=") || line.contains("xfr#"));
+    };
     while (proc.state() != QProcess::NotRunning) {
         eloop.exec();
-        ncopy += proc.readAllStandardOutput().count('\n');
-        proc.status(ncopy);
+        const QByteArray stdoutChunk = proc.readAllStandardOutput();
+        if (!stdoutChunk.isEmpty()) {
+            ncopy += stdoutChunk.count('\n');
+            if (trackRsyncProgress) {
+                updateRsyncProgress(
+                    stdoutChunk,
+                    rsyncStdoutBuffer,
+                    rsyncPercent,
+                    rsyncRemaining,
+                    rsyncTotal,
+                    rsyncXfer);
+            }
+        }
+        const QByteArray stderrChunk = proc.readAllStandardError();
+        if (!stderrChunk.isEmpty()) {
+            if (trackRsyncProgress) {
+                updateRsyncProgress(
+                    stderrChunk,
+                    rsyncStderrBuffer,
+                    rsyncPercent,
+                    rsyncRemaining,
+                    rsyncTotal,
+                    rsyncXfer);
+                QByteArray cleaned = stderrChunk;
+                cleaned.replace('\r', '\n');
+                const QList<QByteArray> lines = cleaned.split('\n');
+                for (const QByteArray &line : lines) {
+                    if (!line.isEmpty() && !isProgressLine(line)) {
+                        stderrBuffer.append(line);
+                        stderrBuffer.append('\n');
+                    }
+                }
+            } else {
+                stderrBuffer.append(stderrChunk);
+            }
+        }
+        if (trackRsyncProgress) {
+            if (copySteps > 0 && rsyncXfer >= 0) {
+                const long long done = std::min(rsyncXfer, copySteps);
+                proc.status(done);
+            } else if (rsyncTotal > 0 && rsyncRemaining >= 0) {
+                const long long done = rsyncTotal - rsyncRemaining;
+                proc.status(done);
+            } else if (rsyncPercent >= 0) {
+                if (copySteps > 0) {
+                    const long long done = (copySteps * rsyncPercent) / 100;
+                    proc.status(done);
+                } else {
+                    proc.status(rsyncPercent);
+                }
+            }
+        } else {
+            proc.status(ncopy);
+        }
     }
     proc.disconnect(&eloop);
 
-    const QByteArray &StdErr = proc.readAllStandardError();
+    const QByteArray &StdErr = stderrBuffer;
     if (!StdErr.isEmpty()) {
         qDebug() << "SErr COPY:" << StdErr;
         QFont logFont = logEntry->font();

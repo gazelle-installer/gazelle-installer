@@ -1,6 +1,32 @@
 #!/bin/bash
 # Build script - see below for command information.
 set -e
+
+# Parse options
+ARCH_PACKAGE=false
+
+while [[ $# -gt 0 ]]; do
+	case $1 in
+		--arch)
+			ARCH_PACKAGE=true
+			shift
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+# Handle --arch option (package build)
+if [ "$ARCH_PACKAGE" = true ]; then
+	echo "Building Arch Linux package..."
+	rm -rf _build_/arch
+	mkdir -p _build_/arch
+	PKGDEST="$(pwd)/_build_/arch" BUILDDIR="$(pwd)/_build_/arch" makepkg -f --cleanbuild --syncdeps --noconfirm --needed
+	echo "Package (and build artifacts) are in _build_/arch"
+	exit 0
+fi
+
 case "${1:-all}" in
 	clean)
 		echo "Performing ultimate clean..."
@@ -33,7 +59,9 @@ case "${1:-all}" in
 		;;
 
 	*)
-		echo "Usage: $0 [command]"
+		echo "Usage: $0 [--arch] [command]"
+		echo "Options:"
+		echo "  --arch        Build Arch Linux package using makepkg"
 		echo "Commands:"
 		echo "  clean        - Ultimate clean (rm -rf build)"
 		echo "  configure    - Configure only"
