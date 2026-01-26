@@ -136,7 +136,8 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     }
     // Account for file system formatting
     struct statvfs svfs;
-    if (statvfs(rootBase.toUtf8().constData(), &svfs) == 0) {
+    const QString statvfsPath = archLive ? rootBase : u"/live/linux"_s;
+    if (statvfs(statvfsPath.toUtf8().constData(), &svfs) == 0) {
         sourceInodes = svfs.f_files - svfs.f_ffree; // Will also be used for progress bar.
     }
     vspecRoot.image += (sourceInodes * BASE_BLOCK);
