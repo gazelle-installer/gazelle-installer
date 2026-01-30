@@ -1304,6 +1304,16 @@ void MInstall::gotoPage(int next) noexcept
             automatic = false;
         }
     }
+    // automatic installation (TUI)
+    if (ui::Context::isTUI() && automatic) {
+        if (!MSettings::isBadWidget(gui.widgetStack->currentWidget()) && next > curr) {
+            if (next != Step::TIPS && next != Step::END && tui_deferredPage < 0) {
+                tui_deferredPage = next + 1;
+            }
+        } else if (curr != 0) { // failed validation
+            automatic = false;
+        }
+    }
 
     // process next installation phase (skip in TUI pretend mode)
     if (ui::Context::isGUI()) {
@@ -3119,6 +3129,12 @@ bool MInstall::processDeferredActions() noexcept
         replacer->scan(true, true);
         tui_replaceScanning = false;
         tui_focusReplace = 0;
+        return true;
+    }
+    if (tui_deferredPage >= 0) {
+        const int target = tui_deferredPage;
+        tui_deferredPage = -1;
+        gotoPage(target);
         return true;
     }
     return false;
