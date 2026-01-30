@@ -5,13 +5,13 @@
 
 namespace qtui {
 
-class CheckBox : public Widget
+class TCheckBox : public Widget
 {
     Q_OBJECT
 
 public:
-    explicit CheckBox(const QString &text = QString(), Widget *parent = nullptr) noexcept;
-    ~CheckBox() override;
+    explicit TCheckBox(const QString &text = QString(), Widget *parent = nullptr) noexcept;
+    ~TCheckBox() override;
 
     void setText(const QString &text) noexcept { this->labelText = text; }
     QString text() const noexcept { return labelText; }

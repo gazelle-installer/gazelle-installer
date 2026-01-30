@@ -5,13 +5,13 @@
 
 namespace qtui {
 
-class ProgressBar : public Widget
+class TProgressBar : public Widget
 {
     Q_OBJECT
 
 public:
-    explicit ProgressBar(Widget *parent = nullptr) noexcept;
-    ~ProgressBar() override;
+    explicit TProgressBar(Widget *parent = nullptr) noexcept;
+    ~TProgressBar() override;
 
     void setValue(int value) noexcept;
     int value() const noexcept { return currentValue; }

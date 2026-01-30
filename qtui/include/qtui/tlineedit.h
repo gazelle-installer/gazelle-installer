@@ -5,7 +5,7 @@
 
 namespace qtui {
 
-class LineEdit : public Widget
+class TLineEdit : public Widget
 {
     Q_OBJECT
 
@@ -17,8 +17,8 @@ public:
         PasswordEchoOnEdit
     };
 
-    explicit LineEdit(const QString &text = QString(), Widget *parent = nullptr) noexcept;
-    ~LineEdit() override;
+    explicit TLineEdit(const QString &text = QString(), Widget *parent = nullptr) noexcept;
+    ~TLineEdit() override;
 
     void setText(const QString &text) noexcept;
     QString text() const noexcept { return editText; }
@@ -40,6 +40,9 @@ public:
     bool hasFocus() const noexcept { return focused; }
     
     void clear() noexcept;
+    
+    // Position cursor for focused widget (call after all widgets are rendered)
+    void showCursor() noexcept;
     
     bool handleMouse(int mouseY, int mouseX) noexcept;
     bool handleKey(int key) noexcept;

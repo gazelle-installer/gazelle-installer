@@ -1,4 +1,4 @@
-#include "qtui/radiobutton.h"
+#include "qtui/tradiobutton.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 
@@ -6,21 +6,21 @@ namespace qtui {
 
 // ButtonGroup implementation
 
-ButtonGroup::ButtonGroup(QObject *parent) noexcept
+TButtonGroup::TButtonGroup(QObject *parent) noexcept
     : QObject(parent)
 {
 }
 
-ButtonGroup::~ButtonGroup()
+TButtonGroup::~TButtonGroup()
 {
-    for (RadioButton *button : buttonList) {
+    for (TRadioButton *button : buttonList) {
         if (button) {
             button->group = nullptr;
         }
     }
 }
 
-void ButtonGroup::addButton(RadioButton *button) noexcept
+void TButtonGroup::addButton(TRadioButton *button) noexcept
 {
     if (!button || buttonList.contains(button)) return;
     
@@ -32,7 +32,7 @@ void ButtonGroup::addButton(RadioButton *button) noexcept
     button->group = this;
 }
 
-void ButtonGroup::removeButton(RadioButton *button) noexcept
+void TButtonGroup::removeButton(TRadioButton *button) noexcept
 {
     if (!button) return;
     buttonList.removeAll(button);
@@ -41,9 +41,9 @@ void ButtonGroup::removeButton(RadioButton *button) noexcept
     }
 }
 
-RadioButton *ButtonGroup::checkedButton() const noexcept
+TRadioButton *TButtonGroup::checkedButton() const noexcept
 {
-    for (RadioButton *button : buttonList) {
+    for (TRadioButton *button : buttonList) {
         if (button && button->isChecked()) {
             return button;
         }
@@ -51,11 +51,11 @@ RadioButton *ButtonGroup::checkedButton() const noexcept
     return nullptr;
 }
 
-void ButtonGroup::uncheckOthers(RadioButton *except) noexcept
+void TButtonGroup::uncheckOthers(TRadioButton *except) noexcept
 {
     if (!exclusive) return;
     
-    for (RadioButton *button : buttonList) {
+    for (TRadioButton *button : buttonList) {
         if (button && button != except && button->isChecked()) {
             button->checked = false;
             emit button->toggled(false);
@@ -63,21 +63,21 @@ void ButtonGroup::uncheckOthers(RadioButton *except) noexcept
     }
 }
 
-// RadioButton implementation
+// TRadioButton implementation
 
-RadioButton::RadioButton(const QString &text, Widget *parent) noexcept
+TRadioButton::TRadioButton(const QString &text, Widget *parent) noexcept
     : Widget(parent), labelText(text)
 {
 }
 
-RadioButton::~RadioButton()
+TRadioButton::~TRadioButton()
 {
     if (group) {
         group->removeButton(this);
     }
 }
 
-void RadioButton::setChecked(bool checked) noexcept
+void TRadioButton::setChecked(bool checked) noexcept
 {
     if (this->checked == checked) return;
     
@@ -89,7 +89,7 @@ void RadioButton::setChecked(bool checked) noexcept
     emit toggled(checked);
 }
 
-void RadioButton::toggle() noexcept
+void TRadioButton::toggle() noexcept
 {
     if (!checked) {
         setChecked(true);
@@ -97,7 +97,7 @@ void RadioButton::toggle() noexcept
     }
 }
 
-void RadioButton::setButtonGroup(ButtonGroup *group) noexcept
+void TRadioButton::setButtonGroup(TButtonGroup *group) noexcept
 {
     if (this->group == group) return;
     
@@ -110,24 +110,25 @@ void RadioButton::setButtonGroup(ButtonGroup *group) noexcept
     }
 }
 
-void RadioButton::render() noexcept
+void TRadioButton::render() noexcept
 {
     if (!visible) return;
-    
+
     if (focused) {
         attron(A_UNDERLINE);
     }
-    
-    QString checkMark = checked ? "(•)" : "( )";
-    mvprintw(row, col, "%s %s", checkMark.toUtf8().constData(), 
+
+    // Use ASCII-safe characters to avoid encoding issues
+    const char* checkMark = checked ? "(*)" : "( )";
+    mvprintw(row, col, "%s %s", checkMark,
              labelText.toUtf8().constData());
-    
+
     if (focused) {
         attroff(A_UNDERLINE);
     }
 }
 
-bool RadioButton::handleMouse(int mouseY, int mouseX) noexcept
+bool TRadioButton::handleMouse(int mouseY, int mouseX) noexcept
 {
     if (!enabled || !visible) return false;
     
@@ -139,7 +140,7 @@ bool RadioButton::handleMouse(int mouseY, int mouseX) noexcept
     return false;
 }
 
-bool RadioButton::handleKey(int key) noexcept
+bool TRadioButton::handleKey(int key) noexcept
 {
     if (!enabled || !visible || !focused) return false;
     

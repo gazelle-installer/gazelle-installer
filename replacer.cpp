@@ -23,12 +23,19 @@
 #include <QHash>
 #include <QDialog>
 #include <QMessageBox>
+#include "ui/qmessagebox.h"
+#include "ui/context.h"
 #include <QRegularExpression>
 #include "mprocess.h"
 #include "partman.h"
 #include "msettings.h"
 #include "crypto.h"
 #include "replacer.h"
+
+// Include ncurses LAST to avoid macro conflicts with Qt, then undefine problematic macros
+#include <ncurses.h>
+#undef border
+#undef timeout
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -136,12 +143,10 @@ void Replacer::scan(bool full, bool allowUnlock) noexcept
             crypto.close(device);
         }
     } else if (cryptoAny) {
-        QMessageBox msgbox(gui.boxMain);
-        msgbox.setIcon(QMessageBox::Information);
-        msgbox.setText(tr("Could not open any of the locked encrypted containers."));
-        msgbox.setInformativeText(tr("Possible incorrect password."
-            " Press the 'Scan' button to try again with a different password."));
-        msgbox.exec();
+        ui::QMessageBox::information(ui::Context::isGUI() ? gui.boxMain : nullptr,
+            tr("Information"),
+            tr("Could not open any of the locked encrypted containers.\n"
+               "Possible incorrect password. Press the 'Scan' button to try again with a different password."));
     }
 }
 bool Replacer::saveInstallInfo(const QString &scratchpath, PartMan::Device *device) noexcept
@@ -177,12 +182,26 @@ void Replacer::clean() noexcept
     partman->scan();
 }
 
+void Replacer::setSelectedInstallation(int row) noexcept
+{
+    if (row >= 0 && row < gui.tableExistInst->rowCount()) {
+        gui.tableExistInst->setCurrentCell(row, 0);
+    }
+}
+
+QString Replacer::installationRelease(size_t index) const noexcept
+{
+    return (index < bases.size()) ? bases[index].release : QString();
+}
+
 bool Replacer::validate() const noexcept
 {
     const int currow = gui.tableExistInst->currentRow();
     assert(static_cast<size_t>(gui.tableExistInst->rowCount()) == bases.size());
     if (currow < 0 || currow >= (int)bases.size()) {
-        QMessageBox::critical(gui.boxMain, QString(), tr("No existing installation selected."));
+        ui::QMessageBox::critical(ui::Context::isGUI() ? gui.boxMain : nullptr,
+            tr("Error"),
+            tr("No existing installation selected."));
         return false;
     }
     return true;
@@ -266,6 +285,75 @@ bool Replacer::preparePartMan() noexcept
 bool Replacer::promptPass() noexcept
 {
     cryptoPass.fill('#'); // Wipe existing secret.
+    cryptoPass.clear();
+
+    if (ui::Context::isTUI()) {
+        // TUI mode: use ncurses for password input
+        const int dialogHeight = 8;
+        const int dialogWidth = 50;
+        int maxY, maxX;
+        getmaxyx(stdscr, maxY, maxX);
+        const int startY = (maxY - dialogHeight) / 2;
+        const int startX = (maxX - dialogWidth) / 2;
+
+        WINDOW *win = newwin(dialogHeight, dialogWidth, startY, startX);
+        box(win, 0, 0);
+
+        // Title
+        const QString title = tr("Unlock encrypted volumes");
+        mvwprintw(win, 0, (dialogWidth - title.length()) / 2, " %s ", title.toUtf8().constData());
+
+        // Password label and input
+        mvwprintw(win, 2, 2, "%s", tr("Password:").toUtf8().constData());
+
+        // Input field
+        char password[256] = {0};
+        mvwprintw(win, 3, 2, "[");
+        mvwprintw(win, 3, dialogWidth - 3, "]");
+
+        // Instructions
+        mvwprintw(win, 5, 2, "ENTER=OK  ESC=Ignore");
+
+        wrefresh(win);
+        curs_set(1);
+        echo();
+        noecho(); // Don't echo password characters
+
+        // Read password with asterisks
+        int ch;
+        int pos = 0;
+        wmove(win, 3, 3);
+        while ((ch = wgetch(win)) != '\n' && ch != 27) { // 27 = ESC
+            if (ch == KEY_BACKSPACE || ch == 127 || ch == 8) {
+                if (pos > 0) {
+                    pos--;
+                    password[pos] = '\0';
+                    mvwaddch(win, 3, 3 + pos, ' ');
+                    wmove(win, 3, 3 + pos);
+                }
+            } else if (pos < 254 && ch >= 32 && ch < 127) {
+                password[pos++] = ch;
+                password[pos] = '\0';
+                waddch(win, '*');
+            }
+            wrefresh(win);
+        }
+
+        curs_set(0);
+        delwin(win);
+        touchwin(stdscr);
+        refresh();
+
+        if (ch == 27 || pos == 0) { // ESC pressed or empty password
+            return false;
+        }
+
+        cryptoPass = QByteArray(password);
+        memset(password, 0, sizeof(password)); // Clear from memory
+        return true;
+    }
+
+    // GUI mode: use QDialog
     QDialog dialog(gui.boxMain);
     QFormLayout layout(&dialog);
     dialog.setWindowTitle(tr("Unlock encrypted volumes"));
@@ -288,7 +376,6 @@ bool Replacer::promptPass() noexcept
         pushOK->setDisabled(text.isEmpty());
     });
 
-    cryptoPass.clear();
     if (dialog.exec() == QDialog::Accepted) {
         cryptoPass = editPass->text().toUtf8();
         return true;
@@ -338,14 +425,16 @@ bool Replacer::openEncrypted(RootBase &base) noexcept
         PartMan::Device *dev = resolveDevSource(crypt.encdev);
         if (dev) {
             if (dev->mapCount == 0 && !crypto.open(dev, cryptoPass)) {
-                QMessageBox::critical(gui.boxMain, QString(),
+                ui::QMessageBox::critical(ui::Context::isGUI() ? gui.boxMain : nullptr,
+                    tr("Error"),
                     tr("Cannot unlock encrypted partition: %1").arg(crypt.encdev));
                 return false;
             }
             dev->addToCrypttab = true;
             crypt.device = dev;
         } else {
-            QMessageBox::critical(gui.boxMain, QString(),
+            ui::QMessageBox::critical(ui::Context::isGUI() ? gui.boxMain : nullptr,
+                tr("Error"),
                 tr("Cannot find partition listed in crypttab: %1").arg(crypt.encdev));
             return false;
         }
@@ -365,10 +454,9 @@ void Replacer::closeEncrypted(RootBase &base) noexcept
         }
     }
     if (!failed.isEmpty()) {
-        QMessageBox msgbox(gui.boxMain);
-        msgbox.setIcon(QMessageBox::Warning);
-        msgbox.setText(tr("Could not re-lock encrypted device(s): %1").arg(failed.join(u", "_s)));
-        msgbox.exec();
+        ui::QMessageBox::warning(ui::Context::isGUI() ? gui.boxMain : nullptr,
+            tr("Warning"),
+            tr("Could not re-lock encrypted device(s): %1").arg(failed.join(u", "_s)));
     }
 }
 

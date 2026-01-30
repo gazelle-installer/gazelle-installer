@@ -12,6 +12,13 @@ option(USE_ZXCVBN "Use zxcvbn for password strength estimation" ON)
 find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Concurrent LinguistTools)
 set(CMAKE_AUTORCC ON)
 
+# Add QTUI library (only once, here)
+add_subdirectory(qtui)
+
+# Add wrapper library (which uses qtui but doesn't add it again)
+# We need to modify src/ui/CMakeLists.txt to not add qtui subdirectory
+add_subdirectory(src/ui)
+
 set(CMAKE_CXX_STANDARD 23)
 #set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 
@@ -49,6 +56,9 @@ target_link_libraries(minstall PRIVATE
 	Qt::Gui
 	Qt::Widgets
 	Qt::Concurrent
+	ui-wrappers
+	qtui
+	ncursesw
 )
 
 if(USE_ZXCVBN)

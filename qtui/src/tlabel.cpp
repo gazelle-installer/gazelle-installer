@@ -1,17 +1,17 @@
-#include "qtui/label.h"
+#include "qtui/tlabel.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 
 namespace qtui {
 
-Label::Label(const QString &text, Widget *parent) noexcept
+TLabel::TLabel(const QString &text, Widget *parent) noexcept
     : Widget(parent), labelText(text)
 {
 }
 
-Label::~Label() = default;
+TLabel::~TLabel() = default;
 
-QStringList Label::wrapText(const QString &text, int width) const noexcept
+QStringList TLabel::wrapText(const QString &text, int width) const noexcept
 {
     if (width <= 0 || !wordWrap) {
         return QStringList() << text;
@@ -41,7 +41,7 @@ QStringList Label::wrapText(const QString &text, int width) const noexcept
     return result;
 }
 
-void Label::render() noexcept
+void TLabel::render() noexcept
 {
     if (!visible) return;
 

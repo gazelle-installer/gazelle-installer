@@ -1,17 +1,17 @@
-#include "qtui/checkbox.h"
+#include "qtui/tcheckbox.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 
 namespace qtui {
 
-CheckBox::CheckBox(const QString &text, Widget *parent) noexcept
+TCheckBox::TCheckBox(const QString &text, Widget *parent) noexcept
     : Widget(parent), labelText(text)
 {
 }
 
-CheckBox::~CheckBox() = default;
+TCheckBox::~TCheckBox() = default;
 
-void CheckBox::setChecked(bool checked) noexcept
+void TCheckBox::setChecked(bool checked) noexcept
 {
     if (this->checked != checked) {
         this->checked = checked;
@@ -20,13 +20,13 @@ void CheckBox::setChecked(bool checked) noexcept
     }
 }
 
-void CheckBox::toggle() noexcept
+void TCheckBox::toggle() noexcept
 {
     setChecked(!checked);
     emit clicked();
 }
 
-void CheckBox::render() noexcept
+void TCheckBox::render() noexcept
 {
     if (!visible) return;
     
@@ -43,7 +43,7 @@ void CheckBox::render() noexcept
     }
 }
 
-bool CheckBox::handleMouse(int mouseY, int mouseX) noexcept
+bool TCheckBox::handleMouse(int mouseY, int mouseX) noexcept
 {
     if (!enabled || !visible) return false;
     
@@ -55,7 +55,7 @@ bool CheckBox::handleMouse(int mouseY, int mouseX) noexcept
     return false;
 }
 
-bool CheckBox::handleKey(int key) noexcept
+bool TCheckBox::handleKey(int key) noexcept
 {
     if (!enabled || !visible || !focused) return false;
     

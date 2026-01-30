@@ -1,17 +1,17 @@
-#include "qtui/lineedit.h"
+#include "qtui/tlineedit.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 
 namespace qtui {
 
-LineEdit::LineEdit(const QString &text, Widget *parent) noexcept
+TLineEdit::TLineEdit(const QString &text, Widget *parent) noexcept
     : Widget(parent), editText(text), cursorPos(text.length())
 {
 }
 
-LineEdit::~LineEdit() = default;
+TLineEdit::~TLineEdit() = default;
 
-void LineEdit::setText(const QString &text) noexcept
+void TLineEdit::setText(const QString &text) noexcept
 {
     if (editText != text) {
         editText = text;
@@ -22,12 +22,12 @@ void LineEdit::setText(const QString &text) noexcept
     }
 }
 
-void LineEdit::clear() noexcept
+void TLineEdit::clear() noexcept
 {
     setText(QString());
 }
 
-QString LineEdit::getDisplayText() const noexcept
+QString TLineEdit::getDisplayText() const noexcept
 {
     if (echoMode == NoEcho) {
         return QString();
@@ -37,7 +37,7 @@ QString LineEdit::getDisplayText() const noexcept
     return editText;
 }
 
-void LineEdit::adjustOffset() noexcept
+void TLineEdit::adjustOffset() noexcept
 {
     if (cursorPos < displayOffset) {
         displayOffset = cursorPos;
@@ -46,7 +46,7 @@ void LineEdit::adjustOffset() noexcept
     }
 }
 
-void LineEdit::moveCursorLeft() noexcept
+void TLineEdit::moveCursorLeft() noexcept
 {
     if (cursorPos > 0) {
         cursorPos--;
@@ -54,7 +54,7 @@ void LineEdit::moveCursorLeft() noexcept
     }
 }
 
-void LineEdit::moveCursorRight() noexcept
+void TLineEdit::moveCursorRight() noexcept
 {
     if (cursorPos < editText.length()) {
         cursorPos++;
@@ -62,19 +62,19 @@ void LineEdit::moveCursorRight() noexcept
     }
 }
 
-void LineEdit::moveCursorHome() noexcept
+void TLineEdit::moveCursorHome() noexcept
 {
     cursorPos = 0;
     adjustOffset();
 }
 
-void LineEdit::moveCursorEnd() noexcept
+void TLineEdit::moveCursorEnd() noexcept
 {
     cursorPos = editText.length();
     adjustOffset();
 }
 
-void LineEdit::insertChar(QChar ch) noexcept
+void TLineEdit::insertChar(QChar ch) noexcept
 {
     if (editText.length() >= maxLen) return;
     
@@ -85,7 +85,7 @@ void LineEdit::insertChar(QChar ch) noexcept
     emit textEdited(editText);
 }
 
-void LineEdit::deleteChar() noexcept
+void TLineEdit::deleteChar() noexcept
 {
     if (cursorPos < editText.length()) {
         editText.remove(cursorPos, 1);
@@ -94,7 +94,7 @@ void LineEdit::deleteChar() noexcept
     }
 }
 
-void LineEdit::backspace() noexcept
+void TLineEdit::backspace() noexcept
 {
     if (cursorPos > 0) {
         editText.remove(cursorPos - 1, 1);
@@ -105,7 +105,7 @@ void LineEdit::backspace() noexcept
     }
 }
 
-void LineEdit::render() noexcept
+void TLineEdit::render() noexcept
 {
     if (!visible) return;
 
@@ -150,7 +150,7 @@ void LineEdit::render() noexcept
     }
 }
 
-bool LineEdit::handleMouse(int mouseY, int mouseX) noexcept
+bool TLineEdit::handleMouse(int mouseY, int mouseX) noexcept
 {
     if (!enabled || !visible) return false;
     
@@ -165,7 +165,7 @@ bool LineEdit::handleMouse(int mouseY, int mouseX) noexcept
     return false;
 }
 
-bool LineEdit::handleKey(int key) noexcept
+bool TLineEdit::handleKey(int key) noexcept
 {
     if (!enabled || !visible || !focused) return false;
 
@@ -211,6 +211,15 @@ bool LineEdit::handleKey(int key) noexcept
     }
     
     return false;
+}
+
+void TLineEdit::showCursor() noexcept
+{
+    if (focused && enabled && visible) {
+        int visualCursor = cursorPos - displayOffset;
+        move(row, col + 1 + visualCursor);
+        curs_set(1);
+    }
 }
 
 } // namespace qtui

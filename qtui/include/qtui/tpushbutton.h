@@ -5,13 +5,13 @@
 
 namespace qtui {
 
-class PushButton : public Widget
+class TPushButton : public Widget
 {
     Q_OBJECT
 
 public:
-    explicit PushButton(const QString &text = QString(), Widget *parent = nullptr) noexcept;
-    ~PushButton() override;
+    explicit TPushButton(const QString &text = QString(), Widget *parent = nullptr) noexcept;
+    ~TPushButton() override;
 
     void setText(const QString &text) noexcept { this->buttonText = text; }
     QString text() const noexcept { return buttonText; }

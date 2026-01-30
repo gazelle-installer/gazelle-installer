@@ -1,17 +1,17 @@
-#include "qtui/pushbutton.h"
+#include "qtui/tpushbutton.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 
 namespace qtui {
 
-PushButton::PushButton(const QString &text, Widget *parent) noexcept
+TPushButton::TPushButton(const QString &text, Widget *parent) noexcept
     : Widget(parent), buttonText(text)
 {
 }
 
-PushButton::~PushButton() = default;
+TPushButton::~TPushButton() = default;
 
-void PushButton::click() noexcept
+void TPushButton::click() noexcept
 {
     if (!enabled) return;
     
@@ -20,7 +20,7 @@ void PushButton::click() noexcept
     emit released();
 }
 
-void PushButton::render() noexcept
+void TPushButton::render() noexcept
 {
     if (!visible) return;
     
@@ -45,7 +45,7 @@ void PushButton::render() noexcept
     }
 }
 
-bool PushButton::handleMouse(int mouseY, int mouseX) noexcept
+bool TPushButton::handleMouse(int mouseY, int mouseX) noexcept
 {
     if (!enabled || !visible) return false;
     
@@ -59,7 +59,7 @@ bool PushButton::handleMouse(int mouseY, int mouseX) noexcept
     return false;
 }
 
-bool PushButton::handleKey(int key) noexcept
+bool TPushButton::handleKey(int key) noexcept
 {
     if (!enabled || !visible || !focused) return false;
     

@@ -5,7 +5,7 @@
 
 namespace qtui {
 
-class Label : public Widget
+class TLabel : public Widget
 {
     Q_OBJECT
 
@@ -19,8 +19,8 @@ public:
         AlignVCenter = 0x80
     };
 
-    explicit Label(const QString &text = QString(), Widget *parent = nullptr) noexcept;
-    ~Label() override;
+    explicit TLabel(const QString &text = QString(), Widget *parent = nullptr) noexcept;
+    ~TLabel() override;
 
     void setText(const QString &text) noexcept { this->labelText = text; }
     QString text() const noexcept { return labelText; }

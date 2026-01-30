@@ -212,7 +212,9 @@ bool Base::saveHomeBasic() noexcept
         mount = partman.findByMount(u"/"_s); // Must have '/' at this point.
         homedir = "/home"_L1;
     }
-    assert(mount != nullptr);
+    if (!mount) {
+        return false;
+    }
     if (mount->willFormat()) return true;
     const QString &homedev = mount->mappedDevice();
 
@@ -247,7 +249,11 @@ void Base::install()
     proc.advance(1, 1);
 
     const PartMan::Device *rootdev = partman.findByMount(u"/"_s);
-    assert(rootdev != nullptr);
+    if (!rootdev) {
+        proc.log(u"No root partition selected."_s, MProcess::LOG_FAIL);
+        proc.halt(true);
+        throw "";
+    }
     const bool skiphome = !rootdev->willFormat();
     if (skiphome) {
         MProcess::Section sect(proc, QT_TR_NOOP("Failed to delete old system on destination."));

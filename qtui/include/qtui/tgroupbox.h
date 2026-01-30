@@ -6,13 +6,13 @@
 
 namespace qtui {
 
-class GroupBox : public Widget
+class TGroupBox : public Widget
 {
     Q_OBJECT
 
 public:
-    explicit GroupBox(Widget *parent = nullptr) noexcept;
-    ~GroupBox() override;
+    explicit TGroupBox(Widget *parent = nullptr) noexcept;
+    ~TGroupBox() override;
 
     void setTitle(const QString &title) noexcept { this->titleText = title; }
     QString title() const noexcept { return titleText; }

@@ -1,0 +1,7 @@
+
+    // Expose cursor position for proper cursor rendering in event loops
+    int getCursorRow() const noexcept { return row; }
+    int getCursorCol() const noexcept { 
+        int visualCursor = cursorPos - displayOffset;
+        return col + 1 + visualCursor;
+    }

@@ -12,20 +12,20 @@ int main(int argc, char *argv[])
     
     auto *tuiApp = qtui::Application::instance();
     
-    qtui::Label titleLabel;
+    qtui::TLabel titleLabel;
     titleLabel.setText("File Download Progress");
     titleLabel.setAlignment(Qt::AlignCenter);
     titleLabel.setPosition(5, 0);
     titleLabel.setWidth(60);
     titleLabel.show();
     
-    qtui::Label statusLabel;
+    qtui::TLabel statusLabel;
     statusLabel.setText("Initializing...");
     statusLabel.setPosition(7, 10);
     statusLabel.setWidth(50);
     statusLabel.show();
     
-    qtui::ProgressBar downloadProgress;
+    qtui::TProgressBar downloadProgress;
     downloadProgress.setPosition(9, 10);
     downloadProgress.setWidth(50);
     downloadProgress.setRange(0, 100);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     downloadProgress.setFormat("Downloading: %p%");
     downloadProgress.show();
     
-    qtui::ProgressBar extractProgress;
+    qtui::TProgressBar extractProgress;
     extractProgress.setPosition(12, 10);
     extractProgress.setWidth(50);
     extractProgress.setRange(0, 100);
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     extractProgress.setFormat("Extracting: %p%");
     extractProgress.show();
     
-    qtui::PushButton cancelButton;
+    qtui::TPushButton cancelButton;
     cancelButton.setText("Cancel");
     cancelButton.setPosition(15, 10);
     cancelButton.show();
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     int phase = 0; // 0=download, 1=extract, 2=done
     int counter = 0;
     
-    QObject::connect(&cancelButton, &qtui::PushButton::clicked, [&]() {
+    QObject::connect(&cancelButton, &qtui::TPushButton::clicked, [&]() {
         cancelled = true;
         running = false;
     });

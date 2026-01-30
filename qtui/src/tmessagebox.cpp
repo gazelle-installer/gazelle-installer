@@ -1,18 +1,18 @@
-#include "qtui/messagebox.h"
+#include "qtui/tmessagebox.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 #include <QList>
 
 namespace qtui {
 
-MessageBox::MessageBox(Widget *parent) noexcept
+TMessageBox::TMessageBox(Widget *parent) noexcept
     : Widget(parent)
 {
 }
 
-MessageBox::~MessageBox() = default;
+TMessageBox::~TMessageBox() = default;
 
-void MessageBox::drawBox(int y, int x, int height, int width) noexcept
+void TMessageBox::drawBox(int y, int x, int height, int width) noexcept
 {
     mvaddch(y, x, ACS_ULCORNER);
     mvaddch(y, x + width - 1, ACS_URCORNER);
@@ -30,7 +30,7 @@ void MessageBox::drawBox(int y, int x, int height, int width) noexcept
     }
 }
 
-QString MessageBox::getIconText() const noexcept
+QString TMessageBox::getIconText() const noexcept
 {
     switch (iconType) {
         case Critical: return "[!]";
@@ -41,7 +41,7 @@ QString MessageBox::getIconText() const noexcept
     }
 }
 
-QList<MessageBox::StandardButton> MessageBox::getButtonList() const noexcept
+QList<TMessageBox::StandardButton> TMessageBox::getButtonList() const noexcept
 {
     QList<StandardButton> result;
     
@@ -59,7 +59,7 @@ QList<MessageBox::StandardButton> MessageBox::getButtonList() const noexcept
     return result;
 }
 
-QString MessageBox::getButtonText(StandardButton button) const noexcept
+QString TMessageBox::getButtonText(StandardButton button) const noexcept
 {
     switch (button) {
         case Ok: return "OK";
@@ -76,7 +76,7 @@ QString MessageBox::getButtonText(StandardButton button) const noexcept
     }
 }
 
-void MessageBox::render() noexcept
+void TMessageBox::render() noexcept
 {
     if (!visible) return;
     
@@ -172,8 +172,22 @@ void MessageBox::render() noexcept
     refresh();
 }
 
-MessageBox::StandardButton MessageBox::exec() noexcept
+TMessageBox::StandardButton TMessageBox::exec() noexcept
 {
+    // Check if ncurses is already initialized
+    bool needsInit = (stdscr == nullptr);
+    
+    if (needsInit) {
+        // Initialize ncurses for standalone message box
+        initscr();
+        start_color();
+        cbreak();
+        noecho();
+        keypad(stdscr, TRUE);
+        mousemask(ALL_MOUSE_EVENTS, nullptr);
+        curs_set(0);
+    }
+    
     if (Application::instance()) {
         Application::instance()->enableMouse();
     }
@@ -266,15 +280,20 @@ MessageBox::StandardButton MessageBox::exec() noexcept
     clear();
     refresh();
     
+    // Clean up ncurses if we initialized it
+    if (needsInit) {
+        endwin();
+    }
+    
     return result;
 }
 
-MessageBox::StandardButton MessageBox::critical(Widget *parent, const QString &title,
+TMessageBox::StandardButton TMessageBox::critical(Widget *parent, const QString &title,
                                                  const QString &text,
                                                  StandardButtons buttons,
                                                  StandardButton defaultButton) noexcept
 {
-    MessageBox box(parent);
+    TMessageBox box(parent);
     box.setIcon(Critical);
     box.setWindowTitle(title);
     box.setText(text);
@@ -285,12 +304,12 @@ MessageBox::StandardButton MessageBox::critical(Widget *parent, const QString &t
     return box.exec();
 }
 
-MessageBox::StandardButton MessageBox::warning(Widget *parent, const QString &title,
+TMessageBox::StandardButton TMessageBox::warning(Widget *parent, const QString &title,
                                                const QString &text,
                                                StandardButtons buttons,
                                                StandardButton defaultButton) noexcept
 {
-    MessageBox box(parent);
+    TMessageBox box(parent);
     box.setIcon(Warning);
     box.setWindowTitle(title);
     box.setText(text);
@@ -301,12 +320,12 @@ MessageBox::StandardButton MessageBox::warning(Widget *parent, const QString &ti
     return box.exec();
 }
 
-MessageBox::StandardButton MessageBox::information(Widget *parent, const QString &title,
+TMessageBox::StandardButton TMessageBox::information(Widget *parent, const QString &title,
                                                    const QString &text,
                                                    StandardButtons buttons,
                                                    StandardButton defaultButton) noexcept
 {
-    MessageBox box(parent);
+    TMessageBox box(parent);
     box.setIcon(Information);
     box.setWindowTitle(title);
     box.setText(text);

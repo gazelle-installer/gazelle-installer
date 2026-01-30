@@ -1,14 +1,14 @@
 #include "qtui/application.h"
-#include "qtui/messagebox.h"
-#include "qtui/checkbox.h"
-#include "qtui/radiobutton.h"
-#include "qtui/pushbutton.h"
-#include "qtui/label.h"
-#include "qtui/lineedit.h"
-#include "qtui/combobox.h"
-#include "qtui/progressbar.h"
-#include "qtui/groupbox.h"
-#include "qtui/dialog.h"
+#include "qtui/tmessagebox.h"
+#include "qtui/tcheckbox.h"
+#include "qtui/tradiobutton.h"
+#include "qtui/tpushbutton.h"
+#include "qtui/tlabel.h"
+#include "qtui/tlineedit.h"
+#include "qtui/tcombobox.h"
+#include "qtui/tprogressbar.h"
+#include "qtui/tgroupbox.h"
+#include "qtui/tdialog.h"
 #include <QCoreApplication>
 #include <QStringList>
 #include <iostream>
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
             QString text = (argc > 2) ? QString::fromUtf8(argv[2]) : "CheckBox";
             bool checked = (argc > 3) ? (QString::fromUtf8(argv[3]).toLower() == "true") : false;
             
-            qtui::CheckBox checkbox(text);
+            qtui::TCheckBox checkbox(text);
             checkbox.setChecked(checked);
             checkbox.setPosition(5, 5);
             checkbox.setFocus(true);
@@ -108,12 +108,12 @@ int main(int argc, char *argv[])
             int selected = (argc > 3) ? QString::fromUtf8(argv[3]).toInt() : 0;
             
             QStringList optionList = options.split(',');
-            qtui::ButtonGroup group;
-            QList<qtui::RadioButton *> buttons;
+            qtui::TButtonGroup group;
+            QList<qtui::TRadioButton *> buttons;
             
             int startRow = 5;
             for (int i = 0; i < optionList.size(); ++i) {
-                qtui::RadioButton *radio = new qtui::RadioButton(optionList[i].trimmed());
+                qtui::TRadioButton *radio = new qtui::TRadioButton(optionList[i].trimmed());
                 radio->setButtonGroup(&group);
                 radio->setPosition(startRow + i, 5);
                 radio->show();
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
                 }
             }
             
-            qtui::RadioButton *checked = group.checkedButton();
+            qtui::TRadioButton *checked = group.checkedButton();
             std::cout << "Selected: " << (checked ? checked->text().toStdString() : "None") << "\n";
             
             qDeleteAll(buttons);
@@ -181,13 +181,13 @@ int main(int argc, char *argv[])
         } else if (command == "PushButton") {
             QString text = (argc > 2) ? QString::fromUtf8(argv[2]) : "Click Me";
             
-            qtui::PushButton button(text);
+            qtui::TPushButton button(text);
             button.setPosition(5, 5);
             button.setFocus(true);
             button.show();
             
             int clickCount = 0;
-            QObject::connect(&button, &qtui::PushButton::clicked, [&clickCount]() {
+            QObject::connect(&button, &qtui::TPushButton::clicked, [&clickCount]() {
                 clickCount++;
             });
             
@@ -225,14 +225,14 @@ int main(int argc, char *argv[])
             QString alignStr = (argc > 3) ? QString::fromUtf8(argv[3]).toLower() : "left";
             int width = (argc > 4) ? QString::fromUtf8(argv[4]).toInt() : 0;
             
-            qtui::Label label(text);
+            qtui::TLabel label(text);
             label.setPosition(5, 5);
             label.show();
             
             if (alignStr == "center") {
-                label.setAlignment(qtui::Label::AlignHCenter);
+                label.setAlignment(qtui::TLabel::AlignHCenter);
             } else if (alignStr == "right") {
-                label.setAlignment(qtui::Label::AlignRight);
+                label.setAlignment(qtui::TLabel::AlignRight);
             }
             
             if (width > 0) {
@@ -264,21 +264,21 @@ int main(int argc, char *argv[])
             QString initialText = (argc > 2) ? QString::fromUtf8(argv[2]) : "";
             QString modeStr = (argc > 3) ? QString::fromUtf8(argv[3]).toLower() : "normal";
             
-            qtui::LineEdit lineEdit(initialText);
+            qtui::TLineEdit lineEdit(initialText);
             lineEdit.setPosition(5, 5);
             lineEdit.setWidth(30);
             lineEdit.setFocus(true);
             lineEdit.show();
             
             if (modeStr == "password") {
-                lineEdit.setEchoMode(qtui::LineEdit::Password);
+                lineEdit.setEchoMode(qtui::TLineEdit::Password);
             }
             
             if (initialText.isEmpty()) {
                 lineEdit.setPlaceholderText("Enter text here...");
             }
             
-            QObject::connect(&lineEdit, &qtui::LineEdit::returnPressed, [&]() {
+            QObject::connect(&lineEdit, &qtui::TLineEdit::returnPressed, [&]() {
                 // User pressed Enter - we'll exit
             });
             
@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
             int selected = (argc > 3) ? QString::fromUtf8(argv[3]).toInt() : 0;
             
             QStringList optionList = options.split(',');
-            qtui::ComboBox combo;
+            qtui::TComboBox combo;
             for (const QString &opt : optionList) {
                 combo.addItem(opt.trimmed());
             }
@@ -377,7 +377,7 @@ int main(int argc, char *argv[])
         } else if (command == "ProgressBar") {
             int initialValue = (argc > 2) ? QString::fromUtf8(argv[2]).toInt() : 0;
             
-            qtui::ProgressBar progress;
+            qtui::TProgressBar progress;
             progress.setPosition(5, 5);
             progress.setWidth(40);
             progress.setValue(initialValue);
@@ -423,26 +423,26 @@ int main(int argc, char *argv[])
         } else if (command == "GroupBox") {
             QString title = (argc > 2) ? QString::fromUtf8(argv[2]) : "Group Title";
             
-            qtui::GroupBox groupBox;
+            qtui::TGroupBox groupBox;
             groupBox.setTitle(title);
             groupBox.setPosition(3, 5);
             groupBox.setSize(12, 50);
             groupBox.show();
             
             // Add some child widgets
-            qtui::Label label1;
+            qtui::TLabel label1;
             label1.setText("This is inside the group box");
             label1.setPosition(5, 7);
             label1.show();
             groupBox.addWidget(&label1);
             
-            qtui::CheckBox checkBox;
+            qtui::TCheckBox checkBox;
             checkBox.setText("Enable option");
             checkBox.setPosition(7, 7);
             checkBox.show();
             groupBox.addWidget(&checkBox);
             
-            qtui::PushButton button;
+            qtui::TPushButton button;
             button.setText("Action");
             button.setPosition(9, 7);
             button.show();
@@ -476,13 +476,13 @@ int main(int argc, char *argv[])
         } else if (command == "Dialog") {
             QString title = (argc > 2) ? QString::fromUtf8(argv[2]) : "Dialog Title";
             
-            qtui::Dialog dialog;
+            qtui::TDialog dialog;
             dialog.setWindowTitle(title);
             dialog.show();
             
             int result = dialog.exec();
             
-            std::cout << "Dialog result: " << (result == qtui::Dialog::Accepted ? "Accepted" : "Rejected") << "\n";
+            std::cout << "Dialog result: " << (result == qtui::TDialog::Accepted ? "Accepted" : "Rejected") << "\n";
             return 0;
             
         } else {
@@ -505,22 +505,22 @@ int main(int argc, char *argv[])
     QString method = parts[1];
     
     qtui::Application app(argc, argv);
-    qtui::MessageBox::StandardButton result = qtui::MessageBox::NoButton;
+    qtui::TMessageBox::StandardButton result = qtui::TMessageBox::NoButton;
     
     if (widget == "MessageBox") {
         QString title = (argc > 3) ? QString::fromUtf8(argv[3]) : QString();
         QString message = (argc > 4) ? QString::fromUtf8(argv[4]) : QString();
         
         if (method == "critical") {
-            result = qtui::MessageBox::critical(nullptr, title, message);
+            result = qtui::TMessageBox::critical(nullptr, title, message);
         } else if (method == "warning") {
-            result = qtui::MessageBox::warning(nullptr, title, message);
+            result = qtui::TMessageBox::warning(nullptr, title, message);
         } else if (method == "information") {
-            result = qtui::MessageBox::information(nullptr, title, message);
+            result = qtui::TMessageBox::information(nullptr, title, message);
         } else if (method == "yesno") {
-            result = qtui::MessageBox::warning(nullptr, title, message,
-                                              qtui::MessageBox::Yes | qtui::MessageBox::No,
-                                              qtui::MessageBox::No);
+            result = qtui::TMessageBox::warning(nullptr, title, message,
+                                              qtui::TMessageBox::Yes | qtui::TMessageBox::No,
+                                              qtui::TMessageBox::No);
         } else {
             std::cerr << "Error: Unknown method '" << method.toStdString() << "' for MessageBox\n";
             printUsage(argv[0]);
@@ -529,10 +529,10 @@ int main(int argc, char *argv[])
         
         std::cout << "Result: ";
         switch (result) {
-            case qtui::MessageBox::Ok: std::cout << "Ok"; break;
-            case qtui::MessageBox::Yes: std::cout << "Yes"; break;
-            case qtui::MessageBox::No: std::cout << "No"; break;
-            case qtui::MessageBox::Cancel: std::cout << "Cancel"; break;
+            case qtui::TMessageBox::Ok: std::cout << "Ok"; break;
+            case qtui::TMessageBox::Yes: std::cout << "Yes"; break;
+            case qtui::TMessageBox::No: std::cout << "No"; break;
+            case qtui::TMessageBox::Cancel: std::cout << "Cancel"; break;
             default: std::cout << "NoButton"; break;
         }
         std::cout << " (" << static_cast<int>(result) << ")\n";

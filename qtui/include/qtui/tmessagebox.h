@@ -5,7 +5,7 @@
 
 namespace qtui {
 
-class MessageBox : public Widget
+class TMessageBox : public Widget
 {
     Q_OBJECT
 
@@ -40,8 +40,8 @@ public:
     };
     Q_DECLARE_FLAGS(StandardButtons, StandardButton)
 
-    explicit MessageBox(Widget *parent = nullptr) noexcept;
-    ~MessageBox() override;
+    explicit TMessageBox(Widget *parent = nullptr) noexcept;
+    ~TMessageBox() override;
 
     void setIcon(Icon icon) noexcept { this->iconType = icon; }
     Icon icon() const noexcept { return iconType; }
@@ -98,6 +98,6 @@ private:
     QString getButtonText(StandardButton button) const noexcept;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(MessageBox::StandardButtons)
+Q_DECLARE_OPERATORS_FOR_FLAGS(qtui::TMessageBox::StandardButtons)
 
 } // namespace qtui

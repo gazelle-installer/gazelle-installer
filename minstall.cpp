@@ -19,6 +19,8 @@
 #include <cstdlib>
 #include <algorithm>
 #include <utility>
+#include <functional>
+#include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -35,9 +37,18 @@
 #include <QToolTip>
 #include <QPainter>
 #include <QMessageBox>
+#include "ui/qmessagebox.h"
 #include <QDebug>
+#include <QTreeWidgetItem>
+#include <QRegularExpression>
 
 #include "msettings.h"
+#include "ui/context.h"
+#include "ui/qcheckbox.h"
+#include "ui/qlabel.h"
+#include "ui/qradiobutton.h"
+#include "ui/qlineedit.h"
+#include "ui/qcombobox.h"
 #include "checkmd5.h"
 #include "partman.h"
 #include "autopart.h"
@@ -50,6 +61,9 @@
 #include "throbber.h"
 
 #include "minstall.h"
+
+// Include ncurses AFTER all Qt headers to avoid macro conflicts
+#include <ncurses.h>
 
 // CODEBASE_VERSION should come from compiler flags.
 #ifndef CODEBASE_VERSION
@@ -87,6 +101,33 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     gui.setupUi(this);
     gui.listLog->addItem(u"Version "_s + qApp->applicationVersion());
     proc.setupUI(gui.listLog, gui.progInstall);
+    if (ui::Context::isTUI()) {
+        proc.setProgressCallback([this]() {
+            if (currentPageIndex == Step::TIPS || (currentPageIndex == Step::CONFIRM && tui_installStarting)) {
+                ++tui_spinnerTick;
+                renderCurrentPage();
+                refresh();
+
+                // Poll for non-blocking input during installation
+                // This allows the reboot checkbox to be toggled while installing
+                timeout(0);  // Non-blocking getch
+                int ch = getch();
+                if (ch != ERR) {
+                    if (ch == KEY_MOUSE) {
+                        MEVENT event;
+                        if (getmouse(&event) == OK) {
+                            handleMouse(event.y, event.x, event.bstate);
+                        }
+                    } else {
+                        handleInput(ch);
+                    }
+                    renderCurrentPage();
+                    refresh();
+                }
+                timeout(-1);  // Restore blocking mode
+            }
+        });
+    }
     gui.textHelp->installEventFilter(this);
     gui.boxInstall->hide();
 
@@ -111,12 +152,54 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     PROJECTFORUM = appConf.getString(u"Forum"_s);
     appConf.setSection();
 
+    // Setup TUI widgets if in TUI mode
+    if (ui::Context::isTUI()) {
+        setupPageSplashTUI();
+        setupPageTermsTUI();
+        setupPageInstallationTUI();
+        setupPageReplaceTUI();
+        setupPagePartitionsTUI();
+        setupPageEncryptionTUI();
+        setupPageConfirmTUI();
+        setupPageBootTUI();
+        setupPageSwapTUI();
+        setupPageNetworkTUI();
+        setupPageLocalizationTUI();
+        setupPageServicesTUI();
+        setupPageUserAccountsTUI();
+        setupPageOldHomeTUI();
+        setupPageTipsTUI();
+        setupPageEndTUI();
+    }
+
     gotoPage(Step::SPLASH);
 
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
     qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
-    QTimer::singleShot(0, this, [this]() noexcept {
+
+    // Auto-start in both GUI and TUI mode
+    if (ui::Context::isGUI()) {
+        QTimer::singleShot(0, this, [this]() noexcept {
+            try {
+                startup();
+                phase = PH_READY;
+            } catch (const char *msg) {
+                if (checkmd5) {
+                    delete checkmd5;
+                    checkmd5 = nullptr;
+                }
+                proc.unhalt();
+                const bool closenow = (!msg || !*msg);
+                if(!closenow) {
+                    proc.log("FAILED START - "_L1 + msg, MProcess::LOG_FAIL);
+                    gui.labelSplash->setText(tr(msg));
+                }
+                abortEndUI(closenow);
+            }
+        });
+    } else {
+        // TUI mode: Call startup directly (blocking, silently)
         try {
             startup();
             phase = PH_READY;
@@ -126,14 +209,9 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
                 checkmd5 = nullptr;
             }
             proc.unhalt();
-            const bool closenow = (!msg || !*msg);
-            if(!closenow) {
-                proc.log("FAILED START - "_L1 + msg, MProcess::LOG_FAIL);
-                gui.labelSplash->setText(tr(msg));
-            }
-            abortEndUI(closenow);
+            // Error will be visible when TUI starts
         }
-    });
+    }
 }
 
 void MInstall::runShutdown(const QString &action) noexcept
@@ -251,11 +329,20 @@ void MInstall::startup()
             link_block += "\n\n"_L1 + tr(link.toUtf8().constData()) + ": "_L1 + appConf.getString(link);
         }
         appConf.setSection();
-        gui.textReminders->setPlainText(tr("Support %1").arg(PROJECTNAME) + "\n\n"_L1
+
+        QString reminderText = tr("Support %1").arg(PROJECTNAME) + "\n\n"_L1
             + tr("%1 is supported by people like you. Some help others at the support forum,"
                 " or translate help files into different languages, or make suggestions,"
                 " write documentation, or help test new software.").arg(PROJECTNAME)
-            + '\n' + link_block);
+            + '\n' + link_block;
+
+        if (ui::Context::isGUI()) {
+            gui.textReminders->setPlainText(reminderText);
+        } else {
+            if (tui_textReminders) {
+                tui_textReminders->setText(reminderText);
+            }
+        }
     }
 
     setupkeyboardbutton();
@@ -442,6 +529,10 @@ void MInstall::processNextPhase() noexcept
             if (appArgs.isSet(u"poweroff"_s)) {
                 runShutdown(u"poweroff"_s);
             }
+            // TUI mode: check if automatic reboot checkbox is selected
+            if (ui::Context::isTUI() && tui_checkTipsReboot && tui_checkTipsReboot->isChecked()) {
+                runShutdown(u"reboot"_s);
+            }
             gotoPage(Step::END);
         }
         // This OOBE phase is only run under --oobe mode.
@@ -489,6 +580,10 @@ void MInstall::pretendNextPhase() noexcept
     if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::TIPS) {
         saveConfig();
         phase = PH_FINISHED;
+        // TUI mode: check if automatic reboot checkbox is selected (skip in pretend mode)
+        if (!pretend && ui::Context::isTUI() && tui_checkTipsReboot && tui_checkTipsReboot->isChecked()) {
+            runShutdown(u"reboot"_s);
+        }
         gotoPage(Step::END);
     }
 }
@@ -519,11 +614,17 @@ void MInstall::loadConfig(int stage) noexcept
     }
 
     if (!config.good) {
-        QMessageBox msgbox(this);
-        msgbox.setIcon(QMessageBox::Critical);
-        msgbox.setText(tr("Invalid settings found in configuration file (%1).").arg(configFile));
-        msgbox.setInformativeText(tr("Please review marked fields as you encounter them."));
-        msgbox.exec();
+        if (ui::Context::isGUI()) {
+            QMessageBox msgbox(this);
+            msgbox.setIcon(QMessageBox::Critical);
+            msgbox.setText(tr("Invalid settings found in configuration file (%1).").arg(configFile));
+            msgbox.setInformativeText(tr("Please review marked fields as you encounter them."));
+            msgbox.exec();
+        } else {
+            ui::QMessageBox::critical(nullptr,
+                tr("Error"),
+                tr("Invalid settings found in configuration file (%1).\nPlease review marked fields as you encounter them.").arg(configFile));
+        }
     }
 }
 void MInstall::saveConfig() noexcept
@@ -583,6 +684,12 @@ int MInstall::showPage(int curr, int next) noexcept
         if (modeOOBE) return Step::NETWORK;
     } else if (curr == Step::INSTALLATION && next > curr) {
         if (gui.radioEntireDrive->isChecked()) {
+            if (ui::Context::isTUI() && pretend) {
+                if (gui.checkEncryptAuto->isChecked()) {
+                    return Step::ENCRYPTION;
+                }
+                return Step::CONFIRM;
+            }
             if (!autopart->validate(automatic, PROJECTNAME)) {
                 return curr;
             }
@@ -594,32 +701,58 @@ int MInstall::showPage(int curr, int next) noexcept
             return Step::PARTITIONS;
         }
     } else if (curr == Step::REPLACE && next > curr) {
-        gui.boxMain->setCursor(Qt::WaitCursor);
-        if (!replacer->validate()) {
-            nextFocus = gui.tableExistInst;
+        if (ui::Context::isGUI()) {
+            gui.boxMain->setCursor(Qt::WaitCursor);
+            if (!replacer || !replacer->validate()) {
+                nextFocus = gui.tableExistInst;
+                gui.boxMain->unsetCursor();
+                return curr;
+            }
+            if (!replacer->preparePartMan()) {
+                gui.boxMain->unsetCursor();
+                return curr;
+            }
+            if (!pretend && !(base && base->saveHomeBasic())) {
+                gui.boxMain->unsetCursor();
+                QMessageBox msgbox(this);
+                msgbox.setIcon(QMessageBox::Critical);
+                msgbox.setText(tr("The data in /home cannot be preserved because"
+                    " the required information could not be obtained."));
+                msgbox.exec();
+                return curr;
+            }
             gui.boxMain->unsetCursor();
-            return curr;
+        } else {
+            if (!replacer || !replacer->validate()) {
+                return curr;
+            }
+            if (!replacer->preparePartMan()) {
+                return curr;
+            }
+            if (!pretend && !(base && base->saveHomeBasic())) {
+                ui::QMessageBox::critical(nullptr,
+                    tr("Error"),
+                    tr("The data in /home cannot be preserved because"
+                        " the required information could not be obtained."));
+                return curr;
+            }
         }
-        if (!replacer->preparePartMan()) {
-            gui.boxMain->unsetCursor();
-            return curr;
-        }
-        if (!pretend && !(base && base->saveHomeBasic())) {
-            gui.boxMain->unsetCursor();
-            QMessageBox msgbox(this);
-            msgbox.setIcon(QMessageBox::Critical);
-            msgbox.setText(tr("The data in /home cannot be preserved because"
-                " the required information could not be obtained."));
-            msgbox.exec();
-            return curr;
-        }
-        gui.boxMain->unsetCursor();
+        // In TUI mode, validation is skipped for now (pretend mode)
         return Step::CONFIRM;
     } else if (curr == Step::REPLACE && next < curr) {
-        gui.boxMain->setCursor(Qt::WaitCursor);
-        replacer->clean();
-        gui.boxMain->unsetCursor();
+        if (ui::Context::isGUI()) {
+            gui.boxMain->setCursor(Qt::WaitCursor);
+        }
+        if (replacer) {
+            replacer->clean();
+        }
+        if (ui::Context::isGUI()) {
+            gui.boxMain->unsetCursor();
+        }
     } else if (curr == Step::PARTITIONS) {
+        if (ui::Context::isTUI()) {
+            return next > curr ? next : Step::INSTALLATION;
+        }
         if (next > curr) {
             if (!partman->validate(automatic)) {
                 nextFocus = gui.treePartitions;
@@ -647,23 +780,43 @@ int MInstall::showPage(int curr, int next) noexcept
         }
         return Step::PARTITIONS;
     } else if (curr == Step::CONFIRM) {
-        gui.treeConfirm->clear(); // Revisiting a step produces a fresh confirmation list.
+        if (ui::Context::isGUI()) {
+            gui.treeConfirm->clear(); // Revisiting a step produces a fresh confirmation list.
+        }
         if (next > curr) {
-            if (gui.radioEntireDrive->isChecked()) {
-                if (!autopart->buildLayout()) {
-                    gui.labelSplash->setText(tr("Cannot find selected drive."));
-                    abortEndUI(false);
-                    return Step::SPLASH;
+            if (ui::Context::isTUI()) {
+                if (gui.radioEntireDrive->isChecked()) {
+                    if (!autopart->buildLayout()) {
+                        ui::QMessageBox::critical(nullptr,
+                            tr("Error"),
+                            tr("Cannot find selected drive."));
+                        return curr;
+                    }
                 }
-            } else if (!gui.radioReplace->isChecked()) {
-                advanced = true;
+                next = Step::BOOT;
+                if (bootman) bootman->buildBootLists();
+                if (swapman) swapman->setupDefaults();
+                loadConfig(2);
+            } else {
+                if (gui.radioEntireDrive->isChecked()) {
+                    if (!autopart->buildLayout()) {
+                        gui.labelSplash->setText(tr("Cannot find selected drive."));
+                        abortEndUI(false);
+                        return Step::SPLASH;
+                    }
+                } else if (!gui.radioReplace->isChecked()) {
+                    advanced = true;
+                }
+                next = (advanced ? Step::BOOT : Step::SWAP);
+                bootman->buildBootLists();
+                swapman->setupDefaults();
+                loadConfig(2);
             }
-            next = (advanced ? Step::BOOT : Step::SWAP);
-            bootman->buildBootLists();
-            swapman->setupDefaults();
-            loadConfig(2);
         } else {
-            if (gui.radioEntireDrive->isChecked()) {
+            // Going back from CONFIRM
+            if (ui::Context::isTUI()) {
+                return Step::INSTALLATION;
+            } else if (gui.radioEntireDrive->isChecked()) {
                 return Step::INSTALLATION;
             } else if (gui.radioCustomPart->isChecked()) {
                 return Step::PARTITIONS;
@@ -677,8 +830,10 @@ int MInstall::showPage(int curr, int next) noexcept
         return oem ? Step::TIPS : Step::NETWORK;
     } else if (curr == Step::NETWORK) {
         if(next > curr) {
-            nextFocus = oobe->validateComputerName();
-            if (nextFocus) return curr;
+            if (ui::Context::isGUI() && oobe) {
+                nextFocus = oobe->validateComputerName();
+                if (nextFocus) return curr;
+            }
         } else { // Backward
             return modeOOBE ? Step::TERMS : Step::SWAP;
         }
@@ -687,17 +842,17 @@ int MInstall::showPage(int curr, int next) noexcept
             return Step::TIPS; // Skip pageUserAccounts and pageOldHome
         }
     } else if (curr == Step::USER_ACCOUNTS && next > curr) {
-        nextFocus = oobe->validateUserInfo(automatic);
-        if (nextFocus) return curr;
+        if (ui::Context::isGUI() && oobe) {
+            nextFocus = oobe->validateUserInfo(automatic);
+            if (nextFocus) return curr;
+        }
         // Check for pre-existing /home directory, see if user directory already exists.
         haveOldHome = base && base->homes.contains(gui.textUserName->text());
         if (!haveOldHome) return Step::TIPS; // Skip pageOldHome
-        else {
-            const QString &str = tr("The home directory for %1 already exists.");
-            gui.labelOldHome->setText(str.arg(gui.textUserName->text()));
-        }
+        const QString &str = tr("The home directory for %1 already exists.");
+        gui.labelOldHome->setText(str.arg(gui.textUserName->text()));
     } else if (curr == Step::OLD_HOME && next < curr) { // Backward
-        if (!pretend && oobe->haveSnapshotUserAccounts) {
+        if (!pretend && oobe && oobe->haveSnapshotUserAccounts) {
             return Step::LOCALIZATION; // Skip pageUserAccounts and pageOldHome
         }
     } else if (curr == Step::TIPS && next < curr) { // Backward
@@ -705,7 +860,7 @@ int MInstall::showPage(int curr, int next) noexcept
             return Step::SWAP;
         } else if (!haveOldHome) {
             // skip pageOldHome
-            if (!pretend && oobe->haveSnapshotUserAccounts) {
+            if (!pretend && oobe && oobe->haveSnapshotUserAccounts) {
                 return Step::LOCALIZATION;
             }
             return Step::USER_ACCOUNTS;
@@ -720,7 +875,7 @@ int MInstall::showPage(int curr, int next) noexcept
 void MInstall::pageDisplayed(int next) noexcept
 {
     bool enableBack = true, enableNext = true;
-    if (!modeOOBE) {
+    if (ui::Context::isGUI() && !modeOOBE) {
         // progress bar shown only for install and configuration pages.
         gui.boxInstall->setVisible(next >= Step::BOOT && next <= Step::TIPS);
         // save the last tip and stop it updating when the progress page is hidden.
@@ -728,8 +883,12 @@ void MInstall::pageDisplayed(int next) noexcept
     }
 
     // This prevents the user accidentally skipping the confirmation.
-    gui.pushNext->setDefault(next != Step::CONFIRM);
+    if (ui::Context::isGUI()) {
+        gui.pushNext->setDefault(next != Step::CONFIRM);
+    }
 
+    // GUI-specific help text and widget updates
+    if (ui::Context::isGUI()) {
     switch (next) {
     case Step::SPLASH:
         if (phase > PH_READY) break;
@@ -940,25 +1099,27 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::USER_ACCOUNTS:
-        gui.textHelp->setText("<p><b>"_L1 + tr("Default User Login") + "</b><br/>"_L1
-        + tr("Please enter the name for a new (default) user account that you will use on a daily basis."
-            " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"_L1
-        "<p><b>"_L1 + tr("Root (administrator) account") + "</b><br/>"_L1
-        + tr("The root user is similar to the Administrator user in some other operating systems."
-            " You should not use the root user as your daily user account.") + "<br/>"_L1
-        + tr("The root account is disabled on MX Linux, as administrative tasks are performed with an elevation prompt for the default user.") + "<br/>"
-        "<i>"_L1 + tr("Enabling the root account is strongly recommended for antiX Linux.") + "</i></p>"_L1
-        "<p><b>"_L1 + tr("Passwords") + "</b><br/>"_L1
-        + tr("Enter a new password for your default user account and for the root account."
-            " Each password must be entered twice.") + "</p>"_L1
-        "<p><b>"_L1 + tr("No passwords") + "</b><br/>"_L1
-        + tr("If you want the default user account to have no password, leave its password fields empty."
-            " This allows you to log in without requiring a password.") + "<br/>"_L1
-        + tr("Obviously, this should only be done in situations where the user account"
-            " does not need to be secure, such as a public terminal.") + "</p>"_L1);
-        if (!nextFocus) nextFocus = gui.textUserName;
-        oobe->userPassValidationChanged();
-        enableNext = gui.pushNext->isEnabled();
+        if (!ui::Context::isTUI()) {
+            gui.textHelp->setText("<p><b>"_L1 + tr("Default User Login") + "</b><br/>"_L1
+            + tr("Please enter the name for a new (default) user account that you will use on a daily basis."
+                " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"_L1
+            "<p><b>"_L1 + tr("Root (administrator) account") + "</b><br/>"_L1
+            + tr("The root user is similar to the Administrator user in some other operating systems."
+                " You should not use the root user as your daily user account.") + "<br/>"_L1
+            + tr("The root account is disabled on MX Linux, as administrative tasks are performed with an elevation prompt for the default user.") + "<br/>"
+            "<i>"_L1 + tr("Enabling the root account is strongly recommended for antiX Linux.") + "</i></p>"_L1
+            "<p><b>"_L1 + tr("Passwords") + "</b><br/>"_L1
+            + tr("Enter a new password for your default user account and for the root account."
+                " Each password must be entered twice.") + "</p>"_L1
+            "<p><b>"_L1 + tr("No passwords") + "</b><br/>"_L1
+            + tr("If you want the default user account to have no password, leave its password fields empty."
+                " This allows you to log in without requiring a password.") + "<br/>"_L1
+            + tr("Obviously, this should only be done in situations where the user account"
+                " does not need to be secure, such as a public terminal.") + "</p>"_L1);
+            if (!nextFocus) nextFocus = gui.textUserName;
+            oobe->userPassValidationChanged();
+            enableNext = gui.pushNext->isEnabled();
+        }
         break;
 
     case Step::OLD_HOME:
@@ -1015,63 +1176,128 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
     }
 
-    gui.pushBack->setEnabled(enableBack);
-    gui.pushNext->setEnabled(enableNext);
+        gui.pushBack->setEnabled(enableBack);
+        gui.pushNext->setEnabled(enableNext);
+    } // end if (ui::Context::isGUI())
 }
 
 void MInstall::gotoPage(int next) noexcept
 {
-    gui.pushBack->setEnabled(false);
-    gui.pushNext->setEnabled(false);
-    gui.widgetStack->setEnabled(false);
-    int curr = gui.widgetStack->currentIndex();
+    if (ui::Context::isGUI()) {
+        gui.pushBack->setEnabled(false);
+        gui.pushNext->setEnabled(false);
+        gui.widgetStack->setEnabled(false);
+    }
+
+    int curr = ui::Context::isGUI() ? gui.widgetStack->currentIndex() : currentPageIndex;
     next = showPage(curr, next);
 
-    // modify ui for standard cases
-    gui.pushClose->setHidden(next == 0);
-    gui.pushBack->setHidden(next <= 1);
-    gui.pushNext->setHidden(next == 0);
+    // Track current page for TUI rendering
+    currentPageIndex = next;
 
-    QSize isize = gui.pushNext->iconSize();
-    isize.setWidth(isize.height());
-    if (next >= Step::END) {
-        // entering the last page
-        gui.pushBack->hide();
-        gui.pushNext->setText(tr("Finish"));
-    } else if (next == Step::CONFIRM) {
-        isize.setWidth(0);
-        gui.pushNext->setText(tr("Start"));
-    } else if (next == Step::SERVICES){
-        isize.setWidth(0);
-        gui.pushNext->setText(tr("OK"));
-    } else {
-        gui.pushNext->setText(tr("Next"));
+    if (next != Step::CONFIRM) {
+        // Hide CONFIRM page widgets when leaving
+        if (ui::Context::isTUI()) {
+            if (tui_labelConfirmTitle) tui_labelConfirmTitle->hide();
+            if (tui_labelConfirmInfo) tui_labelConfirmInfo->hide();
+        }
     }
-    gui.pushNext->setIconSize(isize);
+
+    if (ui::Context::isTUI()) {
+        gui.widgetStack->setCurrentIndex(next);
+        clear();  // Clear screen before rendering new page
+        mvprintw(0, 0, "Gazelle Installer (TUI Mode) - Press ESC to quit (Alt+Left = Back)");
+        mvprintw(1, 0, "========================================================");
+        renderCurrentPage();
+        
+        // Show different footer based on page
+        int maxY, maxX;
+        getmaxyx(stdscr, maxY, maxX);
+        (void)maxX;
+        if (next == Step::TIPS) {
+            mvprintw(maxY - 1, 0, "Installation in progress - please wait");
+        } else {
+            mvprintw(maxY - 1, 0, "SPACE: Toggle | ESC: Quit | Alt+Left: Back");
+        }
+        
+        refresh();
+    }
+
+    if (ui::Context::isTUI() && next == Step::REPLACE) {
+        if (replacer && replacer->installationCount() <= 0) {
+            tui_replaceScanning = true;
+            tui_replaceScanPending = true;
+            tui_focusReplace = 0;
+        }
+    }
+    if (ui::Context::isTUI() && next == Step::LOCALIZATION && !tui_localizationInitialized) {
+        loadConfig(2);
+        tui_localizationInitialized = true;
+    }
+
+    if (ui::Context::isGUI()) {
+        // modify ui for standard cases
+        gui.pushClose->setHidden(next == 0);
+        gui.pushBack->setHidden(next <= 1);
+        gui.pushNext->setHidden(next == 0);
+
+        QSize isize = gui.pushNext->iconSize();
+        isize.setWidth(isize.height());
+        if (next >= Step::END) {
+            // entering the last page
+            gui.pushBack->hide();
+            gui.pushNext->setText(tr("Finish"));
+        } else if (next == Step::CONFIRM) {
+            isize.setWidth(0);
+            gui.pushNext->setText(tr("Start"));
+        } else if (next == Step::SERVICES){
+            isize.setWidth(0);
+            gui.pushNext->setText(tr("OK"));
+        } else {
+            gui.pushNext->setText(tr("Next"));
+        }
+        gui.pushNext->setIconSize(isize);
+    }
 
     if (next > Step::END) {
         // finished
-        qApp->setOverrideCursor(Qt::WaitCursor);
-        if (!pretend && gui.checkExitReboot->isChecked()) {
+        if (ui::Context::isGUI()) {
+            qApp->setOverrideCursor(Qt::WaitCursor);
+        }
+
+        bool shouldReboot = false;
+        if (ui::Context::isGUI()) {
+            shouldReboot = gui.checkExitReboot->isChecked();
+        } else {
+            shouldReboot = tui_checkExitReboot && tui_checkExitReboot->isChecked();
+        }
+
+        if (!pretend && shouldReboot) {
             runShutdown(u"reboot"_s);
         }
         qApp->exit(EXIT_SUCCESS);
         return;
     }
+
     // display the next page
-    gui.widgetStack->setCurrentIndex(next);
+    if (ui::Context::isGUI()) {
+        gui.widgetStack->setCurrentIndex(next);
+    }
+    // TUI mode: page switching happens in event loop via renderCurrentPage()
     qApp->processEvents();
 
     // anything to do after displaying the page
-    pageDisplayed(next);
-    gui.widgetStack->setEnabled(true);
-    if (nextFocus) {
-        nextFocus->setFocus();
-        nextFocus = nullptr;
+    if (ui::Context::isGUI()) {
+        pageDisplayed(next);
+        gui.widgetStack->setEnabled(true);
+        if (nextFocus) {
+            nextFocus->setFocus();
+            nextFocus = nullptr;
+        }
     }
 
-    // automatic installation
-    if (automatic) {
+    // automatic installation (GUI only)
+    if (ui::Context::isGUI() && automatic) {
         if (!MSettings::isBadWidget(gui.widgetStack->currentWidget()) && next > curr) {
             QTimer::singleShot(0, gui.pushNext, &QPushButton::click);
         } else if (curr!=0) { // failed validation
@@ -1079,9 +1305,16 @@ void MInstall::gotoPage(int next) noexcept
         }
     }
 
-    // process next installation phase
-    if (next == Step::BOOT || next == Step::TIPS || (!advanced && next == Step::SWAP)) {
-        processNextPhase();
+    // process next installation phase (skip in TUI pretend mode)
+    if (ui::Context::isGUI()) {
+        if (next == Step::BOOT || next == Step::TIPS || (!advanced && next == Step::SWAP)) {
+            processNextPhase();
+        }
+    } else {
+        // In TUI mode, only start installation on TIPS page (after all config is gathered)
+        if (next == Step::TIPS) {
+            processNextPhase();
+        }
     }
 }
 
@@ -1281,4 +1514,3645 @@ void MInstall::runKeyboardSetup() noexcept
     }
     setupkeyboardbutton();
     this->setEnabled(true);
+}
+
+// TUI Functions
+
+void MInstall::setupPageSplashTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+    
+    qInfo() << "Setting up TUI widgets for pageSplash...";
+    
+    // Create TUI label for splash message
+    tui_labelSplash = new ui::QLabel();
+    tui_labelSplash->setPosition(8, 10);  // Centered-ish position
+    tui_labelSplash->setText(tr("Welcome to %1 Installer").arg(PROJECTNAME));
+    tui_labelSplash->show();
+}
+
+void MInstall::setupPageEndTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageEnd...";
+
+    // Create TUI label for reminders text
+    tui_textReminders = new ui::QLabel();
+    tui_textReminders->setPosition(3, 5);
+    tui_textReminders->setText("Support information will be displayed here.");
+    tui_textReminders->show();
+    
+    // Note: Reboot checkbox is now on TIPS page, not here
+}
+
+void MInstall::setupPageTermsTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+    
+    qInfo() << "Setting up TUI widgets for pageTerms...";
+    
+    // Create TUI label for copyright/terms text
+    tui_textCopyright = new ui::QLabel();
+    tui_textCopyright->setPosition(3, 2);
+    tui_textCopyright->setText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
+        "%1 uses some components from MEPIS Linux which are released under an Apache free license."
+        " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
+    tui_textCopyright->show();
+    
+    // Create TUI label for keyboard info
+    tui_keyboardInfo = new ui::QLabel();
+    tui_keyboardInfo->setPosition(10, 2);
+    tui_keyboardInfo->setText("Keyboard settings will be displayed here.\nPress ENTER or SPACE to continue.");
+    tui_keyboardInfo->show();
+}
+
+void MInstall::setupPageInstallationTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageInstallation...";
+
+    // Create button group for radio buttons
+    tui_installButtonGroup = new qtui::TButtonGroup(this);
+
+    // Create TUI label for install type heading
+    tui_labelInstallType = new ui::QLabel();
+    tui_labelInstallType->setPosition(2, 2);
+    tui_labelInstallType->setText(gui.boxInstallationType->title());
+    tui_labelInstallType->show();
+
+    // Create TUI radio buttons
+    tui_radioEntireDrive = new ui::QRadioButton();
+    tui_radioEntireDrive->setText(gui.radioEntireDrive->text());
+    tui_radioEntireDrive->setPosition(4, 4);
+    tui_radioEntireDrive->setChecked(true);
+    tui_radioEntireDrive->setFocus(true);  // Initial focus on first option
+    tui_radioEntireDrive->setButtonGroup(nullptr, tui_installButtonGroup);
+    tui_radioEntireDrive->show();
+
+    tui_radioCustomPart = new ui::QRadioButton();
+    tui_radioCustomPart->setText(gui.radioCustomPart->text());
+    tui_radioCustomPart->setPosition(6, 4);
+    tui_radioCustomPart->setButtonGroup(nullptr, tui_installButtonGroup);
+    tui_radioCustomPart->show();
+
+    tui_radioReplace = new ui::QRadioButton();
+    tui_radioReplace->setText(gui.radioReplace->text());
+    tui_radioReplace->setPosition(8, 4);
+    tui_radioReplace->setButtonGroup(nullptr, tui_installButtonGroup);
+    tui_radioReplace->show();
+
+    tui_checkDualDrive = new ui::QCheckBox();
+    tui_checkDualDrive->setText(gui.checkDualDrive->text());
+    tui_checkDualDrive->setPosition(4, 60);
+    tui_checkDualDrive->show();
+
+    tui_labelDriveSystem = new ui::QLabel();
+    tui_labelDriveSystem->setPosition(10, 4);
+    tui_labelDriveSystem->setText(gui.labelDriveSystem->text());
+    tui_labelDriveSystem->show();
+
+    tui_comboDriveSystem = new ui::QComboBox();
+    tui_comboDriveSystem->setPosition(10, 20);
+    tui_comboDriveSystem->setWidth(30);
+    tui_comboDriveSystem->show();
+
+    tui_labelDriveHome = new ui::QLabel();
+    tui_labelDriveHome->setPosition(12, 4);
+    tui_labelDriveHome->setText(gui.labelDriveHome->text());
+    tui_labelDriveHome->show();
+
+    tui_comboDriveHome = new ui::QComboBox();
+    tui_comboDriveHome->setPosition(12, 20);
+    tui_comboDriveHome->setWidth(30);
+    tui_comboDriveHome->show();
+
+    tui_labelRootPercent = new ui::QLabel();
+    tui_labelRootPercent->setPosition(14, 4);
+    tui_labelRootPercent->setText(gui.labelSliderRoot->text() + tr(" %:"));
+    tui_labelRootPercent->show();
+
+    tui_textRootPercent = new ui::QLineEdit();
+    tui_textRootPercent->setPosition(14, 20);
+    tui_textRootPercent->setWidth(6);
+    tui_textRootPercent->show();
+
+    tui_labelHomePercent = new ui::QLabel();
+    tui_labelHomePercent->setPosition(14, 30);
+    tui_labelHomePercent->setText(gui.labelSliderHome->text() + tr(" %:"));
+    tui_labelHomePercent->show();
+
+    tui_textHomePercent = new ui::QLineEdit();
+    tui_textHomePercent->setPosition(14, 40);
+    tui_textHomePercent->setWidth(6);
+    tui_textHomePercent->show();
+
+    tui_checkEncryptAuto = new ui::QCheckBox();
+    tui_checkEncryptAuto->setPosition(16, 4);
+    tui_checkEncryptAuto->setText(gui.checkEncryptAuto->text());
+    tui_checkEncryptAuto->show();
+
+    tui_focusInstallationField = 0;
+    syncInstallationTuiFromGui();
+}
+
+void MInstall::syncInstallationTuiFromGui() noexcept
+{
+    if (!tui_comboDriveSystem || !tui_comboDriveHome || !tui_checkDualDrive) {
+        return;
+    }
+
+    if (tui_comboDriveSystem->count() != gui.comboDriveSystem->count()) {
+        tui_comboDriveSystem->clear();
+        for (int i = 0; i < gui.comboDriveSystem->count(); ++i) {
+            tui_comboDriveSystem->addItem(gui.comboDriveSystem->itemText(i), gui.comboDriveSystem->itemData(i));
+        }
+    }
+    if (tui_comboDriveHome->count() != gui.comboDriveHome->count()) {
+        tui_comboDriveHome->clear();
+        for (int i = 0; i < gui.comboDriveHome->count(); ++i) {
+            tui_comboDriveHome->addItem(gui.comboDriveHome->itemText(i), gui.comboDriveHome->itemData(i));
+        }
+    }
+
+    tui_comboDriveSystem->setCurrentIndex(gui.comboDriveSystem->currentIndex());
+    tui_comboDriveHome->setCurrentIndex(gui.comboDriveHome->currentIndex());
+
+    tui_checkDualDrive->setChecked(gui.checkDualDrive->isChecked());
+    if (tui_checkEncryptAuto) {
+        tui_checkEncryptAuto->setChecked(gui.checkEncryptAuto->isChecked());
+    }
+
+    if (tui_radioEntireDrive) tui_radioEntireDrive->setChecked(gui.radioEntireDrive->isChecked());
+    if (tui_radioCustomPart) tui_radioCustomPart->setChecked(gui.radioCustomPart->isChecked());
+    if (tui_radioReplace) tui_radioReplace->setChecked(gui.radioReplace->isChecked());
+    if (gui.radioEntireDrive->isChecked()) tui_focusInstallation = 0;
+    if (gui.radioCustomPart->isChecked()) tui_focusInstallation = 1;
+    if (gui.radioReplace->isChecked()) tui_focusInstallation = 2;
+
+    if (tui_textRootPercent && tui_focusInstallationField != 6) {
+        tui_textRootPercent->setText(QString::number(gui.spinRoot->value()));
+    }
+    if (tui_textHomePercent && tui_focusInstallationField != 7) {
+        tui_textHomePercent->setText(QString::number(gui.spinHome->value()));
+    }
+
+    const bool autoPartEnabled = gui.boxAutoPart->isEnabled();
+    if (tui_labelDriveSystem) tui_labelDriveSystem->setEnabled(autoPartEnabled);
+    tui_comboDriveSystem->setEnabled(autoPartEnabled);
+    if (tui_labelDriveHome) tui_labelDriveHome->setEnabled(autoPartEnabled && gui.checkDualDrive->isChecked());
+    tui_comboDriveHome->setEnabled(autoPartEnabled && gui.checkDualDrive->isChecked());
+    if (tui_labelRootPercent) tui_labelRootPercent->setEnabled(autoPartEnabled);
+    if (tui_textRootPercent) tui_textRootPercent->setEnabled(autoPartEnabled);
+    if (tui_labelHomePercent) tui_labelHomePercent->setEnabled(autoPartEnabled);
+    if (tui_textHomePercent) tui_textHomePercent->setEnabled(autoPartEnabled);
+    if (tui_checkDualDrive) tui_checkDualDrive->setEnabled(autoPartEnabled);
+    if (tui_checkEncryptAuto) tui_checkEncryptAuto->setEnabled(autoPartEnabled);
+}
+
+void MInstall::setupPageConfirmTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageConfirm...";
+
+    // Create TUI label for confirm title
+    tui_labelConfirmTitle = new ui::QLabel();
+    tui_labelConfirmTitle->setPosition(2, 2);
+    tui_labelConfirmTitle->setText(tr("Installation Confirmation"));
+    tui_labelConfirmTitle->show();
+
+    // Create TUI label for confirmation info
+    tui_labelConfirmInfo = new ui::QLabel();
+    tui_labelConfirmInfo->setPosition(4, 2);
+    tui_labelConfirmInfo->setText(tr("Please review the installation settings.\n\n"
+        "This is the last opportunity to check and confirm\n"
+        "the actions of the installation process.\n\n"
+        "Press ENTER to begin installation or Backspace to go back."));
+    tui_labelConfirmInfo->show();
+}
+
+void MInstall::setupPageNetworkTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageNetwork...";
+
+    // Label for Computer Name
+    tui_labelComputerName = new ui::QLabel();
+    tui_labelComputerName->setPosition(3, 2);
+    tui_labelComputerName->setText(gui.labelComputerName->text());
+    tui_labelComputerName->show();
+
+    // LineEdit for Computer Name
+    tui_textComputerName = new ui::QLineEdit();
+    tui_textComputerName->setPosition(3, 20);
+    tui_textComputerName->setWidth(30);
+    tui_textComputerName->setPlaceholderText(tr("Enter computer name"));
+    tui_textComputerName->show();
+    tui_textComputerName->setFocus();
+    tui_textComputerName->setText(gui.textComputerName->text());
+
+    // Label for Domain
+    tui_labelComputerDomain = new ui::QLabel();
+    tui_labelComputerDomain->setPosition(5, 2);
+    tui_labelComputerDomain->setText(gui.labelComputerDomain->text());
+    tui_labelComputerDomain->show();
+
+    // LineEdit for Domain
+    tui_textComputerDomain = new ui::QLineEdit();
+    tui_textComputerDomain->setPosition(5, 20);
+    tui_textComputerDomain->setWidth(30);
+    tui_textComputerDomain->setPlaceholderText(tr("Enter domain name"));
+    tui_textComputerDomain->show();
+    tui_textComputerDomain->setText(gui.textComputerDomain->text());
+
+    // Label for Workgroup
+    tui_labelComputerGroup = new ui::QLabel();
+    tui_labelComputerGroup->setPosition(7, 2);
+    tui_labelComputerGroup->setText(gui.labelComputerGroup->text());
+    tui_labelComputerGroup->show();
+
+    // LineEdit for Workgroup
+    tui_textComputerGroup = new ui::QLineEdit();
+    tui_textComputerGroup->setPosition(7, 20);
+    tui_textComputerGroup->setWidth(30);
+    tui_textComputerGroup->setPlaceholderText(tr("Workgroup"));
+    tui_textComputerGroup->show();
+    tui_textComputerGroup->setText(gui.textComputerGroup->text());
+
+    // Samba checkbox
+    tui_checkSamba = new ui::QCheckBox();
+    tui_checkSamba->setPosition(9, 2);
+    tui_checkSamba->setText(gui.checkSamba->text());
+    tui_checkSamba->show();
+    tui_checkSamba->setChecked(gui.checkSamba->isChecked());
+    tui_checkSamba->setEnabled(gui.checkSamba->isEnabled());
+    if (tui_labelComputerGroup) tui_labelComputerGroup->setEnabled(gui.textComputerGroup->isEnabled());
+    if (tui_textComputerGroup) tui_textComputerGroup->setEnabled(gui.textComputerGroup->isEnabled());
+    tui_networkError.clear();
+}
+
+void MInstall::setupPageBootTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageBoot...";
+
+    // Create button group for radio buttons
+    tui_bootButtonGroup = new qtui::TButtonGroup(this);
+
+    tui_checkBootInstall = new ui::QCheckBox();
+    tui_checkBootInstall->setPosition(4, 2);
+    tui_checkBootInstall->setText(gui.boxBoot->title());
+    tui_checkBootInstall->setChecked(gui.boxBoot->isChecked());
+    tui_checkBootInstall->show();
+    tui_checkBootInstall->setFocus(true);
+
+    tui_labelBootLocation = new ui::QLabel();
+    tui_labelBootLocation->setPosition(6, 4);
+    tui_labelBootLocation->setText(gui.labelBoot->text());
+    tui_labelBootLocation->show();
+
+    tui_comboBoot = new ui::QComboBox();
+    tui_comboBoot->setPosition(6, 24);
+    tui_comboBoot->setWidth(30);
+    tui_comboBoot->show();
+
+    // Radio buttons for boot location
+    tui_radioBootMBR = new ui::QRadioButton();
+    tui_radioBootMBR->setText(gui.radioBootMBR->text());
+    tui_radioBootMBR->setPosition(8, 6);
+    tui_radioBootMBR->setChecked(true);
+    tui_radioBootMBR->setButtonGroup(nullptr, tui_bootButtonGroup);
+    tui_radioBootMBR->show();
+
+    tui_radioBootPBR = new ui::QRadioButton();
+    tui_radioBootPBR->setText(gui.radioBootPBR->text());
+    tui_radioBootPBR->setPosition(10, 6);
+    tui_radioBootPBR->setButtonGroup(nullptr, tui_bootButtonGroup);
+    tui_radioBootPBR->show();
+
+    tui_radioBootESP = new ui::QRadioButton();
+    tui_radioBootESP->setText(gui.radioBootESP->text());
+    tui_radioBootESP->setPosition(12, 6);
+    tui_radioBootESP->setButtonGroup(nullptr, tui_bootButtonGroup);
+    tui_radioBootESP->show();
+
+    tui_checkBootHostSpecific = new ui::QCheckBox();
+    tui_checkBootHostSpecific->setPosition(14, 4);
+    tui_checkBootHostSpecific->setText(gui.checkBootHostSpecific->text());
+    tui_checkBootHostSpecific->show();
+
+    tui_focusBootField = 0;
+}
+
+void MInstall::setupPageLocalizationTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageLocalization...";
+
+    // Title label
+    tui_labelLocaleTitle = new ui::QLabel();
+    tui_labelLocaleTitle->setPosition(2, 2);
+    tui_labelLocaleTitle->setText(tr("Localization Settings"));
+    tui_labelLocaleTitle->show();
+
+    // Locale selection
+    tui_labelLocale = new ui::QLabel();
+    tui_labelLocale->setPosition(4, 2);
+    tui_labelLocale->setText(tr("Locale:"));
+    tui_labelLocale->show();
+
+    tui_comboLocale = new ui::QComboBox();
+    tui_comboLocale->setPosition(4, 20);
+    tui_comboLocale->setWidth(50);
+    tui_comboLocale->show();
+
+    // Time Area selection
+    tui_labelTimeArea = new ui::QLabel();
+    tui_labelTimeArea->setPosition(6, 2);
+    tui_labelTimeArea->setText(tr("Time Area:"));
+    tui_labelTimeArea->show();
+
+    tui_comboTimeArea = new ui::QComboBox();
+    tui_comboTimeArea->setPosition(6, 20);
+    tui_comboTimeArea->setWidth(50);
+    tui_comboTimeArea->show();
+
+    // Time Zone selection
+    tui_labelTimeZone = new ui::QLabel();
+    tui_labelTimeZone->setPosition(8, 2);
+    tui_labelTimeZone->setText(tr("Time Zone:"));
+    tui_labelTimeZone->show();
+
+    tui_comboTimeZone = new ui::QComboBox();
+    tui_comboTimeZone->setPosition(8, 20);
+    tui_comboTimeZone->setWidth(50);
+    tui_comboTimeZone->show();
+
+    tui_checkLocalClock = new ui::QCheckBox();
+    tui_checkLocalClock->setPosition(10, 2);
+    tui_checkLocalClock->setText(gui.checkLocalClock->text());
+    tui_checkLocalClock->setChecked(gui.checkLocalClock->isChecked());
+    tui_checkLocalClock->show();
+
+    tui_labelClockFormat = new ui::QLabel();
+    tui_labelClockFormat->setPosition(12, 2);
+    tui_labelClockFormat->setText(gui.labelClockFormat->text());
+    tui_labelClockFormat->show();
+
+    tui_clockButtonGroup = new qtui::TButtonGroup(this);
+    tui_radioClock24 = new ui::QRadioButton();
+    tui_radioClock24->setPosition(12, 20);
+    tui_radioClock24->setText(gui.radioClock24->text());
+    tui_radioClock24->setButtonGroup(nullptr, tui_clockButtonGroup);
+    tui_radioClock24->setChecked(gui.radioClock24->isChecked());
+    tui_radioClock24->show();
+
+    tui_radioClock12 = new ui::QRadioButton();
+    tui_radioClock12->setPosition(12, 32);
+    tui_radioClock12->setText(gui.radioClock12->text());
+    tui_radioClock12->setButtonGroup(nullptr, tui_clockButtonGroup);
+    tui_radioClock12->setChecked(gui.radioClock12->isChecked());
+    tui_radioClock12->show();
+
+    // Copy items from GUI combo boxes to TUI combo boxes
+    if (tui_comboLocale) {
+        for (int i = 0; i < gui.comboLocale->count(); ++i) {
+            tui_comboLocale->addItem(gui.comboLocale->itemText(i), gui.comboLocale->itemData(i));
+        }
+        tui_comboLocale->setCurrentIndex(gui.comboLocale->currentIndex());
+    }
+
+    if (tui_comboTimeArea) {
+        for (int i = 0; i < gui.comboTimeArea->count(); ++i) {
+            tui_comboTimeArea->addItem(gui.comboTimeArea->itemText(i), gui.comboTimeArea->itemData(i));
+        }
+        tui_comboTimeArea->setCurrentIndex(gui.comboTimeArea->currentIndex());
+    }
+
+    if (tui_comboTimeZone) {
+        for (int i = 0; i < gui.comboTimeZone->count(); ++i) {
+            tui_comboTimeZone->addItem(gui.comboTimeZone->itemText(i), gui.comboTimeZone->itemData(i));
+        }
+        tui_comboTimeZone->setCurrentIndex(gui.comboTimeZone->currentIndex());
+    }
+
+    tui_focusLocalization = 0;
+}
+
+void MInstall::setupPageServicesTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageServices...";
+
+    // Title label
+    tui_labelServicesTitle = new ui::QLabel();
+    tui_labelServicesTitle->setPosition(2, 2);
+    tui_labelServicesTitle->setText(gui.boxServices->title());
+    tui_labelServicesTitle->show();
+
+    // Info label
+    tui_labelServicesInfo = new ui::QLabel();
+    tui_labelServicesInfo->setPosition(4, 2);
+    tui_labelServicesInfo->setText(tr("System services will be configured with default settings.\n"
+        "You can modify service settings after installation\n"
+        "using your system's service manager.\n\n"
+        "Press ENTER to continue."));
+    tui_labelServicesInfo->show();
+}
+
+void MInstall::setupPageReplaceTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageReplace...";
+
+    // Title label
+    tui_labelReplaceTitle = new ui::QLabel();
+    tui_labelReplaceTitle->setPosition(2, 2);
+    tui_labelReplaceTitle->setText(tr("Replace Existing Installation"));
+    tui_labelReplaceTitle->show();
+
+    tui_focusReplace = 0;
+}
+
+void MInstall::setupPagePartitionsTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pagePartitions...";
+
+    // Info label explaining that cfdisk will be launched
+    tui_labelPartitionsInfo = new ui::QLabel();
+    tui_labelPartitionsInfo->setPosition(2, 2);
+    tui_labelPartitionsInfo->setText(tr("Custom Partitioning"));
+    tui_labelPartitionsInfo->show();
+}
+
+void MInstall::setupPageSwapTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageSwap...";
+
+    // Title label
+    tui_labelSwapTitle = new ui::QLabel();
+    tui_labelSwapTitle->setPosition(2, 2);
+    tui_labelSwapTitle->setText(tr("Swap File Configuration"));
+    tui_labelSwapTitle->show();
+
+    // Swap file checkbox
+    tui_checkSwapFile = new ui::QCheckBox();
+    tui_checkSwapFile->setText(tr("Create a swap file"));
+    tui_checkSwapFile->setPosition(4, 4);
+    tui_checkSwapFile->setFocus(true);
+    tui_checkSwapFile->show();
+
+    // Swap file location
+    tui_labelSwapLocation = new ui::QLabel();
+    tui_labelSwapLocation->setPosition(6, 6);
+    tui_labelSwapLocation->setText(tr("Location:"));
+    tui_labelSwapLocation->show();
+
+    tui_textSwapFile = new ui::QLineEdit();
+    tui_textSwapFile->setPosition(6, 18);
+    tui_textSwapFile->setWidth(28);
+    tui_textSwapFile->show();
+
+    // Swap size
+    tui_labelSwapSize = new ui::QLabel();
+    tui_labelSwapSize->setPosition(8, 6);
+    tui_labelSwapSize->setText(tr("Size (MB):"));
+    tui_labelSwapSize->show();
+
+    tui_textSwapSize = new ui::QLineEdit();
+    tui_textSwapSize->setPosition(8, 18);
+    tui_textSwapSize->setWidth(8);
+    tui_textSwapSize->show();
+
+    tui_labelSwapMax = new ui::QLabel();
+    tui_labelSwapMax->setPosition(8, 28);
+    tui_labelSwapMax->show();
+
+    tui_labelSwapReset = new ui::QLabel();
+    tui_labelSwapReset->setPosition(8, 40);
+    tui_labelSwapReset->setText(tr("R: reset size"));
+    tui_labelSwapReset->show();
+
+    // Hibernation support
+    tui_checkHibernation = new ui::QCheckBox();
+    tui_checkHibernation->setPosition(10, 6);
+    tui_checkHibernation->setText(tr("Enable hibernation support"));
+    tui_checkHibernation->show();
+
+    // Zram section
+    tui_labelZramTitle = new ui::QLabel();
+    tui_labelZramTitle->setPosition(12, 4);
+    tui_labelZramTitle->setText(tr("Zram swap"));
+    tui_labelZramTitle->show();
+
+    tui_checkZram = new ui::QCheckBox();
+    tui_checkZram->setPosition(13, 6);
+    tui_checkZram->setText(tr("Enable zram swap"));
+    tui_checkZram->show();
+
+    tui_zramButtonGroup = new qtui::TButtonGroup(this);
+
+    tui_radioZramPercent = new ui::QRadioButton();
+    tui_radioZramPercent->setPosition(15, 8);
+    tui_radioZramPercent->setText(tr("Allocate based on RAM (%):"));
+    tui_radioZramPercent->setButtonGroup(nullptr, tui_zramButtonGroup);
+    tui_radioZramPercent->show();
+
+    tui_textZramPercent = new ui::QLineEdit();
+    tui_textZramPercent->setPosition(15, 38);
+    tui_textZramPercent->setWidth(6);
+    tui_textZramPercent->show();
+
+    tui_labelZramRecPercent = new ui::QLabel();
+    tui_labelZramRecPercent->setPosition(15, 46);
+    tui_labelZramRecPercent->show();
+
+    tui_radioZramSize = new ui::QRadioButton();
+    tui_radioZramSize->setPosition(17, 8);
+    tui_radioZramSize->setText(tr("Allocate fixed size (MB):"));
+    tui_radioZramSize->setButtonGroup(nullptr, tui_zramButtonGroup);
+    tui_radioZramSize->show();
+
+    tui_textZramSize = new ui::QLineEdit();
+    tui_textZramSize->setPosition(17, 38);
+    tui_textZramSize->setWidth(8);
+    tui_textZramSize->show();
+
+    tui_labelZramRecSize = new ui::QLabel();
+    tui_labelZramRecSize->setPosition(17, 48);
+    tui_labelZramRecSize->show();
+
+    tui_focusSwap = 0;
+    syncSwapTuiFromGui();
+}
+
+void MInstall::syncSwapTuiFromGui() noexcept
+{
+    if (!tui_checkSwapFile || !tui_checkZram) {
+        return;
+    }
+
+    const bool swapEnabled = gui.boxSwapFile->isChecked();
+    const bool zramEnabled = gui.boxSwapZram->isChecked();
+    const bool zramPercent = gui.radioZramPercent->isChecked();
+    const bool zramSize = gui.radioZramSize->isChecked();
+
+    tui_checkSwapFile->setChecked(swapEnabled);
+    if (tui_textSwapFile && tui_focusSwap != 1) {
+        tui_textSwapFile->setText(gui.textSwapFile->text());
+    }
+    if (tui_textSwapSize && tui_focusSwap != 2) {
+        tui_textSwapSize->setText(QString::number(gui.spinSwapSize->value()));
+    }
+    if (tui_labelSwapMax) {
+        tui_labelSwapMax->setText(gui.labelSwapMax->text());
+    }
+    if (tui_labelSwapReset) {
+        tui_labelSwapReset->setEnabled(swapEnabled);
+    }
+    if (tui_checkHibernation) {
+        tui_checkHibernation->setChecked(gui.checkHibernation->isChecked());
+    }
+
+    tui_checkZram->setChecked(zramEnabled);
+    if (tui_radioZramPercent) {
+        tui_radioZramPercent->setChecked(zramPercent);
+    }
+    if (tui_radioZramSize) {
+        tui_radioZramSize->setChecked(zramSize);
+    }
+    if (tui_textZramPercent && tui_focusSwap != 6) {
+        tui_textZramPercent->setText(QString::number(gui.spinZramPercent->value()));
+    }
+    if (tui_textZramSize && tui_focusSwap != 8) {
+        tui_textZramSize->setText(QString::number(gui.spinZramSize->value()));
+    }
+    if (tui_labelZramRecPercent) {
+        tui_labelZramRecPercent->setText(gui.labelZramRecPercent->text());
+    }
+    if (tui_labelZramRecSize) {
+        tui_labelZramRecSize->setText(gui.labelZramRecSize->text());
+    }
+
+    if (tui_labelSwapLocation) tui_labelSwapLocation->setEnabled(swapEnabled);
+    if (tui_textSwapFile) tui_textSwapFile->setEnabled(swapEnabled);
+    if (tui_labelSwapSize) tui_labelSwapSize->setEnabled(swapEnabled);
+    if (tui_textSwapSize) tui_textSwapSize->setEnabled(swapEnabled);
+    if (tui_labelSwapMax) tui_labelSwapMax->setEnabled(swapEnabled);
+    if (tui_checkHibernation) tui_checkHibernation->setEnabled(swapEnabled && gui.checkHibernation->isEnabled());
+
+    if (tui_labelZramTitle) tui_labelZramTitle->setEnabled(true);
+    if (tui_checkZram) tui_checkZram->setEnabled(true);
+    if (tui_radioZramPercent) tui_radioZramPercent->setEnabled(zramEnabled);
+    if (tui_radioZramSize) tui_radioZramSize->setEnabled(zramEnabled);
+    if (tui_textZramPercent) tui_textZramPercent->setEnabled(zramEnabled && zramPercent);
+    if (tui_labelZramRecPercent) tui_labelZramRecPercent->setEnabled(zramEnabled && zramPercent);
+    if (tui_textZramSize) tui_textZramSize->setEnabled(zramEnabled && zramSize);
+    if (tui_labelZramRecSize) tui_labelZramRecSize->setEnabled(zramEnabled && zramSize);
+}
+
+void MInstall::buildServicesTui() noexcept
+{
+    if (tui_servicesBuilt) {
+        return;
+    }
+
+    if (gui.treeServices->topLevelItemCount() == 0) {
+        return;
+    }
+
+    int row = 6;
+    for (int i = 0; i < gui.treeServices->topLevelItemCount(); ++i) {
+        QTreeWidgetItem *parent = gui.treeServices->topLevelItem(i);
+        if (!parent) {
+            continue;
+        }
+        auto *category = new ui::QLabel();
+        category->setPosition(row, 2);
+        category->setText(parent->text(0));
+        category->show();
+        tui_serviceCategoryLabels.append(category);
+        row += 1;
+
+        for (int j = 0; j < parent->childCount(); ++j) {
+            QTreeWidgetItem *child = parent->child(j);
+            if (!child) {
+                continue;
+            }
+            auto *checkbox = new ui::QCheckBox();
+            const QString label = child->text(0) + u" - "_s + child->text(1);
+            checkbox->setText(label);
+            checkbox->setPosition(row, 4);
+            checkbox->setChecked(child->checkState(0) == Qt::Checked);
+            checkbox->show();
+            tui_serviceItems.append({checkbox, child, row});
+            row += 1;
+        }
+    }
+
+    tui_servicesBuilt = true;
+    tui_focusServices = 0;
+}
+
+void MInstall::syncServicesTuiFromGui() noexcept
+{
+    if (!tui_servicesBuilt) {
+        return;
+    }
+    for (auto &item : tui_serviceItems) {
+        if (item.checkbox && item.item) {
+            item.checkbox->setChecked(item.item->checkState(0) == Qt::Checked);
+        }
+    }
+}
+
+void MInstall::setupPageEncryptionTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageEncryption...";
+
+    tui_labelEncryptionTitle = new ui::QLabel();
+    tui_labelEncryptionTitle->setPosition(2, 2);
+    tui_labelEncryptionTitle->setText(tr("Encryption options"));
+    tui_labelEncryptionTitle->show();
+
+    tui_labelCryptoPass = new ui::QLabel();
+    tui_labelCryptoPass->setPosition(4, 4);
+    tui_labelCryptoPass->setText(tr("Encryption password:"));
+    tui_labelCryptoPass->show();
+
+    tui_textCryptoPass = new ui::QLineEdit();
+    tui_textCryptoPass->setPosition(4, 28);
+    tui_textCryptoPass->setWidth(26);
+    tui_textCryptoPass->setEchoMode(QLineEdit::Password);
+    tui_textCryptoPass->show();
+
+    tui_labelCryptoPass2 = new ui::QLabel();
+    tui_labelCryptoPass2->setPosition(6, 4);
+    tui_labelCryptoPass2->setText(tr("Confirm password:"));
+    tui_labelCryptoPass2->show();
+
+    tui_textCryptoPass2 = new ui::QLineEdit();
+    tui_textCryptoPass2->setPosition(6, 28);
+    tui_textCryptoPass2->setWidth(26);
+    tui_textCryptoPass2->setEchoMode(QLineEdit::Password);
+    tui_textCryptoPass2->show();
+
+    if (tui_textCryptoPass) {
+        tui_textCryptoPass->setText(gui.textCryptoPass->text());
+        tui_textCryptoPass->setFocus();
+    }
+    if (tui_textCryptoPass2) {
+        tui_textCryptoPass2->setText(gui.textCryptoPass2->text());
+    }
+
+    tui_focusEncryption = 0;
+    tui_encryptionError.clear();
+}
+
+void MInstall::setupPageUserAccountsTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageUserAccounts...";
+
+    // Label and LineEdit for Username
+    tui_labelUserName = new ui::QLabel();
+    tui_labelUserName->setPosition(3, 2);
+    tui_labelUserName->setText(gui.labelUserName->text());
+    tui_labelUserName->show();
+
+    tui_textUserName = new ui::QLineEdit();
+    tui_textUserName->setPosition(3, 20);
+    tui_textUserName->setWidth(30);
+    tui_textUserName->setPlaceholderText(tr("Enter username"));
+    tui_textUserName->show();
+    tui_textUserName->setFocus();
+
+    // Label and LineEdit for Password
+    tui_labelUserPass = new ui::QLabel();
+    tui_labelUserPass->setPosition(5, 2);
+    tui_labelUserPass->setText(gui.labelUserPass->text());
+    tui_labelUserPass->show();
+
+    tui_textUserPass = new ui::QLineEdit();
+    tui_textUserPass->setPosition(5, 20);
+    tui_textUserPass->setWidth(30);
+    tui_textUserPass->setEchoMode(QLineEdit::Password);
+    tui_textUserPass->setPlaceholderText(tr("Enter password"));
+    tui_textUserPass->show();
+
+    // Label and LineEdit for Password Confirmation
+    tui_labelUserPass2 = new ui::QLabel();
+    tui_labelUserPass2->setPosition(7, 2);
+    tui_labelUserPass2->setText(gui.labelUserPass2->text());
+    tui_labelUserPass2->show();
+
+    tui_textUserPass2 = new ui::QLineEdit();
+    tui_textUserPass2->setPosition(7, 20);
+    tui_textUserPass2->setWidth(30);
+    tui_textUserPass2->setEchoMode(QLineEdit::Password);
+    tui_textUserPass2->setPlaceholderText(tr("Re-enter password"));
+    tui_textUserPass2->show();
+
+    // Checkbox for Auto Login
+    tui_checkRootAccount = new ui::QCheckBox();
+    tui_checkRootAccount->setPosition(9, 2);
+    tui_checkRootAccount->setText(gui.boxRootAccount->title());
+    tui_checkRootAccount->setChecked(false);
+    tui_checkRootAccount->show();
+
+    tui_labelRootPass = new ui::QLabel();
+    tui_labelRootPass->setPosition(11, 2);
+    tui_labelRootPass->setText(gui.labelRootPass->text());
+    tui_labelRootPass->show();
+
+    tui_textRootPass = new ui::QLineEdit();
+    tui_textRootPass->setPosition(11, 20);
+    tui_textRootPass->setWidth(30);
+    tui_textRootPass->setEchoMode(QLineEdit::Password);
+    tui_textRootPass->show();
+
+    tui_labelRootPass2 = new ui::QLabel();
+    tui_labelRootPass2->setPosition(13, 2);
+    tui_labelRootPass2->setText(gui.labelRootPass2->text());
+    tui_labelRootPass2->show();
+
+    tui_textRootPass2 = new ui::QLineEdit();
+    tui_textRootPass2->setPosition(13, 20);
+    tui_textRootPass2->setWidth(30);
+    tui_textRootPass2->setEchoMode(QLineEdit::Password);
+    tui_textRootPass2->show();
+
+    tui_checkAutoLogin = new ui::QCheckBox();
+    tui_checkAutoLogin->setPosition(15, 2);
+    tui_checkAutoLogin->setText(gui.checkAutoLogin->text());
+    tui_checkAutoLogin->setChecked(false);
+    tui_checkAutoLogin->show();
+
+    tui_checkSaveDesktop = new ui::QCheckBox();
+    tui_checkSaveDesktop->setPosition(17, 2);
+    tui_checkSaveDesktop->setText(gui.checkSaveDesktop->text());
+    tui_checkSaveDesktop->setChecked(false);
+    tui_checkSaveDesktop->show();
+
+    tui_userError.clear();
+    tui_confirmEmptyUserPass = false;
+    tui_confirmEmptyRootPass = false;
+}
+
+void MInstall::setupPageOldHomeTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageOldHome...";
+
+    // Title label
+    tui_labelOldHomeTitle = new ui::QLabel();
+    tui_labelOldHomeTitle->setPosition(2, 2);
+    tui_labelOldHomeTitle->setText(tr("Old Home Directory"));
+    tui_labelOldHomeTitle->show();
+
+    // Info label explaining the situation
+    tui_labelOldHomeInfo = new ui::QLabel();
+    tui_labelOldHomeInfo->setPosition(4, 2);
+    tui_labelOldHomeInfo->setText(tr("A home directory already exists for this user name.\nChoose what to do with it:"));
+    tui_labelOldHomeInfo->show();
+
+    // Radio button: Re-use existing home
+    tui_radioOldHomeUse = new ui::QRadioButton();
+    tui_radioOldHomeUse->setPosition(7, 2);
+    tui_radioOldHomeUse->setText(tr("Re-use it for this installation"));
+    tui_radioOldHomeUse->setChecked(gui.radioOldHomeUse->isChecked());
+    tui_radioOldHomeUse->show();
+
+    // Radio button: Rename and create new
+    tui_radioOldHomeSave = new ui::QRadioButton();
+    tui_radioOldHomeSave->setPosition(8, 2);
+    tui_radioOldHomeSave->setText(tr("Rename it and create a new directory"));
+    tui_radioOldHomeSave->setChecked(gui.radioOldHomeSave->isChecked());
+    tui_radioOldHomeSave->show();
+
+    // Radio button: Delete and create new
+    tui_radioOldHomeDelete = new ui::QRadioButton();
+    tui_radioOldHomeDelete->setPosition(9, 2);
+    tui_radioOldHomeDelete->setText(tr("Delete it and create a new directory"));
+    tui_radioOldHomeDelete->setChecked(gui.radioOldHomeDelete->isChecked());
+    tui_radioOldHomeDelete->show();
+
+    tui_oldHomeError.clear();
+}
+
+void MInstall::setupPageTipsTUI() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    qInfo() << "Setting up TUI widgets for pageTips...";
+
+    // Title label
+    tui_labelTipsTitle = new ui::QLabel();
+    tui_labelTipsTitle->setPosition(2, 2);
+    tui_labelTipsTitle->setText(tr("Installation in Progress"));
+    tui_labelTipsTitle->show();
+
+    // Info label
+    tui_labelTipsInfo = new ui::QLabel();
+    tui_labelTipsInfo->setPosition(4, 2);
+    tui_labelTipsInfo->setText(tr("The system is being installed.\nThis may take several minutes."));
+    tui_labelTipsInfo->show();
+    
+    // Reboot checkbox
+    tui_checkTipsReboot = new ui::QCheckBox();
+    tui_checkTipsReboot->setPosition(14, 2);
+    tui_checkTipsReboot->setText(tr("Reboot automatically when installation completes"));
+    tui_checkTipsReboot->setChecked(false);  // Disabled by default
+    tui_checkTipsReboot->show();
+}
+
+void MInstall::renderPageSplash() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+    
+    if (tui_labelSplash) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelSplash->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    
+    // Show instruction at bottom
+    mvprintw(12, 10, "Press ENTER or SPACE to continue...");
+}
+
+void MInstall::renderPageEnd() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;  // Only render in TUI mode
+    }
+
+    // Note: Reboot checkbox removed from END page (now on TIPS page)
+    
+    if (tui_textReminders) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_textReminders->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    mvprintw(20, 2, "ENTER: exit");
+}
+
+void MInstall::renderPageTerms() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    if (tui_textCopyright) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_textCopyright->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_keyboardInfo) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_keyboardInfo->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+}
+
+void MInstall::renderPageInstallation() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    syncInstallationTuiFromGui();
+
+    // Render label
+    if (tui_labelInstallType) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelInstallType->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Render radio buttons
+    if (tui_radioEntireDrive) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioEntireDrive->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_radioCustomPart) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioCustomPart->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_radioReplace) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioReplace->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_checkDualDrive) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkDualDrive->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelDriveSystem) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelDriveSystem->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_comboDriveSystem) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboDriveSystem->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelDriveHome) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelDriveHome->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_comboDriveHome) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboDriveHome->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelRootPercent) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelRootPercent->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textRootPercent) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textRootPercent->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelHomePercent) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelHomePercent->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textHomePercent) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textHomePercent->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_checkEncryptAuto) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkEncryptAuto->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Instructions
+    mvprintw(18, 4, "TAB/UP/DOWN: navigate | SPACE: toggle/select | ENTER: continue");
+
+    // Render any open combo popup LAST so it appears on top of other widgets
+    if (tui_comboDriveSystem) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboDriveSystem->tuiWidget());
+        if (tuiWidget && tuiWidget->isPopupVisible()) {
+            tuiWidget->renderPopup();
+        }
+    }
+    if (tui_comboDriveHome) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboDriveHome->tuiWidget());
+        if (tuiWidget && tuiWidget->isPopupVisible()) {
+            tuiWidget->renderPopup();
+        }
+    }
+}
+
+void MInstall::renderPageConfirm() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    // Render title
+    mvprintw(2, 2, "Installation Confirmation");
+    mvprintw(3, 2, "=========================");
+
+    // Show installation settings
+    int line = 5;
+    int maxY = 0;
+    int maxX = 0;
+    getmaxyx(stdscr, maxY, maxX);
+    auto safePrint = [&](int row, int col, const char *fmt, const char *value) {
+        if (row >= 0 && row < maxY) {
+            mvprintw(row, col, fmt, value);
+        }
+    };
+    auto safePrintLine = [&](int row, int col, const char *text) {
+        if (row >= 0 && row < maxY) {
+            mvprintw(row, col, "%s", text);
+        }
+    };
+    if (gui.radioEntireDrive->isChecked()) {
+        safePrintLine(line++, 2, "Mode: Use entire drive");
+        // Get selected drive name
+        const QString driveName = gui.comboDriveSystem->currentText();
+        if (!driveName.isEmpty()) {
+            const QByteArray driveUtf8 = driveName.toUtf8();
+            safePrint(line++, 2, "Drive: %s", driveUtf8.constData());
+        }
+        if (gui.checkDualDrive->isChecked()) {
+            const QString homeDriver = gui.comboDriveHome->currentText();
+            if (!homeDriver.isEmpty()) {
+                const QByteArray homeUtf8 = homeDriver.toUtf8();
+                safePrint(line++, 2, "Home Drive: %s", homeUtf8.constData());
+            }
+        }
+        if (gui.checkEncryptAuto->isChecked()) {
+            safePrintLine(line++, 2, "Encryption: Enabled");
+        }
+    } else if (gui.radioReplace->isChecked()) {
+        safePrintLine(line++, 2, "Mode: Replace existing installation");
+        // Get selected installation
+        if (replacer && replacer->installationCount() > 0) {
+            size_t count = replacer->installationCount();
+            int safeIndex = tui_focusReplace;
+            if (safeIndex < 0) {
+                safeIndex = 0;
+            } else if (count > 0 && safeIndex >= static_cast<int>(count)) {
+                safeIndex = static_cast<int>(count) - 1;
+            }
+            const QString release = replacer->installationRelease(static_cast<size_t>(safeIndex));
+            if (!release.isEmpty()) {
+                const QByteArray releaseUtf8 = release.toUtf8();
+                safePrint(line++, 2, "Replacing: %s", releaseUtf8.constData());
+            }
+        }
+    } else if (gui.radioCustomPart->isChecked()) {
+        safePrintLine(line++, 2, "Mode: Custom partitioning");
+    }
+
+    line++;
+    safePrintLine(line++, 2, "WARNING: All data on the selected drive will be ERASED!");
+    line++;
+    safePrintLine(line++, 2, "Press ENTER to begin installation");
+    safePrintLine(line++, 2, "Press BACKSPACE to go back");
+}
+
+void MInstall::renderPageBoot() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    if (tui_comboBoot) {
+        if (tui_comboBoot->count() != gui.comboBoot->count()) {
+            tui_comboBoot->clear();
+            for (int i = 0; i < gui.comboBoot->count(); ++i) {
+                tui_comboBoot->addItem(gui.comboBoot->itemText(i), gui.comboBoot->itemData(i));
+            }
+        }
+        tui_comboBoot->setCurrentIndex(gui.comboBoot->currentIndex());
+    }
+    if (tui_checkBootInstall) {
+        tui_checkBootInstall->setChecked(gui.boxBoot->isChecked());
+    }
+    if (tui_checkBootHostSpecific) {
+        tui_checkBootHostSpecific->setChecked(gui.checkBootHostSpecific->isChecked());
+    }
+
+    const bool bootEnabled = gui.boxBoot->isChecked();
+    if (tui_labelBootLocation) tui_labelBootLocation->setEnabled(bootEnabled);
+    if (tui_comboBoot) tui_comboBoot->setEnabled(bootEnabled);
+    if (tui_radioBootMBR) tui_radioBootMBR->setEnabled(bootEnabled);
+    if (tui_radioBootPBR) tui_radioBootPBR->setEnabled(bootEnabled);
+    if (tui_radioBootESP) tui_radioBootESP->setEnabled(bootEnabled);
+    if (tui_checkBootHostSpecific) tui_checkBootHostSpecific->setEnabled(bootEnabled);
+    if (tui_radioBootMBR) tui_radioBootMBR->setChecked(gui.radioBootMBR->isChecked());
+    if (tui_radioBootPBR) tui_radioBootPBR->setChecked(gui.radioBootPBR->isChecked());
+    if (tui_radioBootESP) tui_radioBootESP->setChecked(gui.radioBootESP->isChecked());
+
+    // Render title
+    if (tui_labelBootTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelBootTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_checkBootInstall) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkBootInstall->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelBootLocation) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelBootLocation->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_comboBoot) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboBoot->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Render radio buttons
+    if (tui_radioBootMBR) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioBootMBR->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_radioBootPBR) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioBootPBR->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_radioBootESP) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioBootESP->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_checkBootHostSpecific) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkBootHostSpecific->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Instructions
+    mvprintw(16, 4, "TAB/UP/DOWN: navigate | SPACE: toggle/select | ENTER: continue");
+
+    // Render any open combo popup LAST so it appears on top of other widgets
+    if (tui_comboBoot) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboBoot->tuiWidget());
+        if (tuiWidget && tuiWidget->isPopupVisible()) {
+            tuiWidget->renderPopup();
+        }
+    }
+}
+
+void MInstall::renderPageNetwork() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    if (tui_checkSamba) {
+        tui_checkSamba->setChecked(gui.checkSamba->isChecked());
+        tui_checkSamba->setEnabled(gui.checkSamba->isEnabled());
+    }
+    if (tui_labelComputerGroup) tui_labelComputerGroup->setEnabled(gui.textComputerGroup->isEnabled());
+    if (tui_textComputerGroup) tui_textComputerGroup->setEnabled(gui.textComputerGroup->isEnabled());
+
+    // Render labels
+    if (tui_labelComputerName) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelComputerName->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_labelComputerDomain) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelComputerDomain->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Render line edits
+    if (tui_textComputerName && tui_focusNetwork != 0) {
+        tui_textComputerName->setText(gui.textComputerName->text());
+    }
+    if (tui_textComputerName) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textComputerName->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_textComputerDomain && tui_focusNetwork != 1) {
+        tui_textComputerDomain->setText(gui.textComputerDomain->text());
+    }
+    if (tui_textComputerDomain) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textComputerDomain->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_labelComputerGroup) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelComputerGroup->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textComputerGroup && tui_focusNetwork != 2) {
+        tui_textComputerGroup->setText(gui.textComputerGroup->text());
+    }
+    if (tui_textComputerGroup) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textComputerGroup->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_checkSamba) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkSamba->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Instructions
+    if (!tui_networkError.isEmpty()) {
+        mvprintw(11, 2, "%s", tui_networkError.toUtf8().constData());
+    }
+    mvprintw(12, 2, "TAB to switch fields, SPACE to toggle, ENTER to continue");
+}
+
+void MInstall::renderPageLocalization() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    if (tui_comboLocale && tui_comboLocale->count() != gui.comboLocale->count()) {
+        tui_comboLocale->clear();
+        for (int i = 0; i < gui.comboLocale->count(); ++i) {
+            tui_comboLocale->addItem(gui.comboLocale->itemText(i), gui.comboLocale->itemData(i));
+        }
+    }
+    if (tui_comboTimeArea && tui_comboTimeArea->count() != gui.comboTimeArea->count()) {
+        tui_comboTimeArea->clear();
+        for (int i = 0; i < gui.comboTimeArea->count(); ++i) {
+            tui_comboTimeArea->addItem(gui.comboTimeArea->itemText(i), gui.comboTimeArea->itemData(i));
+        }
+    }
+    if (tui_comboTimeZone && tui_comboTimeZone->count() != gui.comboTimeZone->count()) {
+        tui_comboTimeZone->clear();
+        for (int i = 0; i < gui.comboTimeZone->count(); ++i) {
+            tui_comboTimeZone->addItem(gui.comboTimeZone->itemText(i), gui.comboTimeZone->itemData(i));
+        }
+    }
+
+    if (tui_comboLocale) {
+        tui_comboLocale->setCurrentIndex(gui.comboLocale->currentIndex());
+    }
+    if (tui_comboTimeArea) {
+        tui_comboTimeArea->setCurrentIndex(gui.comboTimeArea->currentIndex());
+    }
+    if (tui_comboTimeZone) {
+        tui_comboTimeZone->setCurrentIndex(gui.comboTimeZone->currentIndex());
+    }
+    if (tui_checkLocalClock) {
+        tui_checkLocalClock->setChecked(gui.checkLocalClock->isChecked());
+    }
+    if (tui_radioClock24) {
+        tui_radioClock24->setChecked(gui.radioClock24->isChecked());
+    }
+    if (tui_radioClock12) {
+        tui_radioClock12->setChecked(gui.radioClock12->isChecked());
+    }
+
+    // Render title
+    if (tui_labelLocaleTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelLocaleTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_labelLocale) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelLocale->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_comboLocale) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboLocale->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelTimeArea) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelTimeArea->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_comboTimeArea) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboTimeArea->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelTimeZone) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelTimeZone->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_comboTimeZone) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboTimeZone->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_checkLocalClock) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkLocalClock->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelClockFormat) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelClockFormat->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_radioClock24) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioClock24->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_radioClock12) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioClock12->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Instructions
+    mvprintw(14, 2, "TAB/UP/DOWN: navigate | SPACE: expand | ENTER: select/continue");
+
+    // Render any open combo popup LAST so it appears on top of other widgets
+    if (tui_comboLocale) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboLocale->tuiWidget());
+        if (tuiWidget && tuiWidget->isPopupVisible()) {
+            tuiWidget->renderPopup();
+        }
+    }
+    if (tui_comboTimeArea) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboTimeArea->tuiWidget());
+        if (tuiWidget && tuiWidget->isPopupVisible()) {
+            tuiWidget->renderPopup();
+        }
+    }
+    if (tui_comboTimeZone) {
+        auto* tuiWidget = dynamic_cast<qtui::TComboBox*>(tui_comboTimeZone->tuiWidget());
+        if (tuiWidget && tuiWidget->isPopupVisible()) {
+            tuiWidget->renderPopup();
+        }
+    }
+}
+
+void MInstall::renderPageServices() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    buildServicesTui();
+    syncServicesTuiFromGui();
+
+    // Render title
+    if (tui_labelServicesTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelServicesTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    for (auto *label : tui_serviceCategoryLabels) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(label->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    for (const auto &item : tui_serviceItems) {
+        if (item.checkbox) {
+            auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(item.checkbox->tuiWidget());
+            if (tuiWidget) {
+                tuiWidget->render();
+            }
+        }
+    }
+
+    if (tui_serviceItems.isEmpty() && tui_labelServicesInfo) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelServicesInfo->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    mvprintw(22, 2, "UP/DOWN: navigate | SPACE: toggle | ENTER: continue");
+}
+
+void MInstall::renderPageReplace() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    // Render title
+    if (tui_labelReplaceTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelReplaceTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_replaceScanning) {
+        mvprintw(4, 2, "Detected installations:");
+        mvprintw(6, 4, "Scanning...");
+        mvprintw(8, 2, "Please wait...");
+        return;
+    }
+
+    // Display list of detected installations
+    mvprintw(4, 2, "Detected installations:");
+
+    size_t count = replacer ? replacer->installationCount() : 0;
+    if (count == 0) {
+        mvprintw(6, 4, "(No existing installations found)");
+        mvprintw(8, 2, "Press 'r' to rescan, Backspace to go back");
+    } else {
+        for (size_t i = 0; i < count; ++i) {
+            QString release = replacer->installationRelease(i);
+            const char* marker = (static_cast<int>(i) == tui_focusReplace) ? ">" : " ";
+            if (static_cast<int>(i) == tui_focusReplace) {
+                attron(A_REVERSE);
+            }
+            mvprintw(6 + static_cast<int>(i), 4, "%s %zu. %s", marker, i + 1, release.toUtf8().constData());
+            if (static_cast<int>(i) == tui_focusReplace) {
+                attroff(A_REVERSE);
+            }
+        }
+
+        // Render checkbox
+        if (tui_checkReplacePackages) {
+            auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkReplacePackages->tuiWidget());
+            if (tuiWidget) {
+                tuiWidget->render();
+            }
+        }
+
+        mvprintw(17, 2, "UP/DOWN to select, SPACE to toggle option, ENTER to continue, 'r' to rescan");
+    }
+}
+
+bool MInstall::processDeferredActions() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return false;
+    }
+
+    if (tui_replaceScanPending && replacer) {
+        tui_replaceScanPending = false;
+        replacer->scan(true, true);
+        tui_replaceScanning = false;
+        tui_focusReplace = 0;
+        return true;
+    }
+    return false;
+}
+
+void MInstall::renderPagePartitions() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    // Render title
+    if (tui_labelPartitionsInfo) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelPartitionsInfo->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    mvprintw(4, 2, "Custom partitioning allows you to manually configure");
+    mvprintw(5, 2, "your disk layout using cfdisk.");
+    mvprintw(7, 2, "Press ENTER to launch cfdisk, Backspace to go back.");
+    mvprintw(9, 2, "After partitioning, you will need to restart the installer.");
+}
+
+void MInstall::renderPageSwap() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    syncSwapTuiFromGui();
+
+    // Render title
+    if (tui_labelSwapTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelSwapTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_checkSwapFile) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkSwapFile->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_labelSwapLocation) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelSwapLocation->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textSwapFile) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textSwapFile->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_labelSwapSize) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelSwapSize->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textSwapSize) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textSwapSize->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelSwapMax) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelSwapMax->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelSwapReset) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelSwapReset->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_checkHibernation) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkHibernation->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_labelZramTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelZramTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_checkZram) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkZram->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_radioZramPercent) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioZramPercent->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textZramPercent) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textZramPercent->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelZramRecPercent) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelZramRecPercent->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_radioZramSize) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioZramSize->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textZramSize) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textZramSize->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelZramRecSize) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelZramRecSize->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    mvprintw(20, 2, "TAB/UP/DOWN: navigate | SPACE: toggle | R: reset size");
+    mvprintw(21, 2, "ENTER: continue | Backspace: go back");
+}
+
+void MInstall::renderPageEncryption() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    if (tui_textCryptoPass && tui_focusEncryption != 0) {
+        tui_textCryptoPass->setText(gui.textCryptoPass->text());
+    }
+    if (tui_textCryptoPass2 && tui_focusEncryption != 1) {
+        tui_textCryptoPass2->setText(gui.textCryptoPass2->text());
+    }
+
+    if (tui_labelEncryptionTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelEncryptionTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelCryptoPass) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelCryptoPass->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textCryptoPass) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textCryptoPass->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelCryptoPass2) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelCryptoPass2->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textCryptoPass2) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textCryptoPass2->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (!tui_encryptionError.isEmpty()) {
+        mvprintw(8, 2, "%s", tui_encryptionError.toUtf8().constData());
+    }
+    mvprintw(9, 2, "TAB to switch fields, ENTER to continue");
+}
+
+void MInstall::renderPageUserAccounts() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    if (tui_checkRootAccount) {
+        tui_checkRootAccount->setChecked(gui.boxRootAccount->isChecked());
+    }
+    if (tui_checkAutoLogin) {
+        tui_checkAutoLogin->setChecked(gui.checkAutoLogin->isChecked());
+    }
+    if (tui_checkSaveDesktop) {
+        tui_checkSaveDesktop->setChecked(gui.checkSaveDesktop->isChecked());
+    }
+
+    const bool rootEnabled = gui.boxRootAccount->isChecked();
+    if (tui_labelRootPass) tui_labelRootPass->setEnabled(rootEnabled);
+    if (tui_textRootPass) tui_textRootPass->setEnabled(rootEnabled);
+    if (tui_labelRootPass2) tui_labelRootPass2->setEnabled(rootEnabled);
+    if (tui_textRootPass2) tui_textRootPass2->setEnabled(rootEnabled);
+
+    if (tui_textUserName && tui_focusUserAccounts != 0) {
+        tui_textUserName->setText(gui.textUserName->text());
+    }
+    if (tui_textUserPass && tui_focusUserAccounts != 1) {
+        tui_textUserPass->setText(gui.textUserPass->text());
+    }
+    if (tui_textUserPass2 && tui_focusUserAccounts != 2) {
+        tui_textUserPass2->setText(gui.textUserPass2->text());
+    }
+    if (tui_textRootPass && tui_focusUserAccounts != 4) {
+        tui_textRootPass->setText(gui.textRootPass->text());
+    }
+    if (tui_textRootPass2 && tui_focusUserAccounts != 5) {
+        tui_textRootPass2->setText(gui.textRootPass2->text());
+    }
+
+    // Render labels
+    if (tui_labelUserName) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelUserName->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_labelUserPass) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelUserPass->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_labelUserPass2) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelUserPass2->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Render line edits
+    if (tui_textUserName) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textUserName->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_textUserPass) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textUserPass->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_textUserPass2) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textUserPass2->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_checkRootAccount) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkRootAccount->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelRootPass) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelRootPass->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textRootPass) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textRootPass->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_labelRootPass2) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelRootPass2->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_textRootPass2) {
+        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textRootPass2->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_checkAutoLogin) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkAutoLogin->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+    if (tui_checkSaveDesktop) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkSaveDesktop->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Instructions
+    if (!tui_userError.isEmpty()) {
+        mvprintw(18, 2, "%s", tui_userError.toUtf8().constData());
+    }
+    mvprintw(19, 2, "TAB to switch fields, SPACE to toggle, ENTER to continue");
+}
+
+void MInstall::renderPageOldHome() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    // Render title
+    if (tui_labelOldHomeTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelOldHomeTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Render info
+    if (tui_labelOldHomeInfo) {
+        if (!gui.labelOldHome->text().isEmpty()) {
+            tui_labelOldHomeInfo->setText(gui.labelOldHome->text());
+        }
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelOldHomeInfo->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Render radio buttons
+    if (tui_radioOldHomeUse) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeUse->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_radioOldHomeSave) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeSave->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    if (tui_radioOldHomeDelete) {
+        auto* tuiWidget = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeDelete->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Instructions
+    if (!tui_oldHomeError.isEmpty()) {
+        mvprintw(11, 2, "%s", tui_oldHomeError.toUtf8().constData());
+    }
+    mvprintw(12, 2, "UP/DOWN to navigate, SPACE to select, ENTER to continue");
+}
+
+void MInstall::renderPageTips() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    // Render title
+    if (tui_labelTipsTitle) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelTipsTitle->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Render info
+    if (tui_labelTipsInfo) {
+        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelTipsInfo->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
+
+    // Progress bar + status on same line
+    const int barWidth = 40;
+    const int maxVal = gui.progInstall->maximum() > 0 ? gui.progInstall->maximum() : 100;
+    const int value = qBound(0, gui.progInstall->value(), maxVal);
+    const int filled = (value * barWidth) / maxVal;
+    const int percent = (value * 100) / maxVal;
+    
+    QString status = gui.progInstall->format();
+    if (status.contains("%p"_L1)) {
+        status.replace("%p"_L1, QString::number(percent));
+    }
+    if (status.isEmpty()) {
+        status = tr("Installing...");
+    }
+    
+    // Add spinner inside the progress bar between filled and empty portions
+    const char spinnerChars[] = "|/-\\";
+    const char spin = spinnerChars[tui_spinnerTick % 4];
+    
+    QString bar = "["_L1 + QString(filled, '#') + spin + QString(barWidth - filled, ' ') + "]"_L1;
+    
+    // Clear and print: [####/           ] 25% - Status message
+    int maxY, maxX;
+    getmaxyx(stdscr, maxY, maxX);
+    (void)maxY;
+    QString fullLine = QString("%1 %2").arg(bar).arg(status);
+    // Pad with spaces to clear the rest of the line
+    int lineLen = fullLine.length();
+    if (lineLen < maxX - 4) {
+        fullLine += QString(maxX - 4 - lineLen, ' ');
+    }
+    mvprintw(10, 2, "%s", fullLine.toUtf8().constData());
+    
+    // Render reboot checkbox with focus
+    if (tui_checkTipsReboot) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkTipsReboot->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->setFocus(true);  // Always keep focus on checkbox so SPACE works
+            tuiWidget->render();
+        }
+    }
+}
+
+void MInstall::renderCurrentPage() noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;  // Only for TUI mode
+    }
+
+    // Render based on current page
+    if (currentPageIndex == Step::SPLASH) {
+        renderPageSplash();
+    } else if (currentPageIndex == Step::TERMS) {
+        renderPageTerms();
+    } else if (currentPageIndex == Step::INSTALLATION) {
+        renderPageInstallation();
+    } else if (currentPageIndex == Step::REPLACE) {
+        renderPageReplace();
+    } else if (currentPageIndex == Step::PARTITIONS) {
+        renderPagePartitions();
+    } else if (currentPageIndex == Step::ENCRYPTION) {
+        renderPageEncryption();
+    } else if (currentPageIndex == Step::CONFIRM) {
+        renderPageConfirm();
+    } else if (currentPageIndex == Step::BOOT) {
+        renderPageBoot();
+    } else if (currentPageIndex == Step::SWAP) {
+        renderPageSwap();
+    } else if (currentPageIndex == Step::NETWORK) {
+        renderPageNetwork();
+    } else if (currentPageIndex == Step::LOCALIZATION) {
+        renderPageLocalization();
+    } else if (currentPageIndex == Step::SERVICES) {
+        renderPageServices();
+    } else if (currentPageIndex == Step::USER_ACCOUNTS) {
+        renderPageUserAccounts();
+    } else if (currentPageIndex == Step::OLD_HOME) {
+        renderPageOldHome();
+    } else if (currentPageIndex == Step::TIPS) {
+        renderPageTips();
+    } else if (currentPageIndex == Step::END) {
+        renderPageEnd();
+    } else {
+        mvprintw(5, 5, "Page %d - TUI rendering not yet implemented", currentPageIndex);
+    }
+}
+
+void MInstall::handleInput(int key) noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    // Handle input based on current page
+    if (currentPageIndex == Step::END) {
+        // pageEnd has only checkbox (label is not interactive)
+        // Space or Enter to toggle checkbox
+        if (tui_checkExitReboot) {
+            auto* checkbox = dynamic_cast<qtui::TCheckBox*>(tui_checkExitReboot->tuiWidget());
+            if (checkbox && key == ' ') {
+                checkbox->toggle();
+            }
+        }
+        if (key == '\n' || key == KEY_ENTER) {
+            tui_exitRequested = true;
+        }
+    } else if (currentPageIndex == Step::TERMS) {
+        // pageTerms: Enter/Space to accept and go to next page
+        if (key == ' ' || key == '\n' || key == KEY_ENTER) {
+            gotoPage(currentPageIndex + 1);
+        }
+    } else if (currentPageIndex == Step::SPLASH) {
+        // pageSplash: Enter/Space to continue to terms page
+        if (key == ' ' || key == '\n' || key == KEY_ENTER) {
+            gotoPage(currentPageIndex + 1);
+        }
+    } else if (currentPageIndex == Step::INSTALLATION) {
+        qtui::TRadioButton* radios[3] = {nullptr, nullptr, nullptr};
+        qtui::TCheckBox* dualDrive = nullptr;
+        qtui::TComboBox* comboSystem = nullptr;
+        qtui::TComboBox* comboHome = nullptr;
+        qtui::TLineEdit* rootPercent = nullptr;
+        qtui::TLineEdit* homePercent = nullptr;
+        qtui::TCheckBox* encryptAuto = nullptr;
+
+        if (tui_radioEntireDrive) {
+            radios[0] = dynamic_cast<qtui::TRadioButton*>(tui_radioEntireDrive->tuiWidget());
+        }
+        if (tui_radioCustomPart) {
+            radios[1] = dynamic_cast<qtui::TRadioButton*>(tui_radioCustomPart->tuiWidget());
+        }
+        if (tui_radioReplace) {
+            radios[2] = dynamic_cast<qtui::TRadioButton*>(tui_radioReplace->tuiWidget());
+        }
+        if (tui_checkDualDrive) {
+            dualDrive = dynamic_cast<qtui::TCheckBox*>(tui_checkDualDrive->tuiWidget());
+        }
+        if (tui_comboDriveSystem) {
+            comboSystem = dynamic_cast<qtui::TComboBox*>(tui_comboDriveSystem->tuiWidget());
+        }
+        if (tui_comboDriveHome) {
+            comboHome = dynamic_cast<qtui::TComboBox*>(tui_comboDriveHome->tuiWidget());
+        }
+        if (tui_textRootPercent) {
+            rootPercent = dynamic_cast<qtui::TLineEdit*>(tui_textRootPercent->tuiWidget());
+        }
+        if (tui_textHomePercent) {
+            homePercent = dynamic_cast<qtui::TLineEdit*>(tui_textHomePercent->tuiWidget());
+        }
+        if (tui_checkEncryptAuto) {
+            encryptAuto = dynamic_cast<qtui::TCheckBox*>(tui_checkEncryptAuto->tuiWidget());
+        }
+
+        auto isFocusable = [&](int index) -> bool {
+            switch (index) {
+                case 0: return radios[0] && radios[0]->isEnabled();
+                case 1: return radios[1] && radios[1]->isEnabled();
+                case 2: return radios[2] && radios[2]->isEnabled();
+                case 3: return dualDrive && dualDrive->isEnabled();
+                case 4: return comboSystem && comboSystem->isEnabled();
+                case 5: return comboHome && comboHome->isEnabled();
+                case 6: return rootPercent && rootPercent->isEnabled();
+                case 7: return homePercent && homePercent->isEnabled();
+                case 8: return encryptAuto && encryptAuto->isEnabled();
+                default: return false;
+            }
+        };
+
+        auto moveFocus = [&](int delta) {
+            int idx = tui_focusInstallationField;
+            for (int i = 0; i < 9; ++i) {
+                idx = (idx + delta + 9) % 9;
+                if (isFocusable(idx)) {
+                    tui_focusInstallationField = idx;
+                    break;
+                }
+            }
+        };
+
+        auto applyFocus = [&]() {
+            if (radios[0]) radios[0]->setFocus(tui_focusInstallationField == 0);
+            if (radios[1]) radios[1]->setFocus(tui_focusInstallationField == 1);
+            if (radios[2]) radios[2]->setFocus(tui_focusInstallationField == 2);
+            if (dualDrive) dualDrive->setFocus(tui_focusInstallationField == 3);
+            if (comboSystem) comboSystem->setFocus(tui_focusInstallationField == 4);
+            if (comboHome) comboHome->setFocus(tui_focusInstallationField == 5);
+            if (rootPercent) rootPercent->setFocus(tui_focusInstallationField == 6);
+            if (homePercent) homePercent->setFocus(tui_focusInstallationField == 7);
+            if (encryptAuto) encryptAuto->setFocus(tui_focusInstallationField == 8);
+        };
+
+        auto ensureFocus = [&]() {
+            if (!isFocusable(tui_focusInstallationField)) {
+                moveFocus(1);
+            }
+        };
+
+        const bool installFocusIsEdit = (tui_focusInstallationField == 6 || tui_focusInstallationField == 7);
+        if (key == TUI_KEY_ALT_LEFT || (key == KEY_BACKSPACE && !installFocusIsEdit)) {
+            gotoPage(currentPageIndex - 1);
+            return;
+        } else if (key == '\t' || key == KEY_DOWN) {
+            moveFocus(1);
+        } else if (key == KEY_UP) {
+            moveFocus(-1);
+        } else if (key == ' ') {
+            if (tui_focusInstallationField <= 2 && radios[tui_focusInstallationField]) {
+                radios[tui_focusInstallationField]->setChecked(true);
+                if (tui_focusInstallationField == 0) gui.radioEntireDrive->setChecked(true);
+                if (tui_focusInstallationField == 1) gui.radioCustomPart->setChecked(true);
+                if (tui_focusInstallationField == 2) gui.radioReplace->setChecked(true);
+                tui_focusInstallation = tui_focusInstallationField;
+                syncInstallationTuiFromGui();
+            } else if (tui_focusInstallationField == 3 && dualDrive) {
+                dualDrive->toggle();
+                gui.checkDualDrive->setChecked(dualDrive->isChecked());
+                syncInstallationTuiFromGui();
+            } else if (tui_focusInstallationField == 8 && encryptAuto) {
+                encryptAuto->toggle();
+                gui.checkEncryptAuto->setChecked(encryptAuto->isChecked());
+                syncInstallationTuiFromGui();
+            }
+        } else if (tui_focusInstallationField == 4 && comboSystem) {
+            comboSystem->handleKey(key);
+            gui.comboDriveSystem->setCurrentIndex(comboSystem->currentIndex());
+            syncInstallationTuiFromGui();
+        } else if (tui_focusInstallationField == 5 && comboHome) {
+            comboHome->handleKey(key);
+            gui.comboDriveHome->setCurrentIndex(comboHome->currentIndex());
+            syncInstallationTuiFromGui();
+        } else if (tui_focusInstallationField == 6 && rootPercent) {
+            rootPercent->handleKey(key);
+            bool ok = false;
+            int value = rootPercent->text().toInt(&ok);
+            if (ok) {
+                gui.spinRoot->setValue(value);
+            }
+            syncInstallationTuiFromGui();
+        } else if (tui_focusInstallationField == 7 && homePercent) {
+            homePercent->handleKey(key);
+            bool ok = false;
+            int value = homePercent->text().toInt(&ok);
+            if (ok) {
+                gui.spinHome->setValue(value);
+            }
+            syncInstallationTuiFromGui();
+        }
+
+        if (key == '\n' || key == KEY_ENTER) {
+            if (tui_focusInstallationField == 4 && comboSystem && comboSystem->isPopupVisible()) {
+                comboSystem->handleKey(key);
+            } else if (tui_focusInstallationField == 5 && comboHome && comboHome->isPopupVisible()) {
+                comboHome->handleKey(key);
+            } else {
+                gotoPage(currentPageIndex + 1);
+            }
+        }
+
+        ensureFocus();
+        applyFocus();
+    } else if (currentPageIndex == Step::REPLACE) {
+        // pageReplace: Select installation to replace
+        size_t count = replacer ? replacer->installationCount() : 0;
+
+        if (key == TUI_KEY_ALT_LEFT) {
+            gotoPage(Step::INSTALLATION);
+        } else if (key == KEY_UP && tui_focusReplace > 0) {
+            tui_focusReplace--;
+        } else if (key == KEY_DOWN && tui_focusReplace < static_cast<int>(count) - 1) {
+            tui_focusReplace++;
+        } else if (key == ' ') {
+            // Space toggles upgrade packages checkbox
+            if (tui_checkReplacePackages) {
+                auto* checkbox = dynamic_cast<qtui::TCheckBox*>(tui_checkReplacePackages->tuiWidget());
+                if (checkbox) {
+                    checkbox->toggle();
+                    // Sync with GUI checkbox
+                    gui.checkReplacePackages->setChecked(checkbox->isChecked());
+                }
+            }
+        } else if (key == 'r' || key == 'R') {
+            // Rescan for installations
+            if (replacer) {
+                tui_replaceScanning = true;
+                tui_replaceScanPending = true;
+            }
+            tui_focusReplace = 0;
+        } else if (key == '\n' || key == KEY_ENTER) {
+            if (count > 0 && replacer) {
+                // Set selected installation in GUI widget for validation
+                replacer->setSelectedInstallation(tui_focusReplace);
+                gotoPage(Step::CONFIRM);
+            }
+        } else if (key == KEY_BACKSPACE) {
+            gotoPage(Step::INSTALLATION);
+        }
+    } else if (currentPageIndex == Step::PARTITIONS) {
+        // pagePartitions: Launch cfdisk for manual partitioning
+        if (key == TUI_KEY_ALT_LEFT) {
+            gotoPage(Step::INSTALLATION);
+        } else if (key == '\n' || key == KEY_ENTER) {
+            // End ncurses temporarily to launch cfdisk
+            endwin();
+
+            // Launch cfdisk - let user choose drive
+            int result = system("cfdisk");
+            (void)result;
+
+            // Restart ncurses
+            refresh();
+            clear();
+
+            // Notify user to restart installer after partitioning
+            mvprintw(10, 2, "Partitioning complete. Please restart the installer");
+            mvprintw(11, 2, "to use your new partition layout.");
+            mvprintw(13, 2, "Press any key to exit...");
+            refresh();
+            getch();
+
+            // Signal to exit
+            gotoPage(Step::END);
+        } else if (key == KEY_BACKSPACE) {
+            gotoPage(Step::INSTALLATION);
+        }
+    } else if (currentPageIndex == Step::ENCRYPTION) {
+        qtui::TLineEdit* passFields[2] = {nullptr, nullptr};
+
+        if (tui_textCryptoPass) {
+            passFields[0] = dynamic_cast<qtui::TLineEdit*>(tui_textCryptoPass->tuiWidget());
+        }
+        if (tui_textCryptoPass2) {
+            passFields[1] = dynamic_cast<qtui::TLineEdit*>(tui_textCryptoPass2->tuiWidget());
+        }
+
+        if (key != '\n' && key != KEY_ENTER && key != TUI_KEY_ALT_LEFT) {
+            tui_encryptionError.clear();
+        }
+
+        if (key == TUI_KEY_ALT_LEFT) {
+            gotoPage(currentPageIndex - 1);
+            return;
+        } else if (key == '\t' || key == KEY_DOWN) {
+            tui_focusEncryption = (tui_focusEncryption + 1) % 2;
+        } else if (key == KEY_UP) {
+            tui_focusEncryption = (tui_focusEncryption + 1) % 2;
+        } else if (key == '\n' || key == KEY_ENTER) {
+            const QString pass1 = gui.textCryptoPass->text();
+            const QString pass2 = gui.textCryptoPass2->text();
+            const bool match = !pass1.isEmpty() && pass1 == pass2;
+            if (match && (!crypto || crypto->valid())) {
+                gotoPage(currentPageIndex + 1);
+            } else {
+                tui_encryptionError = tr("Passwords must match and not be empty.");
+            }
+        } else if (passFields[tui_focusEncryption]) {
+            passFields[tui_focusEncryption]->handleKey(key);
+            if (tui_focusEncryption == 0) {
+                gui.textCryptoPass->setText(passFields[0]->text());
+            } else if (tui_focusEncryption == 1) {
+                gui.textCryptoPass2->setText(passFields[1]->text());
+            }
+        }
+
+        for (int i = 0; i < 2; ++i) {
+            if (passFields[i]) {
+                passFields[i]->setFocus(i == tui_focusEncryption);
+            }
+        }
+    } else if (currentPageIndex == Step::CONFIRM) {
+        // pageConfirm: Enter to continue to configuration, ESC or backspace to go back
+        if (key == TUI_KEY_ALT_LEFT) {
+            gotoPage(currentPageIndex - 1);
+        } else if (key == '\n' || key == KEY_ENTER) {
+            gotoPage(currentPageIndex + 1);
+        } else if (key == KEY_BACKSPACE) {
+            gotoPage(Step::INSTALLATION);  // Go back to installation type selection
+        }
+    } else if (currentPageIndex == Step::BOOT) {
+        qtui::TCheckBox* bootInstall = tui_checkBootInstall
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkBootInstall->tuiWidget())
+            : nullptr;
+        qtui::TRadioButton* radios[3] = {nullptr, nullptr, nullptr};
+        qtui::TComboBox* comboBoot = tui_comboBoot
+            ? dynamic_cast<qtui::TComboBox*>(tui_comboBoot->tuiWidget())
+            : nullptr;
+        qtui::TCheckBox* hostSpecific = tui_checkBootHostSpecific
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkBootHostSpecific->tuiWidget())
+            : nullptr;
+
+        if (tui_radioBootMBR) {
+            radios[0] = dynamic_cast<qtui::TRadioButton*>(tui_radioBootMBR->tuiWidget());
+        }
+        if (tui_radioBootPBR) {
+            radios[1] = dynamic_cast<qtui::TRadioButton*>(tui_radioBootPBR->tuiWidget());
+        }
+        if (tui_radioBootESP) {
+            radios[2] = dynamic_cast<qtui::TRadioButton*>(tui_radioBootESP->tuiWidget());
+        }
+
+        auto isFocusable = [&](int index) -> bool {
+            switch (index) {
+                case 0: return bootInstall && bootInstall->isEnabled();
+                case 1: return radios[0] && radios[0]->isEnabled();
+                case 2: return radios[1] && radios[1]->isEnabled();
+                case 3: return radios[2] && radios[2]->isEnabled();
+                case 4: return comboBoot && comboBoot->isEnabled();
+                case 5: return hostSpecific && hostSpecific->isEnabled();
+                default: return false;
+            }
+        };
+
+        auto moveFocus = [&](int delta) {
+            int idx = tui_focusBootField;
+            for (int i = 0; i < 6; ++i) {
+                idx = (idx + delta + 6) % 6;
+                if (isFocusable(idx)) {
+                    tui_focusBootField = idx;
+                    break;
+                }
+            }
+        };
+
+        auto applyFocus = [&]() {
+            if (bootInstall) bootInstall->setFocus(tui_focusBootField == 0);
+            if (radios[0]) radios[0]->setFocus(tui_focusBootField == 1);
+            if (radios[1]) radios[1]->setFocus(tui_focusBootField == 2);
+            if (radios[2]) radios[2]->setFocus(tui_focusBootField == 3);
+            if (comboBoot) comboBoot->setFocus(tui_focusBootField == 4);
+            if (hostSpecific) hostSpecific->setFocus(tui_focusBootField == 5);
+        };
+        auto ensureFocus = [&]() {
+            if (!isFocusable(tui_focusBootField)) {
+                moveFocus(1);
+            }
+        };
+
+        if (key == TUI_KEY_ALT_LEFT || key == KEY_BACKSPACE) {
+            gotoPage(Step::CONFIRM);
+            return;
+        } else if (key == '\t' || key == KEY_DOWN) {
+            moveFocus(1);
+        } else if (key == KEY_UP) {
+            moveFocus(-1);
+        } else if (key == ' ') {
+            if (tui_focusBootField == 0 && bootInstall) {
+                bootInstall->toggle();
+                gui.boxBoot->setChecked(bootInstall->isChecked());
+            } else if (tui_focusBootField >= 1 && tui_focusBootField <= 3) {
+                const int idx = tui_focusBootField - 1;
+                if (radios[idx]) {
+                    radios[idx]->setChecked(true);
+                    if (idx == 0) gui.radioBootMBR->setChecked(true);
+                    if (idx == 1) gui.radioBootPBR->setChecked(true);
+                    if (idx == 2) gui.radioBootESP->setChecked(true);
+                }
+            } else if (tui_focusBootField == 5 && hostSpecific) {
+                hostSpecific->toggle();
+                gui.checkBootHostSpecific->setChecked(hostSpecific->isChecked());
+            }
+        } else if (tui_focusBootField == 4 && comboBoot) {
+            comboBoot->handleKey(key);
+            gui.comboBoot->setCurrentIndex(comboBoot->currentIndex());
+        }
+
+        if (key == '\n' || key == KEY_ENTER) {
+            if (tui_focusBootField == 4 && comboBoot && comboBoot->isPopupVisible()) {
+                comboBoot->handleKey(key);
+            } else {
+                gotoPage(Step::SWAP);
+            }
+        }
+
+        ensureFocus();
+        applyFocus();
+    } else if (currentPageIndex == Step::SWAP) {
+        qtui::TCheckBox* swapCheck = tui_checkSwapFile
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkSwapFile->tuiWidget())
+            : nullptr;
+        qtui::TLineEdit* swapFileEdit = tui_textSwapFile
+            ? dynamic_cast<qtui::TLineEdit*>(tui_textSwapFile->tuiWidget())
+            : nullptr;
+        qtui::TLineEdit* swapSizeEdit = tui_textSwapSize
+            ? dynamic_cast<qtui::TLineEdit*>(tui_textSwapSize->tuiWidget())
+            : nullptr;
+        qtui::TCheckBox* hibernationCheck = tui_checkHibernation
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkHibernation->tuiWidget())
+            : nullptr;
+        qtui::TCheckBox* zramCheck = tui_checkZram
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkZram->tuiWidget())
+            : nullptr;
+        qtui::TRadioButton* zramPercentRadio = tui_radioZramPercent
+            ? dynamic_cast<qtui::TRadioButton*>(tui_radioZramPercent->tuiWidget())
+            : nullptr;
+        qtui::TLineEdit* zramPercentEdit = tui_textZramPercent
+            ? dynamic_cast<qtui::TLineEdit*>(tui_textZramPercent->tuiWidget())
+            : nullptr;
+        qtui::TRadioButton* zramSizeRadio = tui_radioZramSize
+            ? dynamic_cast<qtui::TRadioButton*>(tui_radioZramSize->tuiWidget())
+            : nullptr;
+        qtui::TLineEdit* zramSizeEdit = tui_textZramSize
+            ? dynamic_cast<qtui::TLineEdit*>(tui_textZramSize->tuiWidget())
+            : nullptr;
+
+        auto isFocusable = [&](int index) -> bool {
+            switch (index) {
+                case 0: return swapCheck && swapCheck->isEnabled();
+                case 1: return swapFileEdit && swapFileEdit->isEnabled();
+                case 2: return swapSizeEdit && swapSizeEdit->isEnabled();
+                case 3: return hibernationCheck && hibernationCheck->isEnabled();
+                case 4: return zramCheck && zramCheck->isEnabled();
+                case 5: return zramPercentRadio && zramPercentRadio->isEnabled();
+                case 6: return zramPercentEdit && zramPercentEdit->isEnabled();
+                case 7: return zramSizeRadio && zramSizeRadio->isEnabled();
+                case 8: return zramSizeEdit && zramSizeEdit->isEnabled();
+                default: return false;
+            }
+        };
+
+        auto moveFocus = [&](int delta) {
+            int idx = tui_focusSwap;
+            for (int i = 0; i < 9; ++i) {
+                idx = (idx + delta + 9) % 9;
+                if (isFocusable(idx)) {
+                    tui_focusSwap = idx;
+                    break;
+                }
+            }
+        };
+
+        auto applyFocus = [&]() {
+            if (swapCheck) swapCheck->setFocus(tui_focusSwap == 0);
+            if (swapFileEdit) swapFileEdit->setFocus(tui_focusSwap == 1);
+            if (swapSizeEdit) swapSizeEdit->setFocus(tui_focusSwap == 2);
+            if (hibernationCheck) hibernationCheck->setFocus(tui_focusSwap == 3);
+            if (zramCheck) zramCheck->setFocus(tui_focusSwap == 4);
+            if (zramPercentRadio) zramPercentRadio->setFocus(tui_focusSwap == 5);
+            if (zramPercentEdit) zramPercentEdit->setFocus(tui_focusSwap == 6);
+            if (zramSizeRadio) zramSizeRadio->setFocus(tui_focusSwap == 7);
+            if (zramSizeEdit) zramSizeEdit->setFocus(tui_focusSwap == 8);
+        };
+
+        auto ensureFocus = [&]() {
+            if (!isFocusable(tui_focusSwap)) {
+                moveFocus(1);
+            }
+        };
+
+        const bool swapFocusIsEdit = (tui_focusSwap == 1 || tui_focusSwap == 2 || tui_focusSwap == 6 || tui_focusSwap == 8);
+        if (key == TUI_KEY_ALT_LEFT || (key == KEY_BACKSPACE && !swapFocusIsEdit)) {
+            gotoPage(Step::BOOT);
+            return;
+        }
+        if (key == '\n' || key == KEY_ENTER) {
+            gotoPage(Step::SERVICES);
+            return;
+        }
+
+        if (key == '\t' || key == KEY_DOWN) {
+            moveFocus(1);
+        } else if (key == KEY_UP) {
+            moveFocus(-1);
+        } else if (key == 'r' || key == 'R') {
+            gui.pushSwapSizeReset->click();
+            syncSwapTuiFromGui();
+        } else if (key == ' ') {
+            if (tui_focusSwap == 0 && swapCheck) {
+                swapCheck->toggle();
+                gui.boxSwapFile->setChecked(swapCheck->isChecked());
+                if (swapman) {
+                    swapman->updateBounds();
+                }
+                syncSwapTuiFromGui();
+            } else if (tui_focusSwap == 3 && hibernationCheck) {
+                hibernationCheck->toggle();
+                gui.checkHibernation->setChecked(hibernationCheck->isChecked());
+                syncSwapTuiFromGui();
+            } else if (tui_focusSwap == 4 && zramCheck) {
+                zramCheck->toggle();
+                gui.boxSwapZram->setChecked(zramCheck->isChecked());
+                syncSwapTuiFromGui();
+            } else if (tui_focusSwap == 5 && zramPercentRadio) {
+                zramPercentRadio->setChecked(true);
+                gui.radioZramPercent->setChecked(true);
+                syncSwapTuiFromGui();
+            } else if (tui_focusSwap == 7 && zramSizeRadio) {
+                zramSizeRadio->setChecked(true);
+                gui.radioZramSize->setChecked(true);
+                syncSwapTuiFromGui();
+            }
+        } else if (tui_focusSwap == 1 && swapFileEdit) {
+            swapFileEdit->handleKey(key);
+            gui.textSwapFile->setText(swapFileEdit->text());
+            if (swapman) {
+                swapman->updateBounds();
+            }
+            syncSwapTuiFromGui();
+        } else if (tui_focusSwap == 2 && swapSizeEdit) {
+            swapSizeEdit->handleKey(key);
+            bool ok = false;
+            const int value = swapSizeEdit->text().toInt(&ok);
+            if (ok && value > 0) {
+                gui.spinSwapSize->setValue(value);
+            }
+            syncSwapTuiFromGui();
+        } else if (tui_focusSwap == 6 && zramPercentEdit) {
+            zramPercentEdit->handleKey(key);
+            bool ok = false;
+            const int value = zramPercentEdit->text().toInt(&ok);
+            if (ok && value > 0) {
+                gui.spinZramPercent->setValue(value);
+            }
+            syncSwapTuiFromGui();
+        } else if (tui_focusSwap == 8 && zramSizeEdit) {
+            zramSizeEdit->handleKey(key);
+            bool ok = false;
+            const int value = zramSizeEdit->text().toInt(&ok);
+            if (ok && value > 0) {
+                gui.spinZramSize->setValue(value);
+            }
+            syncSwapTuiFromGui();
+        }
+
+        ensureFocus();
+        applyFocus();
+    } else if (currentPageIndex == Step::NETWORK) {
+        qtui::TLineEdit* fields[3] = {nullptr, nullptr, nullptr};
+        qtui::TCheckBox* samba = nullptr;
+
+        if (tui_textComputerName) {
+            fields[0] = dynamic_cast<qtui::TLineEdit*>(tui_textComputerName->tuiWidget());
+        }
+        if (tui_textComputerDomain) {
+            fields[1] = dynamic_cast<qtui::TLineEdit*>(tui_textComputerDomain->tuiWidget());
+        }
+        if (tui_textComputerGroup) {
+            fields[2] = dynamic_cast<qtui::TLineEdit*>(tui_textComputerGroup->tuiWidget());
+        }
+        if (tui_checkSamba) {
+            samba = dynamic_cast<qtui::TCheckBox*>(tui_checkSamba->tuiWidget());
+        }
+
+        auto isFocusable = [&](int index) -> bool {
+            if (index >= 0 && index < 3) {
+                return fields[index] && fields[index]->isEnabled();
+            }
+            if (index == 3) {
+                return samba && samba->isEnabled();
+            }
+            return false;
+        };
+
+        auto moveFocus = [&](int delta) {
+            int idx = tui_focusNetwork;
+            for (int i = 0; i < 4; ++i) {
+                idx = (idx + delta + 4) % 4;
+                if (isFocusable(idx)) {
+                    tui_focusNetwork = idx;
+                    break;
+                }
+            }
+        };
+
+        const bool focusIsEdit = (tui_focusNetwork >= 0 && tui_focusNetwork <= 2);
+        if (key != '\n' && key != KEY_ENTER && key != TUI_KEY_ALT_LEFT) {
+            tui_networkError.clear();
+        }
+
+        if (key == TUI_KEY_ALT_LEFT || (key == KEY_BACKSPACE && !focusIsEdit)) {
+            gotoPage(currentPageIndex - 1);
+            return;
+        } else if (key == '\t' || key == KEY_DOWN) {
+            moveFocus(1);
+        } else if (key == KEY_UP) {
+            moveFocus(-1);
+        } else if (key == ' ' && tui_focusNetwork == 3 && samba) {
+            samba->toggle();
+            gui.checkSamba->setChecked(samba->isChecked());
+        } else if (key == '\n' || key == KEY_ENTER) {
+            static const QRegularExpression nametest(u"[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."_s);
+            if (gui.textComputerName->text().isEmpty()) {
+                tui_networkError = tr("Please enter a computer name.");
+                tui_focusNetwork = 0;
+            } else if (gui.textComputerName->text().contains(nametest)) {
+                tui_networkError = tr("The computer name contains invalid characters.");
+                tui_focusNetwork = 0;
+            } else if (gui.textComputerDomain->text().isEmpty()) {
+                tui_networkError = tr("Please enter a domain name.");
+                tui_focusNetwork = 1;
+            } else if (gui.textComputerDomain->text().contains(nametest)) {
+                tui_networkError = tr("The computer domain contains invalid characters.");
+                tui_focusNetwork = 1;
+            } else if (gui.textComputerGroup->isEnabled() && gui.textComputerGroup->text().isEmpty()) {
+                tui_networkError = tr("Please enter a workgroup.");
+                tui_focusNetwork = 2;
+            } else {
+                if (!gui.textComputerGroup->isEnabled()) {
+                    gui.textComputerGroup->clear();
+                }
+                gotoPage(currentPageIndex + 1);
+            }
+        } else if (tui_focusNetwork < 3 && fields[tui_focusNetwork]) {
+            fields[tui_focusNetwork]->handleKey(key);
+            if (tui_focusNetwork == 0) gui.textComputerName->setText(fields[0]->text());
+            if (tui_focusNetwork == 1) gui.textComputerDomain->setText(fields[1]->text());
+            if (tui_focusNetwork == 2) gui.textComputerGroup->setText(fields[2]->text());
+        }
+
+        if (!isFocusable(tui_focusNetwork)) {
+            moveFocus(1);
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (fields[i]) {
+                fields[i]->setFocus(i == tui_focusNetwork);
+            }
+        }
+        if (samba) {
+            samba->setFocus(tui_focusNetwork == 3);
+        }
+    } else if (currentPageIndex == Step::LOCALIZATION) {
+        // pageLocalization: TAB to switch controls, UP/DOWN to select items
+        qtui::TComboBox* combos[3] = {nullptr, nullptr, nullptr};
+        qtui::TCheckBox* localClock = nullptr;
+        qtui::TRadioButton* radios[2] = {nullptr, nullptr};
+
+        if (tui_comboLocale) {
+            combos[0] = dynamic_cast<qtui::TComboBox*>(tui_comboLocale->tuiWidget());
+        }
+        if (tui_comboTimeArea) {
+            combos[1] = dynamic_cast<qtui::TComboBox*>(tui_comboTimeArea->tuiWidget());
+        }
+        if (tui_comboTimeZone) {
+            combos[2] = dynamic_cast<qtui::TComboBox*>(tui_comboTimeZone->tuiWidget());
+        }
+        if (tui_checkLocalClock) {
+            localClock = dynamic_cast<qtui::TCheckBox*>(tui_checkLocalClock->tuiWidget());
+        }
+        if (tui_radioClock24) {
+            radios[0] = dynamic_cast<qtui::TRadioButton*>(tui_radioClock24->tuiWidget());
+        }
+        if (tui_radioClock12) {
+            radios[1] = dynamic_cast<qtui::TRadioButton*>(tui_radioClock12->tuiWidget());
+        }
+
+        auto isFocusable = [&](int index) -> bool {
+            switch (index) {
+                case 0: return combos[0] && combos[0]->isEnabled();
+                case 1: return combos[1] && combos[1]->isEnabled();
+                case 2: return combos[2] && combos[2]->isEnabled();
+                case 3: return localClock && localClock->isEnabled();
+                case 4: return radios[0] && radios[0]->isEnabled();
+                case 5: return radios[1] && radios[1]->isEnabled();
+                default: return false;
+            }
+        };
+
+        auto moveFocus = [&](int delta) {
+            int idx = tui_focusLocalization;
+            for (int i = 0; i < 6; ++i) {
+                idx = (idx + delta + 6) % 6;
+                if (isFocusable(idx)) {
+                    tui_focusLocalization = idx;
+                    break;
+                }
+            }
+        };
+
+        auto syncTimeZoneList = [&]() {
+            if (!tui_comboTimeZone) {
+                return;
+            }
+            if (tui_comboTimeZone->count() != gui.comboTimeZone->count()) {
+                tui_comboTimeZone->clear();
+                for (int i = 0; i < gui.comboTimeZone->count(); ++i) {
+                    tui_comboTimeZone->addItem(gui.comboTimeZone->itemText(i), gui.comboTimeZone->itemData(i));
+                }
+            }
+            tui_comboTimeZone->setCurrentIndex(gui.comboTimeZone->currentIndex());
+        };
+
+        const bool comboFocused = (tui_focusLocalization <= 2 && combos[tui_focusLocalization]);
+        const bool comboPopupVisible = comboFocused && combos[tui_focusLocalization]->isPopupVisible();
+
+        if (key == TUI_KEY_ALT_LEFT || key == KEY_BACKSPACE) {
+            gotoPage(currentPageIndex - 1);
+            return;
+        } else if (comboFocused && (comboPopupVisible || key == KEY_UP || key == KEY_DOWN
+            || key == ' ' || key == '\n' || key == KEY_ENTER)) {
+            const bool wasPopupVisible = comboPopupVisible;
+            combos[tui_focusLocalization]->handleKey(key);
+            if (tui_focusLocalization == 0 && tui_comboLocale && gui.comboLocale) {
+                gui.comboLocale->setCurrentIndex(tui_comboLocale->currentIndex());
+                if (tui_radioClock24) tui_radioClock24->setChecked(gui.radioClock24->isChecked());
+                if (tui_radioClock12) tui_radioClock12->setChecked(gui.radioClock12->isChecked());
+            } else if (tui_focusLocalization == 1 && tui_comboTimeArea && gui.comboTimeArea) {
+                gui.comboTimeArea->setCurrentIndex(tui_comboTimeArea->currentIndex());
+                syncTimeZoneList();
+            } else if (tui_focusLocalization == 2 && tui_comboTimeZone && gui.comboTimeZone) {
+                gui.comboTimeZone->setCurrentIndex(tui_comboTimeZone->currentIndex());
+            }
+            // If popup was visible and we just selected an item, don't advance page
+            if (wasPopupVisible && (key == '\n' || key == KEY_ENTER)) {
+                return;
+            }
+        } else if (key == '\t') {
+            moveFocus(1);
+        } else if (key == KEY_DOWN) {
+            moveFocus(1);
+        } else if (key == KEY_UP) {
+            moveFocus(-1);
+        } else if (key == ' ') {
+            if (tui_focusLocalization == 3 && localClock) {
+                localClock->toggle();
+                gui.checkLocalClock->setChecked(localClock->isChecked());
+            } else if (tui_focusLocalization == 4 && radios[0]) {
+                radios[0]->setChecked(true);
+                gui.radioClock24->setChecked(true);
+            } else if (tui_focusLocalization == 5 && radios[1]) {
+                radios[1]->setChecked(true);
+                gui.radioClock12->setChecked(true);
+            }
+        }
+
+        if (key == '\n' || key == KEY_ENTER) {
+            const bool popupVisible = (combos[0] && combos[0]->isPopupVisible())
+                || (combos[1] && combos[1]->isPopupVisible())
+                || (combos[2] && combos[2]->isPopupVisible());
+            if (!popupVisible) {
+                gotoPage(currentPageIndex + 1);
+            }
+        }
+
+        if (!isFocusable(tui_focusLocalization)) {
+            moveFocus(1);
+        }
+
+        if (combos[0]) combos[0]->setFocus(tui_focusLocalization == 0);
+        if (combos[1]) combos[1]->setFocus(tui_focusLocalization == 1);
+        if (combos[2]) combos[2]->setFocus(tui_focusLocalization == 2);
+        if (localClock) localClock->setFocus(tui_focusLocalization == 3);
+        if (radios[0]) radios[0]->setFocus(tui_focusLocalization == 4);
+        if (radios[1]) radios[1]->setFocus(tui_focusLocalization == 5);
+    } else if (currentPageIndex == Step::SERVICES) {
+        buildServicesTui();
+        syncServicesTuiFromGui();
+
+        if (tui_serviceItems.isEmpty()) {
+            if (key == TUI_KEY_ALT_LEFT || key == KEY_BACKSPACE) {
+                gotoPage(Step::LOCALIZATION);
+            } else if (key == '\n' || key == KEY_ENTER) {
+                gotoPage(currentPageIndex + 1);
+            }
+            return;
+        }
+
+        auto isFocusable = [&](int index) -> bool {
+            return index >= 0 && index < tui_serviceItems.size();
+        };
+
+        auto moveFocus = [&](int delta) {
+            int idx = tui_focusServices;
+            for (int i = 0; i < tui_serviceItems.size(); ++i) {
+                idx = (idx + delta + tui_serviceItems.size()) % tui_serviceItems.size();
+                if (isFocusable(idx)) {
+                    tui_focusServices = idx;
+                    break;
+                }
+            }
+        };
+
+        if (key == TUI_KEY_ALT_LEFT || key == KEY_BACKSPACE) {
+            gotoPage(Step::LOCALIZATION);
+        } else if (key == KEY_UP) {
+            moveFocus(-1);
+        } else if (key == KEY_DOWN || key == '\t') {
+            moveFocus(1);
+        } else if (key == ' ') {
+            auto &entry = tui_serviceItems[tui_focusServices];
+            if (entry.checkbox && entry.item) {
+                auto* checkbox = dynamic_cast<qtui::TCheckBox*>(entry.checkbox->tuiWidget());
+                if (checkbox) {
+                    checkbox->toggle();
+                    entry.item->setCheckState(0, checkbox->isChecked() ? Qt::Checked : Qt::Unchecked);
+                }
+            }
+        } else if (key == '\n' || key == KEY_ENTER) {
+            gotoPage(currentPageIndex + 1);
+        }
+
+        for (int i = 0; i < tui_serviceItems.size(); ++i) {
+            auto &entry = tui_serviceItems[i];
+            if (entry.checkbox) {
+                auto* checkbox = dynamic_cast<qtui::TCheckBox*>(entry.checkbox->tuiWidget());
+                if (checkbox) {
+                    checkbox->setFocus(i == tui_focusServices);
+                }
+            }
+        }
+    } else if (currentPageIndex == Step::USER_ACCOUNTS) {
+        qtui::TLineEdit* edits[5] = {nullptr, nullptr, nullptr, nullptr, nullptr};
+        qtui::TCheckBox* rootCheck = nullptr;
+        qtui::TCheckBox* autoLogin = nullptr;
+        qtui::TCheckBox* saveDesktop = nullptr;
+
+        if (tui_textUserName) {
+            edits[0] = dynamic_cast<qtui::TLineEdit*>(tui_textUserName->tuiWidget());
+        }
+        if (tui_textUserPass) {
+            edits[1] = dynamic_cast<qtui::TLineEdit*>(tui_textUserPass->tuiWidget());
+        }
+        if (tui_textUserPass2) {
+            edits[2] = dynamic_cast<qtui::TLineEdit*>(tui_textUserPass2->tuiWidget());
+        }
+        if (tui_textRootPass) {
+            edits[3] = dynamic_cast<qtui::TLineEdit*>(tui_textRootPass->tuiWidget());
+        }
+        if (tui_textRootPass2) {
+            edits[4] = dynamic_cast<qtui::TLineEdit*>(tui_textRootPass2->tuiWidget());
+        }
+        if (tui_checkRootAccount) {
+            rootCheck = dynamic_cast<qtui::TCheckBox*>(tui_checkRootAccount->tuiWidget());
+        }
+        if (tui_checkAutoLogin) {
+            autoLogin = dynamic_cast<qtui::TCheckBox*>(tui_checkAutoLogin->tuiWidget());
+        }
+        if (tui_checkSaveDesktop) {
+            saveDesktop = dynamic_cast<qtui::TCheckBox*>(tui_checkSaveDesktop->tuiWidget());
+        }
+
+        auto isFocusable = [&](int index) -> bool {
+            switch (index) {
+                case 0: return edits[0] && edits[0]->isEnabled();
+                case 1: return edits[1] && edits[1]->isEnabled();
+                case 2: return edits[2] && edits[2]->isEnabled();
+                case 3: return rootCheck && rootCheck->isEnabled();
+                case 4: return edits[3] && edits[3]->isEnabled();
+                case 5: return edits[4] && edits[4]->isEnabled();
+                case 6: return autoLogin && autoLogin->isEnabled();
+                case 7: return saveDesktop && saveDesktop->isEnabled();
+                default: return false;
+            }
+        };
+
+        auto moveFocus = [&](int delta) {
+            int idx = tui_focusUserAccounts;
+            for (int i = 0; i < 8; ++i) {
+                idx = (idx + delta + 8) % 8;
+                if (isFocusable(idx)) {
+                    tui_focusUserAccounts = idx;
+                    break;
+                }
+            }
+        };
+
+        const bool userFocusIsEdit = (tui_focusUserAccounts == 0 || tui_focusUserAccounts == 1
+            || tui_focusUserAccounts == 2 || tui_focusUserAccounts == 4 || tui_focusUserAccounts == 5);
+
+        if (key != '\n' && key != KEY_ENTER && key != TUI_KEY_ALT_LEFT) {
+            tui_userError.clear();
+        }
+
+        if (key == TUI_KEY_ALT_LEFT || (key == KEY_BACKSPACE && !userFocusIsEdit)) {
+            gotoPage(currentPageIndex - 1);
+            return;
+        } else if (key == '\t' || key == KEY_DOWN) {
+            moveFocus(1);
+        } else if (key == KEY_UP) {
+            moveFocus(-1);
+        } else if (key == ' ' && rootCheck && tui_focusUserAccounts == 3) {
+            rootCheck->toggle();
+            gui.boxRootAccount->setChecked(rootCheck->isChecked());
+            tui_confirmEmptyRootPass = false;
+        } else if (key == ' ' && autoLogin && tui_focusUserAccounts == 6) {
+            autoLogin->toggle();
+            gui.checkAutoLogin->setChecked(autoLogin->isChecked());
+        } else if (key == ' ' && saveDesktop && tui_focusUserAccounts == 7) {
+            saveDesktop->toggle();
+            gui.checkSaveDesktop->setChecked(saveDesktop->isChecked());
+        } else if (key == '\n' || key == KEY_ENTER) {
+            const QString &userName = gui.textUserName->text();
+            const QString userPass1 = gui.textUserPass->text();
+            const QString userPass2 = gui.textUserPass2->text();
+            const QString rootPass1 = gui.textRootPass->text();
+            const QString rootPass2 = gui.textRootPass2->text();
+            const bool userMatch = (userPass1 == userPass2);
+            const bool rootMatch = (rootPass1 == rootPass2);
+            static const QRegularExpression usertest(u"^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"_s);
+
+            if (!userName.contains(usertest)) {
+                tui_userError = tr("The user name cannot contain special characters or spaces.");
+                tui_focusUserAccounts = 0;
+            } else if (!userMatch) {
+                tui_userError = tr("Please ensure the passwords match.");
+                tui_focusUserAccounts = 1;
+            } else if (gui.boxRootAccount->isChecked() && !rootMatch) {
+                tui_userError = tr("Please ensure the passwords match.");
+                tui_focusUserAccounts = 4;
+            } else {
+                QFile file(u"/etc/passwd"_s);
+                bool inUse = false;
+                if (file.open(QFile::ReadOnly | QFile::Text)) {
+                    const QByteArray match = QStringLiteral("%1:").arg(userName).toUtf8();
+                    while (!file.atEnd()) {
+                        if (file.readLine().startsWith(match)) {
+                            inUse = true;
+                            break;
+                        }
+                    }
+                }
+                if (inUse) {
+                    tui_userError = tr("The chosen user name is in use.");
+                    tui_focusUserAccounts = 0;
+                } else if (!automatic && userPass1.isEmpty()) {
+                    if (!tui_confirmEmptyUserPass) {
+                        tui_userError = tr("You did not provide a passphrase for %1.").arg(userName);
+                        tui_confirmEmptyUserPass = true;
+                        tui_focusUserAccounts = 1;
+                    } else {
+                        gotoPage(currentPageIndex + 1);
+                    }
+                } else if (!automatic && gui.boxRootAccount->isChecked() && rootPass1.isEmpty()) {
+                    if (!tui_confirmEmptyRootPass) {
+                        tui_userError = tr("You did not provide a password for the root account.");
+                        tui_confirmEmptyRootPass = true;
+                        tui_focusUserAccounts = 4;
+                    } else {
+                        gotoPage(currentPageIndex + 1);
+                    }
+                } else {
+                    gotoPage(currentPageIndex + 1);
+                }
+            }
+        } else if (tui_focusUserAccounts >= 0 && tui_focusUserAccounts <= 2) {
+            const int idx = tui_focusUserAccounts;
+            if (edits[idx]) {
+                edits[idx]->handleKey(key);
+                if (idx == 0) gui.textUserName->setText(edits[0]->text());
+                if (idx == 1) gui.textUserPass->setText(edits[1]->text());
+                if (idx == 2) gui.textUserPass2->setText(edits[2]->text());
+                if (idx == 0 || idx == 1 || idx == 2) {
+                    tui_confirmEmptyUserPass = false;
+                }
+            }
+        } else if (tui_focusUserAccounts == 4 && edits[3]) {
+            edits[3]->handleKey(key);
+            gui.textRootPass->setText(edits[3]->text());
+            tui_confirmEmptyRootPass = false;
+        } else if (tui_focusUserAccounts == 5 && edits[4]) {
+            edits[4]->handleKey(key);
+            gui.textRootPass2->setText(edits[4]->text());
+            tui_confirmEmptyRootPass = false;
+        }
+
+        if (!isFocusable(tui_focusUserAccounts)) {
+            moveFocus(1);
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (edits[i]) {
+                edits[i]->setFocus(i == tui_focusUserAccounts);
+            }
+        }
+        if (rootCheck) rootCheck->setFocus(tui_focusUserAccounts == 3);
+        if (edits[3]) edits[3]->setFocus(tui_focusUserAccounts == 4);
+        if (edits[4]) edits[4]->setFocus(tui_focusUserAccounts == 5);
+        if (autoLogin) autoLogin->setFocus(tui_focusUserAccounts == 6);
+        if (saveDesktop) saveDesktop->setFocus(tui_focusUserAccounts == 7);
+    } else if (currentPageIndex == Step::OLD_HOME) {
+        // pageOldHome: UP/DOWN to navigate, SPACE to select
+        qtui::TRadioButton* radios[3] = {nullptr, nullptr, nullptr};
+
+        if (tui_radioOldHomeUse) {
+            radios[0] = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeUse->tuiWidget());
+        }
+        if (tui_radioOldHomeSave) {
+            radios[1] = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeSave->tuiWidget());
+        }
+        if (tui_radioOldHomeDelete) {
+            radios[2] = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeDelete->tuiWidget());
+        }
+
+        if (key != '\n' && key != KEY_ENTER && key != TUI_KEY_ALT_LEFT) {
+            tui_oldHomeError.clear();
+        }
+
+        if (key == TUI_KEY_ALT_LEFT || key == KEY_BACKSPACE) {
+            gotoPage(Step::USER_ACCOUNTS);
+            return;
+        } else if (key == KEY_UP && tui_focusOldHome > 0) {
+            tui_focusOldHome--;
+        } else if (key == KEY_DOWN && tui_focusOldHome < 2) {
+            tui_focusOldHome++;
+        } else if (key == ' ') {
+            // Space selects the current radio button
+            if (radios[tui_focusOldHome]) {
+                radios[tui_focusOldHome]->setChecked(true);
+                // Sync to GUI
+                if (tui_focusOldHome == 0) {
+                    gui.radioOldHomeUse->setChecked(true);
+                } else if (tui_focusOldHome == 1) {
+                    gui.radioOldHomeSave->setChecked(true);
+                } else if (tui_focusOldHome == 2) {
+                    gui.radioOldHomeDelete->setChecked(true);
+                }
+            }
+        } else if (key == '\n' || key == KEY_ENTER) {
+            if (!gui.radioOldHomeUse->isChecked()
+                && !gui.radioOldHomeSave->isChecked()
+                && !gui.radioOldHomeDelete->isChecked()) {
+                tui_oldHomeError = tr("Please select an option to continue.");
+            } else {
+                gotoPage(currentPageIndex + 1);
+            }
+        }
+
+        // Update focus display
+        for (int i = 0; i < 3; ++i) {
+            if (radios[i]) {
+                radios[i]->setFocus(i == tui_focusOldHome);
+            }
+        }
+    } else if (currentPageIndex == Step::TIPS) {
+        // pageTips: Allow toggling reboot checkbox during installation
+        qtui::TCheckBox* rebootCheck = tui_checkTipsReboot
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkTipsReboot->tuiWidget())
+            : nullptr;
+        
+        if (rebootCheck && rebootCheck->handleKey(key)) {
+            // handleKey already toggles the checkbox for SPACE/ENTER
+            gui.checkExitReboot->setChecked(rebootCheck->isChecked());
+        } else if (key == '\n' || key == KEY_ENTER) {
+            if (phase == PH_FINISHED) {
+                // Sync checkbox state to GUI widget
+                if (rebootCheck) {
+                    gui.checkExitReboot->setChecked(rebootCheck->isChecked());
+                }
+                // If reboot is checked, reboot directly; otherwise go to END page
+                if (gui.checkExitReboot->isChecked()) {
+                    runShutdown(u"reboot"_s);
+                } else {
+                    gotoPage(Step::END);
+                }
+            }
+        }
+    }
+
+    // Future: Add input handling for other pages
+}
+
+void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return;
+    }
+
+    if (!(mouseState & BUTTON1_CLICKED)) {
+        return;
+    }
+
+    if (currentPageIndex == Step::END) {
+        if (tui_checkExitReboot) {
+            auto* checkbox = dynamic_cast<qtui::TCheckBox*>(tui_checkExitReboot->tuiWidget());
+            if (checkbox && checkbox->handleMouse(mouseY, mouseX)) {
+                checkbox->setFocus(true);
+            }
+        }
+    } else if (currentPageIndex == Step::TIPS) {
+        // Handle mouse clicks on reboot checkbox
+        if (tui_checkTipsReboot) {
+            auto* checkbox = dynamic_cast<qtui::TCheckBox*>(tui_checkTipsReboot->tuiWidget());
+            if (checkbox && checkbox->handleMouse(mouseY, mouseX)) {
+                // handleMouse already toggles the checkbox internally
+                gui.checkExitReboot->setChecked(checkbox->isChecked());
+            }
+        }
+    } else if (currentPageIndex == Step::INSTALLATION) {
+        qtui::TRadioButton* radios[3] = {nullptr, nullptr, nullptr};
+        qtui::TCheckBox* dualDrive = nullptr;
+        qtui::TComboBox* comboSystem = nullptr;
+        qtui::TComboBox* comboHome = nullptr;
+        qtui::TLineEdit* rootPercent = nullptr;
+        qtui::TLineEdit* homePercent = nullptr;
+        qtui::TCheckBox* encryptAuto = nullptr;
+
+        if (tui_radioEntireDrive) {
+            radios[0] = dynamic_cast<qtui::TRadioButton*>(tui_radioEntireDrive->tuiWidget());
+        }
+        if (tui_radioCustomPart) {
+            radios[1] = dynamic_cast<qtui::TRadioButton*>(tui_radioCustomPart->tuiWidget());
+        }
+        if (tui_radioReplace) {
+            radios[2] = dynamic_cast<qtui::TRadioButton*>(tui_radioReplace->tuiWidget());
+        }
+        if (tui_checkDualDrive) {
+            dualDrive = dynamic_cast<qtui::TCheckBox*>(tui_checkDualDrive->tuiWidget());
+        }
+        if (tui_comboDriveSystem) {
+            comboSystem = dynamic_cast<qtui::TComboBox*>(tui_comboDriveSystem->tuiWidget());
+        }
+        if (tui_comboDriveHome) {
+            comboHome = dynamic_cast<qtui::TComboBox*>(tui_comboDriveHome->tuiWidget());
+        }
+        if (tui_textRootPercent) {
+            rootPercent = dynamic_cast<qtui::TLineEdit*>(tui_textRootPercent->tuiWidget());
+        }
+        if (tui_textHomePercent) {
+            homePercent = dynamic_cast<qtui::TLineEdit*>(tui_textHomePercent->tuiWidget());
+        }
+        if (tui_checkEncryptAuto) {
+            encryptAuto = dynamic_cast<qtui::TCheckBox*>(tui_checkEncryptAuto->tuiWidget());
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (radios[i] && radios[i]->handleMouse(mouseY, mouseX)) {
+                tui_focusInstallationField = i;
+                if (i == 0) gui.radioEntireDrive->setChecked(true);
+                if (i == 1) gui.radioCustomPart->setChecked(true);
+                if (i == 2) gui.radioReplace->setChecked(true);
+                tui_focusInstallation = i;
+                syncInstallationTuiFromGui();
+                break;
+            }
+        }
+
+        if (dualDrive && dualDrive->handleMouse(mouseY, mouseX)) {
+            tui_focusInstallationField = 3;
+            gui.checkDualDrive->setChecked(dualDrive->isChecked());
+            syncInstallationTuiFromGui();
+        } else if (comboSystem && comboSystem->handleMouse(mouseY, mouseX)) {
+            tui_focusInstallationField = 4;
+            gui.comboDriveSystem->setCurrentIndex(comboSystem->currentIndex());
+        } else if (comboHome && comboHome->handleMouse(mouseY, mouseX)) {
+            tui_focusInstallationField = 5;
+            gui.comboDriveHome->setCurrentIndex(comboHome->currentIndex());
+        } else if (rootPercent && rootPercent->handleMouse(mouseY, mouseX)) {
+            tui_focusInstallationField = 6;
+        } else if (homePercent && homePercent->handleMouse(mouseY, mouseX)) {
+            tui_focusInstallationField = 7;
+        } else if (encryptAuto && encryptAuto->handleMouse(mouseY, mouseX)) {
+            tui_focusInstallationField = 8;
+            gui.checkEncryptAuto->setChecked(encryptAuto->isChecked());
+        }
+
+        if (radios[0]) radios[0]->setFocus(tui_focusInstallationField == 0);
+        if (radios[1]) radios[1]->setFocus(tui_focusInstallationField == 1);
+        if (radios[2]) radios[2]->setFocus(tui_focusInstallationField == 2);
+        if (dualDrive) dualDrive->setFocus(tui_focusInstallationField == 3);
+        if (comboSystem) comboSystem->setFocus(tui_focusInstallationField == 4);
+        if (comboHome) comboHome->setFocus(tui_focusInstallationField == 5);
+        if (rootPercent) rootPercent->setFocus(tui_focusInstallationField == 6);
+        if (homePercent) homePercent->setFocus(tui_focusInstallationField == 7);
+        if (encryptAuto) encryptAuto->setFocus(tui_focusInstallationField == 8);
+    } else if (currentPageIndex == Step::REPLACE) {
+        size_t count = replacer ? replacer->installationCount() : 0;
+        if (count > 0 && mouseY >= 6 && mouseY < 6 + static_cast<int>(count)) {
+            int idx = mouseY - 6;
+            if (idx >= 0 && idx < static_cast<int>(count)) {
+                tui_focusReplace = idx;
+            }
+        }
+        if (tui_checkReplacePackages) {
+            auto* checkbox = dynamic_cast<qtui::TCheckBox*>(tui_checkReplacePackages->tuiWidget());
+            if (checkbox && checkbox->handleMouse(mouseY, mouseX)) {
+                gui.checkReplacePackages->setChecked(checkbox->isChecked());
+            }
+        }
+    } else if (currentPageIndex == Step::ENCRYPTION) {
+        qtui::TLineEdit* passFields[2] = {nullptr, nullptr};
+
+        if (tui_textCryptoPass) {
+            passFields[0] = dynamic_cast<qtui::TLineEdit*>(tui_textCryptoPass->tuiWidget());
+        }
+        if (tui_textCryptoPass2) {
+            passFields[1] = dynamic_cast<qtui::TLineEdit*>(tui_textCryptoPass2->tuiWidget());
+        }
+
+        for (int i = 0; i < 2; ++i) {
+            if (passFields[i] && passFields[i]->handleMouse(mouseY, mouseX)) {
+                tui_focusEncryption = i;
+                break;
+            }
+        }
+
+        for (int i = 0; i < 2; ++i) {
+            if (passFields[i]) {
+                passFields[i]->setFocus(i == tui_focusEncryption);
+            }
+        }
+    } else if (currentPageIndex == Step::SWAP) {
+        qtui::TCheckBox* swapCheck = tui_checkSwapFile
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkSwapFile->tuiWidget())
+            : nullptr;
+        qtui::TLineEdit* swapFileEdit = tui_textSwapFile
+            ? dynamic_cast<qtui::TLineEdit*>(tui_textSwapFile->tuiWidget())
+            : nullptr;
+        qtui::TLineEdit* swapSizeEdit = tui_textSwapSize
+            ? dynamic_cast<qtui::TLineEdit*>(tui_textSwapSize->tuiWidget())
+            : nullptr;
+        qtui::TCheckBox* hibernationCheck = tui_checkHibernation
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkHibernation->tuiWidget())
+            : nullptr;
+        qtui::TCheckBox* zramCheck = tui_checkZram
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkZram->tuiWidget())
+            : nullptr;
+        qtui::TRadioButton* zramPercentRadio = tui_radioZramPercent
+            ? dynamic_cast<qtui::TRadioButton*>(tui_radioZramPercent->tuiWidget())
+            : nullptr;
+        qtui::TLineEdit* zramPercentEdit = tui_textZramPercent
+            ? dynamic_cast<qtui::TLineEdit*>(tui_textZramPercent->tuiWidget())
+            : nullptr;
+        qtui::TRadioButton* zramSizeRadio = tui_radioZramSize
+            ? dynamic_cast<qtui::TRadioButton*>(tui_radioZramSize->tuiWidget())
+            : nullptr;
+        qtui::TLineEdit* zramSizeEdit = tui_textZramSize
+            ? dynamic_cast<qtui::TLineEdit*>(tui_textZramSize->tuiWidget())
+            : nullptr;
+
+        auto applyFocus = [&]() {
+            if (swapCheck) swapCheck->setFocus(tui_focusSwap == 0);
+            if (swapFileEdit) swapFileEdit->setFocus(tui_focusSwap == 1);
+            if (swapSizeEdit) swapSizeEdit->setFocus(tui_focusSwap == 2);
+            if (hibernationCheck) hibernationCheck->setFocus(tui_focusSwap == 3);
+            if (zramCheck) zramCheck->setFocus(tui_focusSwap == 4);
+            if (zramPercentRadio) zramPercentRadio->setFocus(tui_focusSwap == 5);
+            if (zramPercentEdit) zramPercentEdit->setFocus(tui_focusSwap == 6);
+            if (zramSizeRadio) zramSizeRadio->setFocus(tui_focusSwap == 7);
+            if (zramSizeEdit) zramSizeEdit->setFocus(tui_focusSwap == 8);
+        };
+
+        if (swapCheck && swapCheck->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 0;
+            gui.boxSwapFile->setChecked(swapCheck->isChecked());
+            if (swapman) {
+                swapman->updateBounds();
+            }
+            syncSwapTuiFromGui();
+        } else if (swapFileEdit && swapFileEdit->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 1;
+        } else if (swapSizeEdit && swapSizeEdit->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 2;
+        } else if (hibernationCheck && hibernationCheck->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 3;
+            gui.checkHibernation->setChecked(hibernationCheck->isChecked());
+            syncSwapTuiFromGui();
+        } else if (zramCheck && zramCheck->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 4;
+            gui.boxSwapZram->setChecked(zramCheck->isChecked());
+            syncSwapTuiFromGui();
+        } else if (zramPercentRadio && zramPercentRadio->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 5;
+            gui.radioZramPercent->setChecked(true);
+            syncSwapTuiFromGui();
+        } else if (zramPercentEdit && zramPercentEdit->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 6;
+        } else if (zramSizeRadio && zramSizeRadio->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 7;
+            gui.radioZramSize->setChecked(true);
+            syncSwapTuiFromGui();
+        } else if (zramSizeEdit && zramSizeEdit->handleMouse(mouseY, mouseX)) {
+            tui_focusSwap = 8;
+        }
+
+        applyFocus();
+    } else if (currentPageIndex == Step::NETWORK) {
+        qtui::TLineEdit* fields[3] = {nullptr, nullptr, nullptr};
+        qtui::TCheckBox* samba = nullptr;
+
+        if (tui_textComputerName) {
+            fields[0] = dynamic_cast<qtui::TLineEdit*>(tui_textComputerName->tuiWidget());
+        }
+        if (tui_textComputerDomain) {
+            fields[1] = dynamic_cast<qtui::TLineEdit*>(tui_textComputerDomain->tuiWidget());
+        }
+        if (tui_textComputerGroup) {
+            fields[2] = dynamic_cast<qtui::TLineEdit*>(tui_textComputerGroup->tuiWidget());
+        }
+        if (tui_checkSamba) {
+            samba = dynamic_cast<qtui::TCheckBox*>(tui_checkSamba->tuiWidget());
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (fields[i] && fields[i]->handleMouse(mouseY, mouseX)) {
+                tui_focusNetwork = i;
+                tui_networkError.clear();
+                break;
+            }
+        }
+        if (samba && samba->handleMouse(mouseY, mouseX)) {
+            tui_focusNetwork = 3;
+            gui.checkSamba->setChecked(samba->isChecked());
+            tui_networkError.clear();
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (fields[i]) {
+                fields[i]->setFocus(i == tui_focusNetwork);
+            }
+        }
+        if (samba) {
+            samba->setFocus(tui_focusNetwork == 3);
+        }
+    } else if (currentPageIndex == Step::LOCALIZATION) {
+        qtui::TComboBox* combos[3] = {nullptr, nullptr, nullptr};
+        qtui::TCheckBox* localClock = nullptr;
+        qtui::TRadioButton* radios[2] = {nullptr, nullptr};
+
+        if (tui_comboLocale) {
+            combos[0] = dynamic_cast<qtui::TComboBox*>(tui_comboLocale->tuiWidget());
+        }
+        if (tui_comboTimeArea) {
+            combos[1] = dynamic_cast<qtui::TComboBox*>(tui_comboTimeArea->tuiWidget());
+        }
+        if (tui_comboTimeZone) {
+            combos[2] = dynamic_cast<qtui::TComboBox*>(tui_comboTimeZone->tuiWidget());
+        }
+        if (tui_checkLocalClock) {
+            localClock = dynamic_cast<qtui::TCheckBox*>(tui_checkLocalClock->tuiWidget());
+        }
+        if (tui_radioClock24) {
+            radios[0] = dynamic_cast<qtui::TRadioButton*>(tui_radioClock24->tuiWidget());
+        }
+        if (tui_radioClock12) {
+            radios[1] = dynamic_cast<qtui::TRadioButton*>(tui_radioClock12->tuiWidget());
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (combos[i] && combos[i]->handleMouse(mouseY, mouseX)) {
+                tui_focusLocalization = i;
+                if (i == 0) gui.comboLocale->setCurrentIndex(combos[0]->currentIndex());
+                if (i == 1) gui.comboTimeArea->setCurrentIndex(combos[1]->currentIndex());
+                if (i == 2) gui.comboTimeZone->setCurrentIndex(combos[2]->currentIndex());
+                if (i == 1 && tui_comboTimeZone) {
+                    if (tui_comboTimeZone->count() != gui.comboTimeZone->count()) {
+                        tui_comboTimeZone->clear();
+                        for (int j = 0; j < gui.comboTimeZone->count(); ++j) {
+                            tui_comboTimeZone->addItem(gui.comboTimeZone->itemText(j), gui.comboTimeZone->itemData(j));
+                        }
+                    }
+                    tui_comboTimeZone->setCurrentIndex(gui.comboTimeZone->currentIndex());
+                }
+                break;
+            }
+        }
+        if (localClock && localClock->handleMouse(mouseY, mouseX)) {
+            tui_focusLocalization = 3;
+            gui.checkLocalClock->setChecked(localClock->isChecked());
+        }
+        for (int i = 0; i < 2; ++i) {
+            if (radios[i] && radios[i]->handleMouse(mouseY, mouseX)) {
+                tui_focusLocalization = 4 + i;
+                if (i == 0) gui.radioClock24->setChecked(true);
+                if (i == 1) gui.radioClock12->setChecked(true);
+                break;
+            }
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (combos[i]) {
+                combos[i]->setFocus(i == tui_focusLocalization);
+            }
+        }
+        if (localClock) localClock->setFocus(tui_focusLocalization == 3);
+        if (radios[0]) radios[0]->setFocus(tui_focusLocalization == 4);
+        if (radios[1]) radios[1]->setFocus(tui_focusLocalization == 5);
+    } else if (currentPageIndex == Step::SERVICES) {
+        buildServicesTui();
+        syncServicesTuiFromGui();
+        for (int i = 0; i < tui_serviceItems.size(); ++i) {
+            auto &entry = tui_serviceItems[i];
+            if (entry.checkbox && entry.checkbox->tuiWidget()) {
+                auto* checkbox = dynamic_cast<qtui::TCheckBox*>(entry.checkbox->tuiWidget());
+                if (checkbox && checkbox->handleMouse(mouseY, mouseX)) {
+                    tui_focusServices = i;
+                    entry.item->setCheckState(0, checkbox->isChecked() ? Qt::Checked : Qt::Unchecked);
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < tui_serviceItems.size(); ++i) {
+            auto &entry = tui_serviceItems[i];
+            if (entry.checkbox) {
+                auto* checkbox = dynamic_cast<qtui::TCheckBox*>(entry.checkbox->tuiWidget());
+                if (checkbox) {
+                    checkbox->setFocus(i == tui_focusServices);
+                }
+            }
+        }
+    } else if (currentPageIndex == Step::BOOT) {
+        qtui::TCheckBox* bootInstall = tui_checkBootInstall
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkBootInstall->tuiWidget())
+            : nullptr;
+        qtui::TRadioButton* radios[3] = {nullptr, nullptr, nullptr};
+        qtui::TComboBox* comboBoot = tui_comboBoot
+            ? dynamic_cast<qtui::TComboBox*>(tui_comboBoot->tuiWidget())
+            : nullptr;
+        qtui::TCheckBox* hostSpecific = tui_checkBootHostSpecific
+            ? dynamic_cast<qtui::TCheckBox*>(tui_checkBootHostSpecific->tuiWidget())
+            : nullptr;
+
+        if (tui_radioBootMBR) {
+            radios[0] = dynamic_cast<qtui::TRadioButton*>(tui_radioBootMBR->tuiWidget());
+        }
+        if (tui_radioBootPBR) {
+            radios[1] = dynamic_cast<qtui::TRadioButton*>(tui_radioBootPBR->tuiWidget());
+        }
+        if (tui_radioBootESP) {
+            radios[2] = dynamic_cast<qtui::TRadioButton*>(tui_radioBootESP->tuiWidget());
+        }
+
+        if (bootInstall && bootInstall->handleMouse(mouseY, mouseX)) {
+            tui_focusBootField = 0;
+            gui.boxBoot->setChecked(bootInstall->isChecked());
+        } else if (comboBoot && comboBoot->handleMouse(mouseY, mouseX)) {
+            tui_focusBootField = 4;
+            gui.comboBoot->setCurrentIndex(comboBoot->currentIndex());
+        } else if (hostSpecific && hostSpecific->handleMouse(mouseY, mouseX)) {
+            tui_focusBootField = 5;
+            gui.checkBootHostSpecific->setChecked(hostSpecific->isChecked());
+        } else {
+            for (int i = 0; i < 3; ++i) {
+                if (radios[i] && radios[i]->handleMouse(mouseY, mouseX)) {
+                    tui_focusBootField = i + 1;
+                    if (i == 0) gui.radioBootMBR->setChecked(true);
+                    if (i == 1) gui.radioBootPBR->setChecked(true);
+                    if (i == 2) gui.radioBootESP->setChecked(true);
+                    break;
+                }
+            }
+        }
+
+        if (bootInstall) bootInstall->setFocus(tui_focusBootField == 0);
+        if (radios[0]) radios[0]->setFocus(tui_focusBootField == 1);
+        if (radios[1]) radios[1]->setFocus(tui_focusBootField == 2);
+        if (radios[2]) radios[2]->setFocus(tui_focusBootField == 3);
+        if (comboBoot) comboBoot->setFocus(tui_focusBootField == 4);
+        if (hostSpecific) hostSpecific->setFocus(tui_focusBootField == 5);
+    } else if (currentPageIndex == Step::USER_ACCOUNTS) {
+        qtui::TLineEdit* edits[5] = {nullptr, nullptr, nullptr, nullptr, nullptr};
+        qtui::TCheckBox* rootCheck = nullptr;
+        qtui::TCheckBox* autoLogin = nullptr;
+        qtui::TCheckBox* saveDesktop = nullptr;
+
+        if (tui_textUserName) {
+            edits[0] = dynamic_cast<qtui::TLineEdit*>(tui_textUserName->tuiWidget());
+        }
+        if (tui_textUserPass) {
+            edits[1] = dynamic_cast<qtui::TLineEdit*>(tui_textUserPass->tuiWidget());
+        }
+        if (tui_textUserPass2) {
+            edits[2] = dynamic_cast<qtui::TLineEdit*>(tui_textUserPass2->tuiWidget());
+        }
+        if (tui_textRootPass) {
+            edits[3] = dynamic_cast<qtui::TLineEdit*>(tui_textRootPass->tuiWidget());
+        }
+        if (tui_textRootPass2) {
+            edits[4] = dynamic_cast<qtui::TLineEdit*>(tui_textRootPass2->tuiWidget());
+        }
+        if (tui_checkRootAccount) {
+            rootCheck = dynamic_cast<qtui::TCheckBox*>(tui_checkRootAccount->tuiWidget());
+        }
+        if (tui_checkAutoLogin) {
+            autoLogin = dynamic_cast<qtui::TCheckBox*>(tui_checkAutoLogin->tuiWidget());
+        }
+        if (tui_checkSaveDesktop) {
+            saveDesktop = dynamic_cast<qtui::TCheckBox*>(tui_checkSaveDesktop->tuiWidget());
+        }
+
+        for (int i = 0; i < 5; ++i) {
+            if (edits[i] && edits[i]->handleMouse(mouseY, mouseX)) {
+                tui_focusUserAccounts = (i < 3) ? i : (i == 3 ? 4 : 5);
+                tui_userError.clear();
+                if (i < 3) {
+                    tui_confirmEmptyUserPass = false;
+                } else {
+                    tui_confirmEmptyRootPass = false;
+                }
+                break;
+            }
+        }
+        if (rootCheck && rootCheck->handleMouse(mouseY, mouseX)) {
+            tui_focusUserAccounts = 3;
+            gui.boxRootAccount->setChecked(rootCheck->isChecked());
+            tui_confirmEmptyRootPass = false;
+            tui_userError.clear();
+        } else if (autoLogin && autoLogin->handleMouse(mouseY, mouseX)) {
+            tui_focusUserAccounts = 6;
+            gui.checkAutoLogin->setChecked(autoLogin->isChecked());
+        } else if (saveDesktop && saveDesktop->handleMouse(mouseY, mouseX)) {
+            tui_focusUserAccounts = 7;
+            gui.checkSaveDesktop->setChecked(saveDesktop->isChecked());
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (edits[i]) {
+                edits[i]->setFocus(i == tui_focusUserAccounts);
+            }
+        }
+        if (rootCheck) rootCheck->setFocus(tui_focusUserAccounts == 3);
+        if (edits[3]) edits[3]->setFocus(tui_focusUserAccounts == 4);
+        if (edits[4]) edits[4]->setFocus(tui_focusUserAccounts == 5);
+        if (autoLogin) autoLogin->setFocus(tui_focusUserAccounts == 6);
+        if (saveDesktop) saveDesktop->setFocus(tui_focusUserAccounts == 7);
+    } else if (currentPageIndex == Step::OLD_HOME) {
+        qtui::TRadioButton* radios[3] = {nullptr, nullptr, nullptr};
+
+        if (tui_radioOldHomeUse) {
+            radios[0] = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeUse->tuiWidget());
+        }
+        if (tui_radioOldHomeSave) {
+            radios[1] = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeSave->tuiWidget());
+        }
+        if (tui_radioOldHomeDelete) {
+            radios[2] = dynamic_cast<qtui::TRadioButton*>(tui_radioOldHomeDelete->tuiWidget());
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (radios[i] && radios[i]->handleMouse(mouseY, mouseX)) {
+                tui_focusOldHome = i;
+                if (i == 0) gui.radioOldHomeUse->setChecked(true);
+                if (i == 1) gui.radioOldHomeSave->setChecked(true);
+                if (i == 2) gui.radioOldHomeDelete->setChecked(true);
+                tui_oldHomeError.clear();
+                break;
+            }
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (radios[i]) {
+                radios[i]->setFocus(i == tui_focusOldHome);
+            }
+        }
+    }
 }

@@ -7,13 +7,13 @@
 
 namespace qtui {
 
-class ComboBox : public Widget
+class TComboBox : public Widget
 {
     Q_OBJECT
 
 public:
-    explicit ComboBox(Widget *parent = nullptr) noexcept;
-    ~ComboBox() override;
+    explicit TComboBox(Widget *parent = nullptr) noexcept;
+    ~TComboBox() override;
 
     void addItem(const QString &text, const QVariant &userData = QVariant()) noexcept;
     void addItems(const QStringList &texts) noexcept;
@@ -33,7 +33,8 @@ public:
     QVariant itemData(int index) const noexcept;
 
     void render() noexcept override;
-    
+    void renderPopup() noexcept;  // Render popup separately (call after all widgets)
+
     void setPosition(int row, int col) noexcept { this->row = row; this->col = col; }
     void setWidth(int width) noexcept { this->displayWidth = width; }
     void setFocus(bool focused) noexcept { this->focused = focused; }

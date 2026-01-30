@@ -1,27 +1,27 @@
-#include "qtui/dialog.h"
+#include "qtui/tdialog.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 
 namespace qtui {
 
-Dialog::Dialog(Widget *parent) noexcept
+TDialog::TDialog(Widget *parent) noexcept
     : Widget(parent)
 {
 }
 
-Dialog::~Dialog() = default;
+TDialog::~TDialog() = default;
 
-void Dialog::accept() noexcept
+void TDialog::accept() noexcept
 {
     done(Accepted);
 }
 
-void Dialog::reject() noexcept
+void TDialog::reject() noexcept
 {
     done(Rejected);
 }
 
-void Dialog::done(int result) noexcept
+void TDialog::done(int result) noexcept
 {
     dialogResult = result;
     dialogActive = false;
@@ -34,7 +34,7 @@ void Dialog::done(int result) noexcept
     emit finished(result);
 }
 
-int Dialog::exec() noexcept
+int TDialog::exec() noexcept
 {
     if (!isModal) {
         return Rejected;
@@ -71,7 +71,7 @@ int Dialog::exec() noexcept
     return dialogResult;
 }
 
-void Dialog::render() noexcept
+void TDialog::render() noexcept
 {
     if (!visible) return;
 
@@ -112,7 +112,7 @@ void Dialog::render() noexcept
     renderContent();
 }
 
-void Dialog::renderContent() noexcept
+void TDialog::renderContent() noexcept
 {
     // Default: show help text
     mvprintw(row + 3, col + 2, "Press Enter to accept, ESC to cancel");

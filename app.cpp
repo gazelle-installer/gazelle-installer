@@ -17,7 +17,11 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <clocale>
 #include <unistd.h>
+#include <atomic>
+#include <thread>
+#include <chrono>
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -36,6 +40,11 @@
 
 #include "minstall.h"
 #include "msettings.h"
+#include "src/ui/context.h"
+#include "src/ui/qmessagebox.h"
+
+// ncurses for TUI mode
+#include <ncurses.h>
 
 // VERSION should come from compiler flags.
 #ifndef VERSION
@@ -46,6 +55,7 @@ using namespace Qt::Literals::StringLiterals;
 
 static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 static QtMessageHandler origHandler = nullptr;
+static bool suppressConsoleLogs = false;
 
 int main(int argc, char *argv[])
 {
@@ -121,9 +131,18 @@ int main(int argc, char *argv[])
             "-- doesn't format /root and it doesn't work with encryption.")},
         {"media-check", QObject::tr("Always check the installation media at the beginning.")},
         {"no-media-check", QObject::tr("Do not check the installation media at the beginning.\n"
-            "Not recommended unless the installation media is guaranteed to be free from errors.")}});
+            "Not recommended unless the installation media is guaranteed to be free from errors.")},
+        {"tui", QObject::tr("Force TUI (Text User Interface) mode instead of GUI.")},
+        {"test-page", QObject::tr("Jump directly to a specific page for testing (use with --pretend).\n"
+            "Page names: splash, terms, installation, partitions, confirm, boot, services, user, end"), QObject::tr("<page-name>")}});
     parser.addPositionalArgument(u"config-file"_s, QObject::tr("Load a configuration file as specified by <config-file>."), u"<config-file>"_s);
     parser.process(a);
+    
+    // Force TUI mode if --tui flag is present (do this EARLY, before any UI)
+    if (parser.isSet(u"tui"_s)) {
+        ui::Context::forceTUI();
+        suppressConsoleLogs = true;  // Suppress console output for clean TUI
+    }
 
     if (parser.positionalArguments().size() > 1) {
         qDebug() << QObject::tr("Too many arguments. Please check the command format by running the program with --help");
@@ -141,19 +160,35 @@ int main(int argc, char *argv[])
     // The lock is released when this object is destroyed.
     QLockFile lockfile(u"/var/lock/gazelle-installer.lock"_s);
     if (!parser.isSet(u"pretend"_s)) {
-        QMessageBox msgbox;
-        msgbox.setIcon(QMessageBox::Critical);
         // Set Lock or exit if lockfile is present.
         if (!lockfile.tryLock()) {
-            msgbox.setText(QObject::tr("The installer appears to be running already."));
-            msgbox.setInformativeText(QObject::tr("Please close it if possible, or run 'pkill minstall' in terminal."));
-            msgbox.exec();
+            if (ui::Context::isGUI()) {
+                QMessageBox msgbox;
+                msgbox.setIcon(QMessageBox::Critical);
+                msgbox.setText(QObject::tr("The installer appears to be running already."));
+                msgbox.setInformativeText(QObject::tr("Please close it if possible, or run 'pkill minstall' in terminal."));
+                msgbox.exec();
+            } else {
+                // TUI mode - use wrapper
+                ui::QMessageBox::critical(nullptr, 
+                    QObject::tr("Error"),
+                    QObject::tr("The installer appears to be running already.\nPlease close it if possible, or run 'pkill minstall' in terminal."));
+            }
             return EXIT_FAILURE;
         }
         // Alert the user if not running as root.
         if (getuid() != 0) {
-            msgbox.setText(QObject::tr("This operation requires root access."));
-            msgbox.exec();
+            if (ui::Context::isGUI()) {
+                QMessageBox msgbox;
+                msgbox.setIcon(QMessageBox::Critical);
+                msgbox.setText(QObject::tr("This operation requires root access."));
+                msgbox.exec();
+            } else {
+                // TUI mode - use wrapper
+                ui::QMessageBox::critical(nullptr,
+                    QObject::tr("Error"),
+                    QObject::tr("This operation requires root access."));
+            }
             return EXIT_FAILURE;
         }
     }
@@ -169,32 +204,200 @@ int main(int argc, char *argv[])
         }
         // give error message and exit if no config file found
         if (! QFile::exists(cfgfile)) {
-            QMessageBox msgbox;
-            msgbox.setIcon(QMessageBox::Warning);
-            msgbox.setText(QObject::tr("Configuration file (%1) not found.").arg(cfgfile));
-            msgbox.exec();
+            if (ui::Context::isGUI()) {
+                QMessageBox msgbox;
+                msgbox.setIcon(QMessageBox::Warning);
+                msgbox.setText(QObject::tr("Configuration file (%1) not found.").arg(cfgfile));
+                msgbox.exec();
+            } else {
+                ui::QMessageBox::critical(nullptr,
+                    QObject::tr("Error"),
+                    QObject::tr("Configuration file (%1) not found.").arg(cfgfile));
+            }
             return EXIT_FAILURE;
         }
     }
 
     // main routine
     qInfo() << "Installer version:" << VERSION;
+
+    // For TUI mode, initialize ncurses first and show loading spinner
+    std::atomic<bool> startupComplete{false};
+    if (ui::Context::isTUI()) {
+        // Set locale for proper UTF-8 support in ncurses
+        std::setlocale(LC_ALL, "");
+        initscr();
+        start_color();
+        cbreak();
+        noecho();
+        keypad(stdscr, TRUE);
+        curs_set(0);
+
+        // Show loading message with spinner
+        const char* spinChars = "|/-\\";
+        int spinIdx = 0;
+        auto spinnerThread = std::thread([&]() {
+            while (!startupComplete.load()) {
+                clear();
+                mvprintw(0, 0, "Gazelle Installer (TUI Mode)");
+                mvprintw(1, 0, "============================");
+                mvprintw(10, 30, "Loading... %c", spinChars[spinIdx % 4]);
+                mvprintw(12, 25, "Scanning disk drives...");
+                refresh();
+                spinIdx++;
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        });
+
+        MInstall minstall(appConf, parser, cfgfile);
+        startupComplete.store(true);
+        spinnerThread.join();
+
+        // Handle --test-page option
+        if (parser.isSet(u"test-page"_s) && parser.isSet(u"pretend"_s)) {
+            QString pageName = parser.value(u"test-page"_s).toLower();
+            int targetPage = -1;
+            if (pageName == u"splash"_s) targetPage = 0;
+            else if (pageName == u"terms"_s) targetPage = 1;
+            else if (pageName == u"installation"_s) targetPage = 2;
+            else if (pageName == u"replace"_s) targetPage = 3;
+            else if (pageName == u"partitions"_s) targetPage = 4;
+            else if (pageName == u"encryption"_s) targetPage = 5;
+            else if (pageName == u"confirm"_s) targetPage = 6;
+            else if (pageName == u"boot"_s) targetPage = 7;
+            else if (pageName == u"swap"_s) targetPage = 8;
+            else if (pageName == u"services"_s) targetPage = 9;
+            else if (pageName == u"network"_s) targetPage = 10;
+            else if (pageName == u"localization"_s) targetPage = 11;
+            else if (pageName == u"user"_s) targetPage = 12;
+            else if (pageName == u"oldhome"_s) targetPage = 13;
+            else if (pageName == u"tips"_s) targetPage = 14;
+            else if (pageName == u"end"_s) targetPage = 15;
+            if (targetPage >= 0) {
+                minstall.gotoPage(targetPage);
+            }
+        }
+
+        // TUI event loop
+        mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, nullptr);
+        init_pair(1, COLOR_WHITE, COLOR_BLUE);
+        init_pair(2, COLOR_BLACK, COLOR_WHITE);
+        init_pair(3, COLOR_YELLOW, COLOR_BLUE);
+
+        bool running = true;
+        int exitCode = EXIT_SUCCESS;
+
+        while (running) {
+            clear();
+            mvprintw(0, 0, "Gazelle Installer (TUI Mode) - Press ESC to quit (Alt+Left = Back)");
+            mvprintw(1, 0, "========================================================");
+            minstall.renderCurrentPage();
+            int maxY, maxX;
+            getmaxyx(stdscr, maxY, maxX);
+            (void)maxX;
+            
+            // Show different footer based on page
+            if (minstall.getCurrentPage() == 14) {  // Step::TIPS
+                mvprintw(maxY - 1, 0, "Installation in progress - please wait");
+            } else {
+                mvprintw(maxY - 1, 0, "SPACE: Toggle | ESC: Quit | Alt+Left: Back");
+            }
+            refresh();
+
+            if (minstall.processDeferredActions()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(150));
+                continue;
+            }
+
+            timeout(-1);
+            int ch = getch();
+
+            if (ch == 27) {
+                timeout(0);
+                int ch1 = getch();
+                if (ch1 == ERR) {
+                    running = false;
+                } else if (ch1 == '[') {
+                    int ch2 = getch();
+                    int ch3 = getch();
+                    int ch4 = getch();
+                    int ch5 = getch();
+                    if (ch2 == '1' && ch3 == ';' && ch4 == '3' && ch5 == 'D') {
+                        minstall.handleInput(MInstall::TUI_KEY_ALT_LEFT);
+                    }
+                } else {
+                    running = false;
+                }
+                timeout(-1);
+            } else if (ch == KEY_MOUSE) {
+                MEVENT event;
+                if (getmouse(&event) == OK) {
+                    minstall.handleMouse(event.y, event.x, event.bstate);
+                }
+            } else {
+                minstall.handleInput(ch);
+            }
+
+            if (minstall.shouldExit()) {
+                running = false;
+            }
+        }
+
+        endwin();
+        return exitCode;
+    }
+
     MInstall minstall(appConf, parser, cfgfile);
-    const QRect &geo = a.primaryScreen()->availableGeometry();
-    int width = 800;
-    int height = 600;
-    if (geo.width() > 1200) {
-        width = geo.width()/1.5;
-        if (width > 1280) width = 1280; //  1920 / 1.5
+
+    // Handle --test-page option for testing
+    if (parser.isSet(u"test-page"_s) && parser.isSet(u"pretend"_s)) {
+        QString pageName = parser.value(u"test-page"_s).toLower();
+        int targetPage = -1;
+        
+        if (pageName == u"splash"_s) targetPage = 0;  // Step::SPLASH
+        else if (pageName == u"terms"_s) targetPage = 1;  // Step::TERMS
+        else if (pageName == u"installation"_s) targetPage = 2;  // Step::INSTALLATION
+        else if (pageName == u"replace"_s) targetPage = 3;  // Step::REPLACE
+        else if (pageName == u"partitions"_s) targetPage = 4;  // Step::PARTITIONS
+        else if (pageName == u"encryption"_s) targetPage = 5;  // Step::ENCRYPTION
+        else if (pageName == u"confirm"_s) targetPage = 6;  // Step::CONFIRM
+        else if (pageName == u"boot"_s) targetPage = 7;  // Step::BOOT
+        else if (pageName == u"swap"_s) targetPage = 8;  // Step::SWAP
+        else if (pageName == u"services"_s) targetPage = 9;  // Step::SERVICES
+        else if (pageName == u"network"_s) targetPage = 10;  // Step::NETWORK
+        else if (pageName == u"localization"_s) targetPage = 11;  // Step::LOCALIZATION
+        else if (pageName == u"user"_s) targetPage = 12;  // Step::USER_ACCOUNTS
+        else if (pageName == u"oldhome"_s) targetPage = 13;  // Step::OLD_HOME
+        else if (pageName == u"tips"_s) targetPage = 14;  // Step::TIPS
+        else if (pageName == u"end"_s) targetPage = 15;  // Step::END
+        
+        if (targetPage >= 0) {
+            qInfo() << "Jumping to test page:" << pageName << "(index" << targetPage << ")";
+            minstall.gotoPage(targetPage);
+        }
     }
-    if (geo.height() > 900){
-        height = geo.height()/1.5;
-        if (height > 720) height = 720; // 1080 / 1.5
+    
+    if (ui::Context::isGUI()) {
+        // GUI mode - standard Qt event loop
+        const QRect &geo = a.primaryScreen()->availableGeometry();
+        int width = 800;
+        int height = 600;
+        if (geo.width() > 1200) {
+            width = geo.width()/1.5;
+            if (width > 1280) width = 1280; //  1920 / 1.5
+        }
+        if (geo.height() > 900){
+            height = geo.height()/1.5;
+            if (height > 720) height = 720; // 1080 / 1.5
+        }
+        minstall.setGeometry(0,0,width,height);
+        minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
+        minstall.show();
+        return a.exec();
     }
-    minstall.setGeometry(0,0,width,height);
-    minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
-    minstall.show();
-    return a.exec();
+
+    // Should not reach here - TUI returns early, GUI returns from a.exec()
+    return EXIT_FAILURE;
 }
 
 // Qt log message handler
@@ -215,7 +418,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
         nolog = true;
     }
     // Call the original handler which should print text to the console.
-    if (origHandler) {
+    if (!suppressConsoleLogs && origHandler) {
         (*origHandler)(type, context, msg);
     }
 }

@@ -127,23 +127,23 @@ E no mínimo %2</translation>
         <translation>Instalando o GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="338"/>
+        <location filename="../bootman.cpp" line="341"/>
         <source>Updating initramfs</source>
         <translation>Atualizando o initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="339"/>
+        <location filename="../bootman.cpp" line="342"/>
         <source>Failed to update initramfs.</source>
         <translation>Ocorreu uma falha ao atualizar o initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="369"/>
+        <location filename="../bootman.cpp" line="372"/>
         <source>System boot disk:</source>
         <translation>Disco de inicialização do sistema operacional:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="384"/>
-        <location filename="../bootman.cpp" line="394"/>
+        <location filename="../bootman.cpp" line="387"/>
+        <location filename="../bootman.cpp" line="397"/>
         <source>Partition to use:</source>
         <translation>Partição para ser utilizada:</translation>
     </message>
@@ -197,32 +197,32 @@ E no mínimo %2</translation>
 <context>
     <name>Device</name>
     <message>
-        <location filename="../partman.cpp" line="2236"/>
+        <location filename="../partman.cpp" line="2239"/>
         <source>Overwrite</source>
         <translation>Substituir</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2236"/>
+        <location filename="../partman.cpp" line="2239"/>
         <source>Create</source>
         <translation>Criar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2237"/>
+        <location filename="../partman.cpp" line="2240"/>
         <source>Delete</source>
         <translation>Excluir</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2240"/>
+        <location filename="../partman.cpp" line="2243"/>
         <source>Preserve</source>
         <translation>Preservar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2241"/>
+        <location filename="../partman.cpp" line="2244"/>
         <source>Preserve (%1)</source>
         <translation>Preservar (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2242"/>
+        <location filename="../partman.cpp" line="2245"/>
         <source>Preserve /home (%1)</source>
         <translation>Preservar a pasta /home do (%1)</translation>
     </message>
@@ -2139,92 +2139,92 @@ Divirta-se utilizando o %1.</translation>
         <translation>Preparando os subvolumes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1522"/>
+        <location filename="../partman.cpp" line="1525"/>
         <source>Failed to mount partition.</source>
         <translation>Ocorreu uma falha ao montar a partição.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1535"/>
+        <location filename="../partman.cpp" line="1538"/>
         <source>Mounting: %1</source>
         <translation>Montagem: % 1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1710"/>
+        <location filename="../partman.cpp" line="1713"/>
         <source>Model: %1</source>
         <translation>Modelo: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1718"/>
+        <location filename="../partman.cpp" line="1721"/>
         <source>Free space: %1</source>
         <translation>Espaço livre: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1818"/>
+        <location filename="../partman.cpp" line="1821"/>
         <source>Device</source>
         <translation>Dispositivo</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1819"/>
+        <location filename="../partman.cpp" line="1822"/>
         <source>Size</source>
         <translation>Tamanho</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1820"/>
+        <location filename="../partman.cpp" line="1823"/>
         <source>Active</source>
         <translation>Ativo</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1821"/>
+        <location filename="../partman.cpp" line="1824"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1822"/>
+        <location filename="../partman.cpp" line="1825"/>
         <source>Use For</source>
         <translation>Para a Utilização</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1823"/>
+        <location filename="../partman.cpp" line="1826"/>
         <source>Label</source>
         <translation>Rótulo</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1824"/>
+        <location filename="../partman.cpp" line="1827"/>
         <source>Encrypt</source>
         <translation>Criptografar/Encriptar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1825"/>
+        <location filename="../partman.cpp" line="1828"/>
         <source>Format</source>
         <translation>Formato</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1826"/>
+        <location filename="../partman.cpp" line="1829"/>
         <source>Check</source>
         <translation>Verificar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1827"/>
+        <location filename="../partman.cpp" line="1830"/>
         <source>Options</source>
         <translation>Opções</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1828"/>
+        <location filename="../partman.cpp" line="1831"/>
         <source>Dump</source>
         <translation>Despejar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1829"/>
+        <location filename="../partman.cpp" line="1832"/>
         <source>Pass</source>
         <translation>Passar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1837"/>
+        <location filename="../partman.cpp" line="1840"/>
         <source>Active partition</source>
         <translation>Partição Ativa</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1838"/>
+        <location filename="../partman.cpp" line="1841"/>
         <source>EFI System Partition</source>
         <translation>Partição de Sistema EFI</translation>
     </message>
@@ -2232,22 +2232,22 @@ Divirta-se utilizando o %1.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2656"/>
+        <location filename="../partman.cpp" line="2659"/>
         <source>&amp;Templates</source>
         <translation>&amp;Modelos</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2663"/>
+        <location filename="../partman.cpp" line="2666"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compressão (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2665"/>
+        <location filename="../partman.cpp" line="2668"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compressão (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2667"/>
+        <location filename="../partman.cpp" line="2670"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compressão (&amp;ZLIB)</translation>
     </message>

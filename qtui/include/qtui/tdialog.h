@@ -5,7 +5,7 @@
 
 namespace qtui {
 
-class Dialog : public Widget
+class TDialog : public Widget
 {
     Q_OBJECT
 
@@ -15,8 +15,8 @@ public:
         Accepted = 1
     };
 
-    explicit Dialog(Widget *parent = nullptr) noexcept;
-    ~Dialog() override;
+    explicit TDialog(Widget *parent = nullptr) noexcept;
+    ~TDialog() override;
 
     void setWindowTitle(const QString &title) noexcept { this->titleText = title; }
     QString windowTitle() const noexcept { return titleText; }

@@ -11,28 +11,28 @@ find_package(Curses REQUIRED)
 add_library(qtui SHARED
     include/qtui/widget.h
     include/qtui/application.h
-    include/qtui/messagebox.h
-    include/qtui/checkbox.h
-    include/qtui/radiobutton.h
-    include/qtui/pushbutton.h
-    include/qtui/label.h
-    include/qtui/lineedit.h
-    include/qtui/combobox.h
-    include/qtui/progressbar.h
-    include/qtui/groupbox.h
-    include/qtui/dialog.h
+    include/qtui/tmessagebox.h
+    include/qtui/tcheckbox.h
+    include/qtui/tradiobutton.h
+    include/qtui/tpushbutton.h
+    include/qtui/tlabel.h
+    include/qtui/tlineedit.h
+    include/qtui/tcombobox.h
+    include/qtui/tprogressbar.h
+    include/qtui/tgroupbox.h
+    include/qtui/tdialog.h
     src/widget.cpp
-    src/messagebox.cpp
+    src/tmessagebox.cpp
     src/application.cpp
-    src/checkbox.cpp
-    src/radiobutton.cpp
-    src/pushbutton.cpp
-    src/label.cpp
-    src/lineedit.cpp
-    src/combobox.cpp
-    src/progressbar.cpp
-    src/groupbox.cpp
-    src/dialog.cpp
+    src/tcheckbox.cpp
+    src/tradiobutton.cpp
+    src/tpushbutton.cpp
+    src/tlabel.cpp
+    src/tlineedit.cpp
+    src/tcombobox.cpp
+    src/tprogressbar.cpp
+    src/tgroupbox.cpp
+    src/tdialog.cpp
 )
 
 target_include_directories(qtui
@@ -47,7 +47,7 @@ target_link_libraries(qtui
     PUBLIC
         Qt6::Core
     PRIVATE
-        ${CURSES_LIBRARIES}
+        ncursesw
 )
 
 target_compile_options(qtui PRIVATE

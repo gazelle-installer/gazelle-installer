@@ -1,29 +1,29 @@
-#include "qtui/groupbox.h"
+#include "qtui/tgroupbox.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 
 namespace qtui {
 
-GroupBox::GroupBox(Widget *parent) noexcept
+TGroupBox::TGroupBox(Widget *parent) noexcept
     : Widget(parent)
 {
 }
 
-GroupBox::~GroupBox() = default;
+TGroupBox::~TGroupBox() = default;
 
-void GroupBox::addWidget(Widget *widget) noexcept
+void TGroupBox::addWidget(Widget *widget) noexcept
 {
     if (widget && !children.contains(widget)) {
         children.append(widget);
     }
 }
 
-void GroupBox::removeWidget(Widget *widget) noexcept
+void TGroupBox::removeWidget(Widget *widget) noexcept
 {
     children.removeAll(widget);
 }
 
-void GroupBox::render() noexcept
+void TGroupBox::render() noexcept
 {
     if (!visible) return;
 

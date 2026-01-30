@@ -1,17 +1,17 @@
-#include "qtui/progressbar.h"
+#include "qtui/tprogressbar.h"
 #include "qtui/application.h"
 #include <ncurses.h>
 
 namespace qtui {
 
-ProgressBar::ProgressBar(Widget *parent) noexcept
+TProgressBar::TProgressBar(Widget *parent) noexcept
     : Widget(parent)
 {
 }
 
-ProgressBar::~ProgressBar() = default;
+TProgressBar::~TProgressBar() = default;
 
-void ProgressBar::setValue(int value) noexcept
+void TProgressBar::setValue(int value) noexcept
 {
     int newValue = qBound(minValue, value, maxValue);
     
@@ -21,7 +21,7 @@ void ProgressBar::setValue(int value) noexcept
     }
 }
 
-void ProgressBar::setMinimum(int min) noexcept
+void TProgressBar::setMinimum(int min) noexcept
 {
     minValue = min;
     if (currentValue < minValue) {
@@ -29,7 +29,7 @@ void ProgressBar::setMinimum(int min) noexcept
     }
 }
 
-void ProgressBar::setMaximum(int max) noexcept
+void TProgressBar::setMaximum(int max) noexcept
 {
     maxValue = max;
     if (currentValue > maxValue) {
@@ -37,7 +37,7 @@ void ProgressBar::setMaximum(int max) noexcept
     }
 }
 
-void ProgressBar::setRange(int min, int max) noexcept
+void TProgressBar::setRange(int min, int max) noexcept
 {
     minValue = min;
     maxValue = max;
@@ -48,12 +48,12 @@ void ProgressBar::setRange(int min, int max) noexcept
     }
 }
 
-void ProgressBar::reset() noexcept
+void TProgressBar::reset() noexcept
 {
     setValue(minValue);
 }
 
-int ProgressBar::percentage() const noexcept
+int TProgressBar::percentage() const noexcept
 {
     if (maxValue == minValue) {
         return 0;
@@ -62,7 +62,7 @@ int ProgressBar::percentage() const noexcept
     return ((currentValue - minValue) * 100) / (maxValue - minValue);
 }
 
-QString ProgressBar::formattedText() const noexcept
+QString TProgressBar::formattedText() const noexcept
 {
     QString text = formatStr;
     
@@ -74,7 +74,7 @@ QString ProgressBar::formattedText() const noexcept
     return text;
 }
 
-void ProgressBar::render() noexcept
+void TProgressBar::render() noexcept
 {
     if (!visible) return;
 

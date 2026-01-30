@@ -16,13 +16,13 @@ int main(int argc, char *argv[])
     tuiApp->enableMouse();
     
     // Partition options group
-    qtui::GroupBox partitionGroup;
+    qtui::TGroupBox partitionGroup;
     partitionGroup.setTitle("Partitioning");
     partitionGroup.setPosition(3, 5);
     partitionGroup.setSize(10, 50);
     partitionGroup.show();
     
-    qtui::RadioButton autoPartition, manualPartition;
+    qtui::TRadioButton autoPartition, manualPartition;
     autoPartition.setText("Automatic partitioning");
     autoPartition.setPosition(5, 8);
     autoPartition.setChecked(true);
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     manualPartition.setPosition(7, 8);
     manualPartition.show();
     
-    qtui::ButtonGroup partitionButtonGroup;
+    qtui::TButtonGroup partitionButtonGroup;
     partitionButtonGroup.addButton(&autoPartition);
     partitionButtonGroup.addButton(&manualPartition);
     
@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
     partitionGroup.addWidget(&manualPartition);
     
     // File system group
-    qtui::GroupBox fsGroup;
+    qtui::TGroupBox fsGroup;
     fsGroup.setTitle("File System");
     fsGroup.setPosition(14, 5);
     fsGroup.setSize(7, 50);
     fsGroup.show();
     
-    qtui::ComboBox fsCombo;
+    qtui::TComboBox fsCombo;
     fsCombo.addItems(QStringList() << "ext4" << "btrfs" << "xfs" << "f2fs");
     fsCombo.setCurrentIndex(0);
     fsCombo.setPosition(16, 8);
@@ -56,13 +56,13 @@ int main(int argc, char *argv[])
     fsGroup.addWidget(&fsCombo);
     
     // Encryption group
-    qtui::GroupBox encryptionGroup;
+    qtui::TGroupBox encryptionGroup;
     encryptionGroup.setTitle("Encryption");
     encryptionGroup.setPosition(22, 5);
     encryptionGroup.setSize(6, 50);
     encryptionGroup.show();
     
-    qtui::CheckBox enableEncryption;
+    qtui::TCheckBox enableEncryption;
     enableEncryption.setText("Enable full disk encryption");
     enableEncryption.setPosition(24, 8);
     enableEncryption.show();
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     encryptionGroup.addWidget(&enableEncryption);
     
     // Action buttons
-    qtui::PushButton installButton, cancelButton;
+    qtui::TPushButton installButton, cancelButton;
     installButton.setText("Install");
     installButton.setPosition(30, 5);
     installButton.show();
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     // Event handlers
     bool running = true;
     
-    QObject::connect(&installButton, &qtui::PushButton::clicked, [&]() {
+    QObject::connect(&installButton, &qtui::TPushButton::clicked, [&]() {
         QString summary = "Installation Summary:\n\n";
         summary += QString("Partitioning: %1\n").arg(
             autoPartition.isChecked() ? "Automatic" : "Manual");
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
         }
     });
     
-    QObject::connect(&cancelButton, &qtui::PushButton::clicked, [&]() {
+    QObject::connect(&cancelButton, &qtui::TPushButton::clicked, [&]() {
         running = false;
     });
     

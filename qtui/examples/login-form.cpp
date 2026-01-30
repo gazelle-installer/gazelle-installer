@@ -15,30 +15,30 @@ int main(int argc, char *argv[])
     tuiApp->enableMouse();
     
     // Create widgets
-    qtui::LineEdit nameEdit;
+    qtui::TLineEdit nameEdit;
     nameEdit.setPlaceholderText("Enter your name");
     nameEdit.setPosition(5, 10);
     nameEdit.setWidth(30);
     nameEdit.show();
     
-    qtui::LineEdit passwordEdit;
+    qtui::TLineEdit passwordEdit;
     passwordEdit.setPlaceholderText("Enter password");
-    passwordEdit.setEchoMode(qtui::LineEdit::Password);
+    passwordEdit.setEchoMode(qtui::TLineEdit::Password);
     passwordEdit.setPosition(7, 10);
     passwordEdit.setWidth(30);
     passwordEdit.show();
     
-    qtui::CheckBox rememberMe;
+    qtui::TCheckBox rememberMe;
     rememberMe.setText("Remember me");
     rememberMe.setPosition(9, 10);
     rememberMe.show();
     
-    qtui::PushButton loginButton;
+    qtui::TPushButton loginButton;
     loginButton.setText("Login");
     loginButton.setPosition(11, 10);
     loginButton.show();
     
-    qtui::PushButton cancelButton;
+    qtui::TPushButton cancelButton;
     cancelButton.setText("Cancel");
     cancelButton.setPosition(11, 20);
     cancelButton.show();
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     // Connect signals
     bool running = true;
     
-    QObject::connect(&loginButton, &qtui::PushButton::clicked, [&]() {
+    QObject::connect(&loginButton, &qtui::TPushButton::clicked, [&]() {
         if (nameEdit.text().isEmpty() || passwordEdit.text().isEmpty()) {
             qtui::MessageBox::warning(nullptr, "Validation Error", 
                                      "Please enter both name and password");
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
         }
     });
     
-    QObject::connect(&cancelButton, &qtui::PushButton::clicked, [&]() {
+    QObject::connect(&cancelButton, &qtui::TPushButton::clicked, [&]() {
         running = false;
     });
     
