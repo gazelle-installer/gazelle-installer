@@ -246,9 +246,14 @@ private:
     // TUI wrapper widgets for pagePartitions
     class ui::QLabel *tui_labelPartitionsInfo = nullptr;
     enum PartitionColumn {
-        PART_COL_USEFOR = 0,
-        PART_COL_LABEL = 1,
-        PART_COL_FORMAT = 2
+        PART_COL_SIZE = 0,
+        PART_COL_USEFOR = 1,
+        PART_COL_LABEL = 2,
+        PART_COL_FORMAT = 3
+    };
+    enum PartitionSizeUnit {
+        SIZE_UNIT_MB = 0,
+        SIZE_UNIT_GB = 1
     };
     int tui_partitionRow = 0;        // Currently selected row in partition list
     int tui_partitionCol = 0;        // Currently selected column (for editing)
@@ -256,8 +261,12 @@ private:
     bool tui_partitionEditing = false; // True when editing a cell
     int tui_partitionEditIndex = 0;  // Index in dropdown when editing
     bool tui_partitionEditIsLabel = false;
+    bool tui_partitionEditIsSize = false;
+    PartitionSizeUnit tui_partitionSizeUnit = SIZE_UNIT_MB;
+    QString tui_partitionSizeOriginal;
     QString tui_partitionLabelOriginal;
     qtui::TLineEdit *tui_partitionLabelEdit = nullptr;
+    qtui::TLineEdit *tui_partitionSizeEdit = nullptr;
     bool tui_partitionPopupVisible = false;
     int tui_partitionPopupRow = 0;
     int tui_partitionPopupCol = 0;

@@ -21,6 +21,7 @@
 #include <utility>
 #include <functional>
 #include <cstring>
+#include <cmath>
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -2084,6 +2085,7 @@ void MInstall::setupPagePartitionsTUI() noexcept
     tui_partitionScroll = 0;
     tui_partitionEditing = false;
     tui_partitionEditIsLabel = false;
+    tui_partitionEditIsSize = false;
 
     if (!tui_buttonPartitionsApply) {
         tui_buttonPartitionsApply = new qtui::TPushButton(tr("Apply"));
@@ -2097,6 +2099,10 @@ void MInstall::setupPagePartitionsTUI() noexcept
     if (!tui_partitionLabelEdit) {
         tui_partitionLabelEdit = new qtui::TLineEdit();
         tui_partitionLabelEdit->setWidth(10);
+    }
+    if (!tui_partitionSizeEdit) {
+        tui_partitionSizeEdit = new qtui::TLineEdit();
+        tui_partitionSizeEdit->setWidth(8);
     }
 }
 
@@ -3298,7 +3304,13 @@ void MInstall::renderPagePartitions() noexcept
             } else {
                 sizeStr = QString::number(dev->size / (double)KB, 'f', 0) + " KB";
             }
+            if (selected && tui_partitionCol == PART_COL_SIZE) {
+                attron(A_BOLD);
+            }
             mvprintw(row, colSize, "%-10s", sizeStr.toUtf8().constData());
+            if (selected && tui_partitionCol == PART_COL_SIZE) {
+                attroff(A_BOLD);
+            }
         }
 
         // Use For (mount point)
@@ -3365,7 +3377,8 @@ void MInstall::renderPagePartitions() noexcept
 
     // Show editing dropdown if in edit mode
     tui_partitionPopupVisible = false;
-    if (tui_partitionEditing && tui_partitionRow < static_cast<int>(devices.size()) && !tui_partitionEditIsLabel) {
+    if (tui_partitionEditing && tui_partitionRow < static_cast<int>(devices.size())
+        && !tui_partitionEditIsLabel && !tui_partitionEditIsSize) {
         PartMan::Device *dev = devices[tui_partitionRow];
         QStringList options;
         int popupCol = (tui_partitionCol == PART_COL_USEFOR) ? colUseFor : colFormat;
@@ -3418,6 +3431,22 @@ void MInstall::renderPagePartitions() noexcept
         attroff(A_REVERSE);
     }
 
+    const int sizeEditWidth = 8;
+    if (tui_partitionEditing && tui_partitionEditIsSize && tui_partitionSizeEdit
+        && tui_partitionRow < static_cast<int>(devices.size())) {
+        const int editRow = startRow + (tui_partitionRow - tui_partitionScroll);
+        tui_partitionSizeEdit->setPosition(editRow, colSize);
+        tui_partitionSizeEdit->setWidth(sizeEditWidth);
+        tui_partitionSizeEdit->show();
+        tui_partitionSizeEdit->setFocus(true);
+        tui_partitionSizeEdit->render();
+        const char *unitText = (tui_partitionSizeUnit == SIZE_UNIT_GB) ? "GB" : "MB";
+        mvprintw(editRow, colSize + sizeEditWidth + 3, "%s", unitText);
+    } else if (tui_partitionSizeEdit) {
+        tui_partitionSizeEdit->setFocus(false);
+        tui_partitionSizeEdit->hide();
+    }
+
     if (tui_partitionEditing && tui_partitionEditIsLabel && tui_partitionLabelEdit
         && tui_partitionRow < static_cast<int>(devices.size())) {
         const int editRow = startRow + (tui_partitionRow - tui_partitionScroll);
@@ -3437,7 +3466,11 @@ void MInstall::renderPagePartitions() noexcept
 
     // Instructions and action keys
     if (tui_partitionEditing) {
-        mvprintw(17, 2, "UP/DOWN: select option | ENTER: apply | ESC: cancel");
+        if (tui_partitionEditIsSize) {
+            mvprintw(17, 2, "Type number | G/M: switch units | X: MAX | ENTER: apply | ESC: cancel");
+        } else {
+            mvprintw(17, 2, "UP/DOWN: select option | ENTER: apply | ESC: cancel");
+        }
         move(18, 2); clrtoeol();
     } else {
         mvprintw(17, 2, "UP/DOWN: select | LEFT/RIGHT: column | ENTER: edit | SPACE: toggle encrypt");
@@ -4161,7 +4194,133 @@ void MInstall::handleInput(int key) noexcept
             }
         } else if (tui_partitionEditing && selectedDevice) {
             // Handle editing navigation first so arrows don't move the row
-            if (tui_partitionEditIsLabel) {
+            if (tui_partitionEditIsSize) {
+                auto formatSizeValue = [](double value) -> QString {
+                    double rounded = std::round(value * 10.0) / 10.0;
+                    if (std::fabs(rounded - std::round(rounded)) < 0.05) {
+                        return QString::number(static_cast<long long>(std::llround(rounded)));
+                    }
+                    return QString::number(rounded, 'f', 1);
+                };
+
+                if (key == KEY_BACKSPACE || key == 127 || key == 8) {
+                    if (tui_partitionSizeEdit) {
+                        tui_partitionSizeEdit->handleKey(key);
+                    }
+                } else if (key == 'x' || key == 'X') {
+                    if (tui_partitionSizeEdit) {
+                        tui_partitionSizeEdit->setText("MAX");
+                    }
+                } else if (key == 'g' || key == 'G' || key == 'm' || key == 'M') {
+                    const bool toGb = (key == 'g' || key == 'G');
+                    if (tui_partitionSizeEdit) {
+                        QString text = tui_partitionSizeEdit->text().trimmed();
+                        if (!text.compare("MAX"_L1, Qt::CaseInsensitive)) {
+                            tui_partitionSizeUnit = toGb ? SIZE_UNIT_GB : SIZE_UNIT_MB;
+                            return;
+                        }
+                        text = text.replace("MB"_L1, ""_L1, Qt::CaseInsensitive)
+                                   .replace("GB"_L1, ""_L1, Qt::CaseInsensitive)
+                                   .replace(" "_L1, ""_L1)
+                                   .trimmed();
+                        bool ok = false;
+                        double value = text.toDouble(&ok);
+                        if (ok) {
+                            if (toGb && tui_partitionSizeUnit == SIZE_UNIT_MB) {
+                                value = value / 1024.0;
+                            } else if (!toGb && tui_partitionSizeUnit == SIZE_UNIT_GB) {
+                                value = value * 1024.0;
+                            }
+                            tui_partitionSizeUnit = toGb ? SIZE_UNIT_GB : SIZE_UNIT_MB;
+                            tui_partitionSizeEdit->setText(formatSizeValue(value));
+                        } else {
+                            tui_partitionSizeUnit = toGb ? SIZE_UNIT_GB : SIZE_UNIT_MB;
+                        }
+                    }
+                } else if (key == 27) { // ESC
+                    tui_partitionEditing = false;
+                    tui_partitionEditIsSize = false;
+                    if (tui_partitionSizeEdit) {
+                        tui_partitionSizeEdit->setText(tui_partitionSizeOriginal);
+                    }
+                } else if (key == '\n' || key == KEY_ENTER) {
+                    if (!partman || !selectedDevice) {
+                        beep();
+                        tui_partitionEditing = false;
+                        tui_partitionEditIsSize = false;
+                        return;
+                    }
+                    if (tui_partitionSizeEdit) {
+                        QString text = tui_partitionSizeEdit->text().trimmed();
+                        double sizeMb = -1.0;
+                        if (text.compare("MAX"_L1, Qt::CaseInsensitive) == 0) {
+                            sizeMb = 0.0;
+                        } else {
+                            QString work = text;
+                            QChar suffix;
+                            work.replace(" "_L1, ""_L1);
+                            if (work.endsWith("MB"_L1, Qt::CaseInsensitive)) {
+                                suffix = 'M';
+                                work.chop(2);
+                            } else if (work.endsWith("GB"_L1, Qt::CaseInsensitive)) {
+                                suffix = 'G';
+                                work.chop(2);
+                            } else if (!work.isEmpty()) {
+                                suffix = work.at(work.size() - 1);
+                                if (suffix.isLetter()) {
+                                    work.chop(1);
+                                }
+                            }
+                            bool ok = false;
+                            double value = work.toDouble(&ok);
+                            if (ok) {
+                                PartitionSizeUnit unit = tui_partitionSizeUnit;
+                                if (suffix == 'g' || suffix == 'G') unit = SIZE_UNIT_GB;
+                                else if (suffix == 'm' || suffix == 'M') unit = SIZE_UNIT_MB;
+                                sizeMb = (unit == SIZE_UNIT_GB) ? (value * 1024.0) : value;
+                            }
+                        }
+                        if (sizeMb >= 0.0) {
+                            if (!partman->changeBegin(selectedDevice)) {
+                                beep();
+                                return;
+                            }
+                            long long sizeBytes = static_cast<long long>(std::llround(sizeMb)) * MB;
+                            if (sizeMb == 0.0) {
+                                sizeBytes = selectedDevice->driveFreeSpace();
+                            } else {
+                                const long long maxBytes = selectedDevice->driveFreeSpace();
+                                if (sizeBytes > maxBytes) {
+                                    sizeBytes = maxBytes;
+                                }
+                            }
+                            selectedDevice->size = sizeBytes;
+                            partman->changeEnd();
+                            if (partman->index(selectedDevice).isValid()) {
+                                for (PartMan::Iterator it(*partman); PartMan::Device *subvol = *it; it.next()) {
+                                    if (subvol->type == PartMan::Device::SUBVOLUME && subvol->parent() == selectedDevice) {
+                                        subvol->size = selectedDevice->size;
+                                    }
+                                }
+                            }
+                            tui_partitionEditing = false;
+                            tui_partitionEditIsSize = false;
+                            tui_partitionCol = PART_COL_USEFOR;
+                        } else {
+                            beep();
+                        }
+                    }
+                } else if (tui_partitionSizeEdit) {
+                    if ((key >= '0' && key <= '9') || key == '.' || key == ',') {
+                        if (key == ',') {
+                            key = '.';
+                        }
+                        tui_partitionSizeEdit->handleKey(key);
+                    } else {
+                        beep();
+                    }
+                }
+            } else if (tui_partitionEditIsLabel) {
                 if (key == KEY_BACKSPACE || key == 127 || key == 8) {
                     if (tui_partitionLabelEdit) {
                         tui_partitionLabelEdit->handleKey(key);
@@ -4194,10 +4353,7 @@ void MInstall::handleInput(int key) noexcept
                         tui_partitionEditIndex++;
                     }
                 } else if (key == KEY_LEFT || key == KEY_RIGHT) {
-                    int maxCol = (selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
-                    int nextCol = tui_partitionCol + (key == KEY_LEFT ? -1 : 1);
-                    if (nextCol < 0) nextCol = 0;
-                    if (nextCol > maxCol) nextCol = maxCol;
+                    int nextCol = (key == KEY_LEFT) ? PART_COL_USEFOR : PART_COL_FORMAT;
                     if (nextCol != tui_partitionCol) {
                         tui_partitionCol = nextCol;
                         if (tui_partitionCol == PART_COL_USEFOR) {
@@ -4214,6 +4370,7 @@ void MInstall::handleInput(int key) noexcept
                 } else if (key == 27) { // ESC
                     tui_partitionEditing = false;
                     tui_partitionEditIsLabel = false;
+                    tui_partitionEditIsSize = false;
                 } else if (key == '\n' || key == KEY_ENTER) {
                     // Apply edit
                     partman->changeBegin(selectedDevice);
@@ -4231,39 +4388,44 @@ void MInstall::handleInput(int key) noexcept
                     partman->changeEnd();
                     tui_partitionEditing = false;
                     tui_partitionEditIsLabel = false;
+                    tui_partitionEditIsSize = false;
                 }
             }
         } else if (key == KEY_UP && tui_partitionRow > 0) {
             tui_partitionRow--;
             tui_partitionEditing = false;
             tui_partitionEditIsLabel = false;
+            tui_partitionEditIsSize = false;
             tui_focusPartitions = 0;
             if (tui_partitionRow < deviceCount) selectedDevice = devices[tui_partitionRow];
-            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_SIZE;
             if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
         } else if (key == KEY_DOWN && tui_partitionRow < deviceCount - 1) {
             tui_partitionRow++;
             tui_partitionEditing = false;
             tui_partitionEditIsLabel = false;
+            tui_partitionEditIsSize = false;
             tui_focusPartitions = 0;
             if (tui_partitionRow < deviceCount) selectedDevice = devices[tui_partitionRow];
-            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_SIZE;
             if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
         } else if (key == KEY_LEFT) {
-            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_SIZE;
             if (tui_partitionCol > 0) {
                 tui_partitionCol--;
             }
             tui_focusPartitions = 0;
             tui_partitionEditIsLabel = false;
+            tui_partitionEditIsSize = false;
             if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
         } else if (key == KEY_RIGHT) {
-            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_SIZE;
             if (tui_partitionCol < maxCol) {
                 tui_partitionCol++;
             }
             tui_focusPartitions = 0;
             tui_partitionEditIsLabel = false;
+            tui_partitionEditIsSize = false;
         } else if (key == ' ' && selectedDevice) {
             // Toggle encrypt for partitions
             if (selectedDevice->type == PartMan::Device::PARTITION && selectedDevice->canEncrypt()) {
@@ -4275,7 +4437,30 @@ void MInstall::handleInput(int key) noexcept
             if (selectedDevice->type != PartMan::Device::DRIVE) {
                 if (!tui_partitionEditing) {
                     // Start editing - get current options
-                    if (tui_partitionCol == PART_COL_LABEL) {
+                    if (tui_partitionCol == PART_COL_SIZE) {
+                        if (selectedDevice->type == PartMan::Device::PARTITION && !selectedDevice->flags.oldLayout
+                            && tui_partitionSizeEdit) {
+                            tui_partitionEditing = true;
+                            tui_partitionEditIsLabel = false;
+                            tui_partitionEditIsSize = true;
+                            double sizeMb = static_cast<double>(selectedDevice->size) / MB;
+                            auto formatSizeValue = [](double value) -> QString {
+                                double rounded = std::round(value * 10.0) / 10.0;
+                                if (std::fabs(rounded - std::round(rounded)) < 0.05) {
+                                    return QString::number(static_cast<long long>(std::llround(rounded)));
+                                }
+                                return QString::number(rounded, 'f', 1);
+                            };
+                            if (sizeMb >= 1024.0) {
+                                tui_partitionSizeUnit = SIZE_UNIT_GB;
+                                tui_partitionSizeOriginal = formatSizeValue(sizeMb / 1024.0);
+                            } else {
+                                tui_partitionSizeUnit = SIZE_UNIT_MB;
+                                tui_partitionSizeOriginal = formatSizeValue(sizeMb);
+                            }
+                            tui_partitionSizeEdit->setText(tui_partitionSizeOriginal);
+                        }
+                    } else if (tui_partitionCol == PART_COL_LABEL) {
                         bool editableLabel = (selectedDevice->format != "PRESERVE"_L1 && selectedDevice->format != "DELETE"_L1)
                             && (selectedDevice->type == PartMan::Device::SUBVOLUME || !selectedDevice->usefor.isEmpty());
                         if (editableLabel && tui_partitionLabelEdit) {
@@ -4287,6 +4472,7 @@ void MInstall::handleInput(int key) noexcept
                     } else {
                         tui_partitionEditing = true;
                         tui_partitionEditIsLabel = false;
+                        tui_partitionEditIsSize = false;
                         tui_partitionEditIndex = 0;
                         if (tui_partitionCol == PART_COL_USEFOR) {
                             // Use For column - find current index
@@ -5341,6 +5527,7 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
     } else if (currentPageIndex == Step::PARTITIONS) {
         const int startRow = 4;
         const int maxVisibleRows = 12;
+        const int colSize = 18;
         const int colUseFor = 30;
         const int colLabel = 44;
         const int colFormat = 60;
@@ -5358,7 +5545,7 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
             }
         }
 
-        if (tui_partitionEditing && tui_partitionPopupVisible && !tui_partitionEditIsLabel) {
+        if (tui_partitionEditing && tui_partitionPopupVisible && !tui_partitionEditIsLabel && !tui_partitionEditIsSize) {
             const int popupWidth = 14;
             if (mouseY >= tui_partitionPopupRow && mouseY < tui_partitionPopupRow + tui_partitionPopupHeight
                 && mouseX >= tui_partitionPopupCol && mouseX < tui_partitionPopupCol + popupWidth) {
@@ -5382,6 +5569,7 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
                             partman->changeEnd();
                             tui_partitionEditing = false;
                             tui_partitionEditIsLabel = false;
+                            tui_partitionEditIsSize = false;
                         }
                     }
                 }
@@ -5403,8 +5591,11 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
                 tui_partitionRow = idx;
                 tui_partitionEditing = false;
                 tui_partitionEditIsLabel = false;
+                tui_partitionEditIsSize = false;
                 tui_focusPartitions = 0;
-                if (mouseX >= colUseFor && mouseX < colLabel) {
+                if (mouseX >= colSize && mouseX < colUseFor) {
+                    tui_partitionCol = PART_COL_SIZE;
+                } else if (mouseX >= colUseFor && mouseX < colLabel) {
                     tui_partitionCol = PART_COL_USEFOR;
                 } else if (mouseX >= colLabel && mouseX < colFormat) {
                     tui_partitionCol = PART_COL_LABEL;
@@ -5415,7 +5606,16 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
                 if (mouseState & BUTTON1_DOUBLE_CLICKED) {
                     PartMan::Device *selectedDevice = devices[idx];
                     if (selectedDevice->type != PartMan::Device::DRIVE) {
-                        if (tui_partitionCol == PART_COL_LABEL) {
+                        if (tui_partitionCol == PART_COL_SIZE) {
+                            if (selectedDevice->type == PartMan::Device::PARTITION && !selectedDevice->flags.oldLayout
+                                && tui_partitionSizeEdit) {
+                                tui_partitionEditing = true;
+                                tui_partitionEditIsLabel = false;
+                                tui_partitionEditIsSize = true;
+                                tui_partitionSizeOriginal = QString::number(selectedDevice->size / MB);
+                                tui_partitionSizeEdit->setText(tui_partitionSizeOriginal);
+                            }
+                        } else if (tui_partitionCol == PART_COL_LABEL) {
                             bool editableLabel = (selectedDevice->format != "PRESERVE"_L1 && selectedDevice->format != "DELETE"_L1)
                                 && (selectedDevice->type == PartMan::Device::SUBVOLUME || !selectedDevice->usefor.isEmpty());
                             if (editableLabel && tui_partitionLabelEdit) {
@@ -5427,6 +5627,7 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
                         } else {
                             tui_partitionEditing = true;
                             tui_partitionEditIsLabel = false;
+                            tui_partitionEditIsSize = false;
                             tui_partitionEditIndex = 0;
                             if (tui_partitionCol == PART_COL_USEFOR) {
                                 QStringList uses = selectedDevice->allowedUsesFor();
