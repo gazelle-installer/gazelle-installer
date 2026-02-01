@@ -163,6 +163,7 @@ public:
     bool removeDevice(Device *device) noexcept;
     bool newSubvolume(Device *device) noexcept;
     bool scanSubvolumesFor(Device *device) noexcept;
+    Device *selectedDevice() const noexcept;
     bool changeBegin(Device *device) noexcept;
     int changeEnd(bool autofill = true, bool notify = true) noexcept;
     void notifyChange(class Device *device, int first = -1, int last = -1) noexcept;

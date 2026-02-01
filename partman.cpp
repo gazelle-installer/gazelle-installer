@@ -711,6 +711,11 @@ bool PartMan::newSubvolume(Device *device) noexcept
     changeEnd();
     Device *subvol = new Device(Device::SUBVOLUME, device);
     subvol->autoFill();
+    const QModelIndex idx = index(subvol);
+    if (idx.isValid()) {
+        gui.treePartitions->selectionModel()->select(idx,
+            QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    }
     return true;
 }
 
@@ -726,6 +731,13 @@ bool PartMan::scanSubvolumesFor(Device *device) noexcept
     gui.boxMain->setEnabled(true);
     qApp->restoreOverrideCursor();
     return true;
+}
+
+PartMan::Device *PartMan::selectedDevice() const noexcept
+{
+    const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
+    if (indexes.size() < 1) return nullptr;
+    return item(indexes.at(0));
 }
 void PartMan::partReloadClick()
 {

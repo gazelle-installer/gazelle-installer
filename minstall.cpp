@@ -4290,7 +4290,30 @@ void MInstall::handleInput(int key) noexcept
             if (selectedDevice && partman
                 && selectedDevice->isVolume()
                 && selectedDevice->finalFormat() == "btrfs"_L1) {
-                if (!partman->newSubvolume(selectedDevice)) {
+                if (partman->newSubvolume(selectedDevice)) {
+                    PartMan::Device *newSel = partman->selectedDevice();
+                    if (newSel) {
+                        devices.clear();
+                        for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
+                            if (device->type == PartMan::Device::DRIVE ||
+                                device->type == PartMan::Device::PARTITION ||
+                                device->type == PartMan::Device::VIRTUAL ||
+                                device->type == PartMan::Device::SUBVOLUME) {
+                                devices.push_back(device);
+                            }
+                        }
+                        for (int i = 0; i < static_cast<int>(devices.size()); ++i) {
+                            if (devices[i] == newSel) {
+                                tui_partitionRow = i;
+                                break;
+                            }
+                        }
+                        tui_partitionCol = PART_COL_USEFOR;
+                        tui_partitionEditing = false;
+                        tui_partitionEditIsLabel = false;
+                        tui_focusPartitions = 0;
+                    }
+                } else {
                     beep();
                 }
             } else {
