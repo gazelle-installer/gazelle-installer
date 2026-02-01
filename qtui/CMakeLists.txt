@@ -19,6 +19,7 @@ add_library(qtui SHARED
     include/qtui/tlineedit.h
     include/qtui/tcombobox.h
     include/qtui/tprogressbar.h
+    include/qtui/tslider.h
     include/qtui/tgroupbox.h
     include/qtui/tdialog.h
     src/widget.cpp
@@ -31,6 +32,7 @@ add_library(qtui SHARED
     src/tlineedit.cpp
     src/tcombobox.cpp
     src/tprogressbar.cpp
+    src/tslider.cpp
     src/tgroupbox.cpp
     src/tdialog.cpp
 )

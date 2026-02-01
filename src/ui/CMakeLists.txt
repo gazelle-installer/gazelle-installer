@@ -28,6 +28,8 @@ add_library(ui-wrappers STATIC
     qlabel.cpp
     qprogressbar.h
     qprogressbar.cpp
+    qslider.h
+    qslider.cpp
     qmessagebox.h
     qmessagebox.cpp
 )

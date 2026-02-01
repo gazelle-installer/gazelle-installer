@@ -49,6 +49,7 @@
 #include "ui/qradiobutton.h"
 #include "ui/qlineedit.h"
 #include "ui/qcombobox.h"
+#include "ui/qslider.h"
 #include "checkmd5.h"
 #include "partman.h"
 #include "autopart.h"
@@ -1646,25 +1647,15 @@ void MInstall::setupPageInstallationTUI() noexcept
     tui_comboDriveHome->setWidth(30);
     tui_comboDriveHome->show();
 
-    tui_labelRootPercent = new ui::QLabel();
-    tui_labelRootPercent->setPosition(14, 4);
-    tui_labelRootPercent->setText(gui.labelSliderRoot->text() + tr(" %:"));
-    tui_labelRootPercent->show();
-
-    tui_textRootPercent = new ui::QLineEdit();
-    tui_textRootPercent->setPosition(14, 20);
-    tui_textRootPercent->setWidth(6);
-    tui_textRootPercent->show();
-
-    tui_labelHomePercent = new ui::QLabel();
-    tui_labelHomePercent->setPosition(14, 30);
-    tui_labelHomePercent->setText(gui.labelSliderHome->text() + tr(" %:"));
-    tui_labelHomePercent->show();
-
-    tui_textHomePercent = new ui::QLineEdit();
-    tui_textHomePercent->setPosition(14, 40);
-    tui_textHomePercent->setWidth(6);
-    tui_textHomePercent->show();
+    tui_sliderPart = new ui::QSlider();
+    tui_sliderPart->setPosition(14, 4);
+    tui_sliderPart->setWidth(50);
+    tui_sliderPart->setRange(0, 100);
+    tui_sliderPart->setSingleStep(1);
+    tui_sliderPart->setPageStep(10);
+    tui_sliderPart->setLeftLabel(gui.labelSliderRoot->text());
+    tui_sliderPart->setRightLabel(gui.labelSliderHome->text());
+    tui_sliderPart->show();
 
     tui_checkEncryptAuto = new ui::QCheckBox();
     tui_checkEncryptAuto->setPosition(16, 4);
@@ -1709,22 +1700,23 @@ void MInstall::syncInstallationTuiFromGui() noexcept
     if (gui.radioCustomPart->isChecked()) tui_focusInstallation = 1;
     if (gui.radioReplace->isChecked()) tui_focusInstallation = 2;
 
-    if (tui_textRootPercent && tui_focusInstallationField != 6) {
-        tui_textRootPercent->setText(QString::number(gui.spinRoot->value()));
-    }
-    if (tui_textHomePercent && tui_focusInstallationField != 7) {
-        tui_textHomePercent->setText(QString::number(gui.spinHome->value()));
+    if (tui_sliderPart) {
+        // Sync slider range from GUI spinbox limits
+        tui_sliderPart->setMinimum(gui.spinRoot->minimum());
+        tui_sliderPart->setMaximum(100); // Allow 100% for combined root+home
+        if (tui_focusInstallationField != 6) {
+            tui_sliderPart->setValue(gui.spinRoot->value());
+        }
     }
 
     const bool autoPartEnabled = gui.boxAutoPart->isEnabled();
+    const bool dualDrive = gui.checkDualDrive->isChecked();
     if (tui_labelDriveSystem) tui_labelDriveSystem->setEnabled(autoPartEnabled);
     tui_comboDriveSystem->setEnabled(autoPartEnabled);
-    if (tui_labelDriveHome) tui_labelDriveHome->setEnabled(autoPartEnabled && gui.checkDualDrive->isChecked());
-    tui_comboDriveHome->setEnabled(autoPartEnabled && gui.checkDualDrive->isChecked());
-    if (tui_labelRootPercent) tui_labelRootPercent->setEnabled(autoPartEnabled);
-    if (tui_textRootPercent) tui_textRootPercent->setEnabled(autoPartEnabled);
-    if (tui_labelHomePercent) tui_labelHomePercent->setEnabled(autoPartEnabled);
-    if (tui_textHomePercent) tui_textHomePercent->setEnabled(autoPartEnabled);
+    if (tui_labelDriveHome) tui_labelDriveHome->setEnabled(autoPartEnabled && dualDrive);
+    tui_comboDriveHome->setEnabled(autoPartEnabled && dualDrive);
+    // Slider only enabled when not using dual drives (single drive partitioning)
+    if (tui_sliderPart) tui_sliderPart->setEnabled(autoPartEnabled && !dualDrive);
     if (tui_checkDualDrive) tui_checkDualDrive->setEnabled(autoPartEnabled);
     if (tui_checkEncryptAuto) tui_checkEncryptAuto->setEnabled(autoPartEnabled);
 }
@@ -2587,26 +2579,8 @@ void MInstall::renderPageInstallation() noexcept
             tuiWidget->render();
         }
     }
-    if (tui_labelRootPercent) {
-        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelRootPercent->tuiWidget());
-        if (tuiWidget) {
-            tuiWidget->render();
-        }
-    }
-    if (tui_textRootPercent) {
-        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textRootPercent->tuiWidget());
-        if (tuiWidget) {
-            tuiWidget->render();
-        }
-    }
-    if (tui_labelHomePercent) {
-        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelHomePercent->tuiWidget());
-        if (tuiWidget) {
-            tuiWidget->render();
-        }
-    }
-    if (tui_textHomePercent) {
-        auto* tuiWidget = dynamic_cast<qtui::TLineEdit*>(tui_textHomePercent->tuiWidget());
+    if (tui_sliderPart) {
+        auto* tuiWidget = dynamic_cast<qtui::TSlider*>(tui_sliderPart->tuiWidget());
         if (tuiWidget) {
             tuiWidget->render();
         }
@@ -2619,7 +2593,7 @@ void MInstall::renderPageInstallation() noexcept
     }
 
     // Instructions
-    mvprintw(18, 4, "TAB/UP/DOWN: navigate | SPACE: toggle/select | ENTER: continue");
+    mvprintw(18, 4, "TAB: navigate | SPACE: toggle | LEFT/RIGHT: slider | ENTER: continue");
 
     // Render any open combo popup LAST so it appears on top of other widgets
     if (tui_comboDriveSystem) {
@@ -3660,8 +3634,7 @@ void MInstall::handleInput(int key) noexcept
         qtui::TCheckBox* dualDrive = nullptr;
         qtui::TComboBox* comboSystem = nullptr;
         qtui::TComboBox* comboHome = nullptr;
-        qtui::TLineEdit* rootPercent = nullptr;
-        qtui::TLineEdit* homePercent = nullptr;
+        qtui::TSlider* slider = nullptr;
         qtui::TCheckBox* encryptAuto = nullptr;
 
         if (tui_radioEntireDrive) {
@@ -3682,11 +3655,8 @@ void MInstall::handleInput(int key) noexcept
         if (tui_comboDriveHome) {
             comboHome = dynamic_cast<qtui::TComboBox*>(tui_comboDriveHome->tuiWidget());
         }
-        if (tui_textRootPercent) {
-            rootPercent = dynamic_cast<qtui::TLineEdit*>(tui_textRootPercent->tuiWidget());
-        }
-        if (tui_textHomePercent) {
-            homePercent = dynamic_cast<qtui::TLineEdit*>(tui_textHomePercent->tuiWidget());
+        if (tui_sliderPart) {
+            slider = dynamic_cast<qtui::TSlider*>(tui_sliderPart->tuiWidget());
         }
         if (tui_checkEncryptAuto) {
             encryptAuto = dynamic_cast<qtui::TCheckBox*>(tui_checkEncryptAuto->tuiWidget());
@@ -3700,17 +3670,16 @@ void MInstall::handleInput(int key) noexcept
                 case 3: return dualDrive && dualDrive->isEnabled();
                 case 4: return comboSystem && comboSystem->isEnabled();
                 case 5: return comboHome && comboHome->isEnabled();
-                case 6: return rootPercent && rootPercent->isEnabled();
-                case 7: return homePercent && homePercent->isEnabled();
-                case 8: return encryptAuto && encryptAuto->isEnabled();
+                case 6: return slider && slider->isEnabled();
+                case 7: return encryptAuto && encryptAuto->isEnabled();
                 default: return false;
             }
         };
 
         auto moveFocus = [&](int delta) {
             int idx = tui_focusInstallationField;
-            for (int i = 0; i < 9; ++i) {
-                idx = (idx + delta + 9) % 9;
+            for (int i = 0; i < 8; ++i) {
+                idx = (idx + delta + 8) % 8;
                 if (isFocusable(idx)) {
                     tui_focusInstallationField = idx;
                     break;
@@ -3725,9 +3694,8 @@ void MInstall::handleInput(int key) noexcept
             if (dualDrive) dualDrive->setFocus(tui_focusInstallationField == 3);
             if (comboSystem) comboSystem->setFocus(tui_focusInstallationField == 4);
             if (comboHome) comboHome->setFocus(tui_focusInstallationField == 5);
-            if (rootPercent) rootPercent->setFocus(tui_focusInstallationField == 6);
-            if (homePercent) homePercent->setFocus(tui_focusInstallationField == 7);
-            if (encryptAuto) encryptAuto->setFocus(tui_focusInstallationField == 8);
+            if (slider) slider->setFocus(tui_focusInstallationField == 6);
+            if (encryptAuto) encryptAuto->setFocus(tui_focusInstallationField == 7);
         };
 
         auto ensureFocus = [&]() {
@@ -3736,13 +3704,13 @@ void MInstall::handleInput(int key) noexcept
             }
         };
 
-        const bool installFocusIsEdit = (tui_focusInstallationField == 6 || tui_focusInstallationField == 7);
-        if (key == TUI_KEY_ALT_LEFT || (key == KEY_BACKSPACE && !installFocusIsEdit)) {
+        const bool installFocusIsSlider = (tui_focusInstallationField == 6);
+        if (key == TUI_KEY_ALT_LEFT || key == KEY_BACKSPACE) {
             gotoPage(currentPageIndex - 1);
             return;
-        } else if (key == '\t' || key == KEY_DOWN) {
+        } else if (key == '\t' || (key == KEY_DOWN && !installFocusIsSlider)) {
             moveFocus(1);
-        } else if (key == KEY_UP) {
+        } else if (key == KEY_UP && !installFocusIsSlider) {
             moveFocus(-1);
         } else if (key == ' ') {
             if (tui_focusInstallationField <= 2 && radios[tui_focusInstallationField]) {
@@ -3756,7 +3724,7 @@ void MInstall::handleInput(int key) noexcept
                 dualDrive->toggle();
                 gui.checkDualDrive->setChecked(dualDrive->isChecked());
                 syncInstallationTuiFromGui();
-            } else if (tui_focusInstallationField == 8 && encryptAuto) {
+            } else if (tui_focusInstallationField == 7 && encryptAuto) {
                 encryptAuto->toggle();
                 gui.checkEncryptAuto->setChecked(encryptAuto->isChecked());
                 syncInstallationTuiFromGui();
@@ -3769,21 +3737,9 @@ void MInstall::handleInput(int key) noexcept
             comboHome->handleKey(key);
             gui.comboDriveHome->setCurrentIndex(comboHome->currentIndex());
             syncInstallationTuiFromGui();
-        } else if (tui_focusInstallationField == 6 && rootPercent) {
-            rootPercent->handleKey(key);
-            bool ok = false;
-            int value = rootPercent->text().toInt(&ok);
-            if (ok) {
-                gui.spinRoot->setValue(value);
-            }
-            syncInstallationTuiFromGui();
-        } else if (tui_focusInstallationField == 7 && homePercent) {
-            homePercent->handleKey(key);
-            bool ok = false;
-            int value = homePercent->text().toInt(&ok);
-            if (ok) {
-                gui.spinHome->setValue(value);
-            }
+        } else if (tui_focusInstallationField == 6 && slider) {
+            slider->handleKey(key);
+            gui.spinRoot->setValue(slider->value());
             syncInstallationTuiFromGui();
         }
 
@@ -4719,8 +4675,7 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         qtui::TCheckBox* dualDrive = nullptr;
         qtui::TComboBox* comboSystem = nullptr;
         qtui::TComboBox* comboHome = nullptr;
-        qtui::TLineEdit* rootPercent = nullptr;
-        qtui::TLineEdit* homePercent = nullptr;
+        qtui::TSlider* slider = nullptr;
         qtui::TCheckBox* encryptAuto = nullptr;
 
         if (tui_radioEntireDrive) {
@@ -4741,11 +4696,8 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         if (tui_comboDriveHome) {
             comboHome = dynamic_cast<qtui::TComboBox*>(tui_comboDriveHome->tuiWidget());
         }
-        if (tui_textRootPercent) {
-            rootPercent = dynamic_cast<qtui::TLineEdit*>(tui_textRootPercent->tuiWidget());
-        }
-        if (tui_textHomePercent) {
-            homePercent = dynamic_cast<qtui::TLineEdit*>(tui_textHomePercent->tuiWidget());
+        if (tui_sliderPart) {
+            slider = dynamic_cast<qtui::TSlider*>(tui_sliderPart->tuiWidget());
         }
         if (tui_checkEncryptAuto) {
             encryptAuto = dynamic_cast<qtui::TCheckBox*>(tui_checkEncryptAuto->tuiWidget());
@@ -4773,12 +4725,12 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         } else if (comboHome && comboHome->handleMouse(mouseY, mouseX)) {
             tui_focusInstallationField = 5;
             gui.comboDriveHome->setCurrentIndex(comboHome->currentIndex());
-        } else if (rootPercent && rootPercent->handleMouse(mouseY, mouseX)) {
+        } else if (slider && slider->handleMouse(mouseY, mouseX)) {
             tui_focusInstallationField = 6;
-        } else if (homePercent && homePercent->handleMouse(mouseY, mouseX)) {
-            tui_focusInstallationField = 7;
+            gui.spinRoot->setValue(slider->value());
+            syncInstallationTuiFromGui();
         } else if (encryptAuto && encryptAuto->handleMouse(mouseY, mouseX)) {
-            tui_focusInstallationField = 8;
+            tui_focusInstallationField = 7;
             gui.checkEncryptAuto->setChecked(encryptAuto->isChecked());
         }
 
@@ -4788,9 +4740,8 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         if (dualDrive) dualDrive->setFocus(tui_focusInstallationField == 3);
         if (comboSystem) comboSystem->setFocus(tui_focusInstallationField == 4);
         if (comboHome) comboHome->setFocus(tui_focusInstallationField == 5);
-        if (rootPercent) rootPercent->setFocus(tui_focusInstallationField == 6);
-        if (homePercent) homePercent->setFocus(tui_focusInstallationField == 7);
-        if (encryptAuto) encryptAuto->setFocus(tui_focusInstallationField == 8);
+        if (slider) slider->setFocus(tui_focusInstallationField == 6);
+        if (encryptAuto) encryptAuto->setFocus(tui_focusInstallationField == 7);
     } else if (currentPageIndex == Step::REPLACE) {
         size_t count = replacer ? replacer->installationCount() : 0;
         if (count > 0 && mouseY >= 6 && mouseY < 6 + static_cast<int>(count)) {

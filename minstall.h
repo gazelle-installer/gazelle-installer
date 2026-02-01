@@ -26,6 +26,7 @@ namespace ui { class QLabel; }
 namespace ui { class QRadioButton; }
 namespace ui { class QLineEdit; }
 namespace ui { class QComboBox; }
+namespace ui { class QSlider; }
 namespace qtui { class TButtonGroup; }
 class QTreeWidgetItem;
 
@@ -145,10 +146,7 @@ private:
     class ui::QComboBox *tui_comboDriveSystem = nullptr;
     class ui::QLabel *tui_labelDriveHome = nullptr;
     class ui::QComboBox *tui_comboDriveHome = nullptr;
-    class ui::QLabel *tui_labelRootPercent = nullptr;
-    class ui::QLineEdit *tui_textRootPercent = nullptr;
-    class ui::QLabel *tui_labelHomePercent = nullptr;
-    class ui::QLineEdit *tui_textHomePercent = nullptr;
+    class ui::QSlider *tui_sliderPart = nullptr;
     class ui::QCheckBox *tui_checkEncryptAuto = nullptr;
 
     // TUI wrapper widgets for pageConfirm
