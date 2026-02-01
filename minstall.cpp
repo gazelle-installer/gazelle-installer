@@ -50,6 +50,8 @@
 #include "ui/qlineedit.h"
 #include "ui/qcombobox.h"
 #include "ui/qslider.h"
+#include "qtui/tpushbutton.h"
+#include "qtui/tlineedit.h"
 #include "checkmd5.h"
 #include "partman.h"
 #include "autopart.h"
@@ -213,6 +215,25 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
             // Error will be visible when TUI starts
         }
     }
+}
+
+void MInstall::gotoAfterPartitionsTui() noexcept
+{
+    if (!partman) {
+        return;
+    }
+    if (!partman->validate(false)) {
+        return;
+    }
+    for (PartMan::Iterator it(*partman); *it; it.next()) {
+        PartMan::Device *device = *it;
+        if (device && device->type == PartMan::Device::PARTITION
+            && device->encrypt && device->canEncrypt()) {
+            gotoPage(Step::ENCRYPTION);
+            return;
+        }
+    }
+    gotoPage(Step::CONFIRM);
 }
 
 void MInstall::runShutdown(const QString &action) noexcept
@@ -2011,11 +2032,30 @@ void MInstall::setupPagePartitionsTUI() noexcept
 
     qInfo() << "Setting up TUI widgets for pagePartitions...";
 
-    // Info label explaining that cfdisk will be launched
     tui_labelPartitionsInfo = new ui::QLabel();
-    tui_labelPartitionsInfo->setPosition(2, 2);
+    tui_labelPartitionsInfo->setPosition(1, 2);
     tui_labelPartitionsInfo->setText(tr("Custom Partitioning"));
     tui_labelPartitionsInfo->show();
+
+    tui_partitionRow = 0;
+    tui_partitionCol = 0;
+    tui_partitionScroll = 0;
+    tui_partitionEditing = false;
+    tui_partitionEditIsLabel = false;
+
+    if (!tui_buttonPartitionsApply) {
+        tui_buttonPartitionsApply = new qtui::TPushButton(tr("Apply"));
+        tui_buttonPartitionsApply->setPosition(19, 2);
+        tui_buttonPartitionsApply->show();
+        connect(tui_buttonPartitionsApply, &qtui::TPushButton::clicked, this, [this]() noexcept {
+            gotoAfterPartitionsTui();
+        });
+    }
+
+    if (!tui_partitionLabelEdit) {
+        tui_partitionLabelEdit = new qtui::TLineEdit();
+        tui_partitionLabelEdit->setWidth(10);
+    }
 }
 
 void MInstall::setupPageSwapTUI() noexcept
@@ -3128,10 +3168,268 @@ void MInstall::renderPagePartitions() noexcept
         }
     }
 
-    mvprintw(4, 2, "Custom partitioning allows you to manually configure");
-    mvprintw(5, 2, "your disk layout using cfdisk.");
-    mvprintw(7, 2, "Press ENTER to launch cfdisk, Backspace to go back.");
-    mvprintw(9, 2, "After partitioning, you will need to restart the installer.");
+    // Build device list
+    std::vector<PartMan::Device*> devices;
+    if (partman) {
+        for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
+            if (device->type == PartMan::Device::DRIVE ||
+                device->type == PartMan::Device::PARTITION ||
+                device->type == PartMan::Device::VIRTUAL ||
+                device->type == PartMan::Device::SUBVOLUME) {
+                devices.push_back(device);
+            }
+        }
+    }
+
+    // Ensure selection is within bounds
+    if (tui_partitionRow >= static_cast<int>(devices.size())) {
+        tui_partitionRow = devices.empty() ? 0 : static_cast<int>(devices.size()) - 1;
+    }
+
+    // Column headers
+    const int colDevice = 2;
+    const int colSize = 18;
+    const int colUseFor = 30;
+    const int colLabel = 44;
+    const int colFormat = 60;
+    const int colEncrypt = 72;
+
+    attron(A_BOLD | A_UNDERLINE);
+    mvprintw(3, colDevice, "Device");
+    mvprintw(3, colSize, "Size");
+    mvprintw(3, colUseFor, "Use For");
+    mvprintw(3, colLabel, "Label");
+    mvprintw(3, colFormat, "Format");
+    mvprintw(3, colEncrypt, "Encrypt");
+    attroff(A_BOLD | A_UNDERLINE);
+
+    // Calculate visible rows
+    const int startRow = 4;
+    const int maxVisibleRows = 12;
+
+    // Adjust scroll
+    if (tui_partitionRow < tui_partitionScroll) {
+        tui_partitionScroll = tui_partitionRow;
+    } else if (tui_partitionRow >= tui_partitionScroll + maxVisibleRows) {
+        tui_partitionScroll = tui_partitionRow - maxVisibleRows + 1;
+    }
+
+    // Render device rows
+    for (int i = 0; i < maxVisibleRows && (tui_partitionScroll + i) < static_cast<int>(devices.size()); ++i) {
+        int idx = tui_partitionScroll + i;
+        PartMan::Device *dev = devices[idx];
+        int row = startRow + i;
+        bool selected = (idx == tui_partitionRow);
+
+        if (selected) {
+            attron(A_REVERSE);
+        }
+
+        // Clear the row
+        move(row, colDevice);
+        clrtoeol();
+
+        // Indentation based on device type
+        int indent = 0;
+        QString prefix;
+        if (dev->type == PartMan::Device::PARTITION || dev->type == PartMan::Device::VIRTUAL) {
+            indent = 2;
+            prefix = "├─";
+        } else if (dev->type == PartMan::Device::SUBVOLUME) {
+            indent = 4;
+            prefix = "└─";
+        }
+
+        // Device name
+        QString devName = prefix + dev->name;
+        mvprintw(row, colDevice + indent, "%-14s", devName.left(14).toUtf8().constData());
+
+        // Size
+        if (dev->size > 0) {
+            QString sizeStr;
+            if (dev->size >= TB) {
+                sizeStr = QString::number(dev->size / (double)TB, 'f', 1) + " TB";
+            } else if (dev->size >= GB) {
+                sizeStr = QString::number(dev->size / (double)GB, 'f', 1) + " GB";
+            } else if (dev->size >= MB) {
+                sizeStr = QString::number(dev->size / (double)MB, 'f', 1) + " MB";
+            } else {
+                sizeStr = QString::number(dev->size / (double)KB, 'f', 0) + " KB";
+            }
+            mvprintw(row, colSize, "%-10s", sizeStr.toUtf8().constData());
+        }
+
+        // Use For (mount point)
+        if (dev->type != PartMan::Device::DRIVE) {
+            QString useFor = dev->usefor.isEmpty() ? "-" : dev->usefor;
+            if (selected && tui_partitionCol == PART_COL_USEFOR) {
+                attron(A_BOLD);
+            }
+            mvprintw(row, colUseFor, "%-12s", useFor.left(12).toUtf8().constData());
+            if (selected && tui_partitionCol == PART_COL_USEFOR) {
+                attroff(A_BOLD);
+            }
+        }
+
+        // Label
+        if (dev->type != PartMan::Device::DRIVE) {
+            QString label;
+            bool editableLabel = (dev->format != "PRESERVE"_L1 && dev->format != "DELETE"_L1)
+                && (dev->type == PartMan::Device::SUBVOLUME || !dev->usefor.isEmpty());
+            if (editableLabel) {
+                label = dev->label;
+            } else {
+                label = dev->curLabel;
+            }
+            if (label.isEmpty()) label = "-";
+            if (selected && tui_partitionCol == PART_COL_LABEL) {
+                attron(A_BOLD);
+            }
+            mvprintw(row, colLabel, "%-12s", label.left(12).toUtf8().constData());
+            if (selected && tui_partitionCol == PART_COL_LABEL) {
+                attroff(A_BOLD);
+            }
+        }
+
+        // Format
+        if (dev->type != PartMan::Device::DRIVE) {
+            QString fmt = dev->format.isEmpty() ? (dev->curFormat.isEmpty() ? "-" : dev->curFormat) : dev->format;
+            if (selected && tui_partitionCol == PART_COL_FORMAT) {
+                attron(A_BOLD);
+            }
+            mvprintw(row, colFormat, "%-10s", fmt.left(10).toUtf8().constData());
+            if (selected && tui_partitionCol == PART_COL_FORMAT) {
+                attroff(A_BOLD);
+            }
+        }
+
+        // Encrypt
+        if (dev->type == PartMan::Device::PARTITION && dev->canEncrypt()) {
+            mvprintw(row, colEncrypt, "[%c]", dev->encrypt ? 'X' : ' ');
+        }
+
+        if (selected) {
+            attroff(A_REVERSE);
+        }
+    }
+
+    // Scroll indicators
+    if (tui_partitionScroll > 0) {
+        mvprintw(startRow - 1, 70, "▲ more");
+    }
+    if (tui_partitionScroll + maxVisibleRows < static_cast<int>(devices.size())) {
+        mvprintw(startRow + maxVisibleRows, 70, "▼ more");
+    }
+
+    // Show editing dropdown if in edit mode
+    tui_partitionPopupVisible = false;
+    if (tui_partitionEditing && tui_partitionRow < static_cast<int>(devices.size()) && !tui_partitionEditIsLabel) {
+        PartMan::Device *dev = devices[tui_partitionRow];
+        QStringList options;
+        int popupCol = (tui_partitionCol == PART_COL_USEFOR) ? colUseFor : colFormat;
+
+        if (tui_partitionCol == PART_COL_USEFOR) {
+            options = dev->allowedUsesFor();
+        } else {
+            options = dev->allowedFormats();
+        }
+
+        // Draw popup box
+        int popupRow = startRow + (tui_partitionRow - tui_partitionScroll) + 1;
+        int popupHeight = qMin(static_cast<int>(options.size()), 8);
+        int scrollOffset = 0;
+
+        // Ensure popup doesn't go off screen
+        if (popupRow + popupHeight > 16) {
+            popupRow = 16 - popupHeight;
+        }
+
+        if (options.size() > 8) {
+            scrollOffset = qMax(0, tui_partitionEditIndex - 4);
+            scrollOffset = qMin(scrollOffset, static_cast<int>(options.size()) - 8);
+        }
+
+        tui_partitionPopupVisible = true;
+        tui_partitionPopupRow = popupRow;
+        tui_partitionPopupCol = popupCol;
+        tui_partitionPopupHeight = popupHeight;
+        tui_partitionPopupScroll = scrollOffset;
+
+        // Draw popup border and options
+        attron(A_REVERSE);
+        for (int i = 0; i < popupHeight; ++i) {
+            int optIdx = scrollOffset + i;
+
+            if (optIdx < options.size()) {
+                bool highlighted = (optIdx == tui_partitionEditIndex);
+                if (highlighted) {
+                    attroff(A_REVERSE);
+                    attron(A_BOLD);
+                }
+                mvprintw(popupRow + i, popupCol, "%-14s", options[optIdx].left(14).toUtf8().constData());
+                if (highlighted) {
+                    attroff(A_BOLD);
+                    attron(A_REVERSE);
+                }
+            }
+        }
+        attroff(A_REVERSE);
+    }
+
+    if (tui_partitionEditing && tui_partitionEditIsLabel && tui_partitionLabelEdit
+        && tui_partitionRow < static_cast<int>(devices.size())) {
+        const int editRow = startRow + (tui_partitionRow - tui_partitionScroll);
+        tui_partitionLabelEdit->setPosition(editRow, colLabel);
+        tui_partitionLabelEdit->show();
+        tui_partitionLabelEdit->setFocus(true);
+        tui_partitionLabelEdit->render();
+    } else if (tui_partitionLabelEdit) {
+        tui_partitionLabelEdit->setFocus(false);
+        tui_partitionLabelEdit->hide();
+    }
+
+    if (tui_buttonPartitionsApply) {
+        tui_buttonPartitionsApply->setFocus(tui_focusPartitions == 1);
+        tui_buttonPartitionsApply->render();
+    }
+
+    // Instructions and action keys
+    if (tui_partitionEditing) {
+        mvprintw(17, 2, "UP/DOWN: select option | ENTER: apply | ESC: cancel");
+        move(18, 2); clrtoeol();
+    } else {
+        mvprintw(17, 2, "UP/DOWN: select | LEFT/RIGHT: column | ENTER: edit | SPACE: toggle encrypt");
+
+        PartMan::Device *selectedDevice = nullptr;
+        if (tui_partitionRow < static_cast<int>(devices.size())) {
+            selectedDevice = devices[tui_partitionRow];
+        }
+        const bool canClear = selectedDevice && selectedDevice->type == PartMan::Device::DRIVE && !selectedDevice->isLocked();
+        const bool canAdd = selectedDevice && !selectedDevice->flags.oldLayout
+            && selectedDevice->driveFreeSpace(true) >= 1 * MB;
+        const bool canDelete = selectedDevice && selectedDevice->type != PartMan::Device::DRIVE
+            && !selectedDevice->flags.oldLayout;
+        const bool canNewSubvol = selectedDevice && selectedDevice->isVolume()
+            && selectedDevice->finalFormat() == "btrfs"_L1;
+        const bool canScanSubvols = canNewSubvol && !selectedDevice->willFormat();
+
+        int col = 2;
+        auto printAction = [&](const char *text, bool enabled) {
+            if (!enabled) attron(A_DIM);
+            mvprintw(18, col, "%s", text);
+            if (!enabled) attroff(A_DIM);
+            col += static_cast<int>(std::strlen(text));
+        };
+
+        printAction("C: clear drive", canClear);
+        printAction(" | A: add partition", canAdd);
+        printAction(" | D: delete", canDelete);
+        printAction(" | N: new subvol", canNewSubvol);
+        printAction(" | S: scan subvols", canScanSubvols);
+        printAction(" | R: reload", true);
+        printAction(" | P: partition manager", true);
+        printAction(" | TAB: focus apply", true);
+    }
 }
 
 void MInstall::renderPageSwap() noexcept
@@ -3792,32 +4090,237 @@ void MInstall::handleInput(int key) noexcept
             gotoPage(Step::INSTALLATION);
         }
     } else if (currentPageIndex == Step::PARTITIONS) {
-        // pagePartitions: Launch cfdisk for manual partitioning
+        // Build device list for navigation
+        std::vector<PartMan::Device*> devices;
+        if (partman) {
+            for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
+                if (device->type == PartMan::Device::DRIVE ||
+                    device->type == PartMan::Device::PARTITION ||
+                    device->type == PartMan::Device::VIRTUAL ||
+                    device->type == PartMan::Device::SUBVOLUME) {
+                    devices.push_back(device);
+                }
+            }
+        }
+
+        const int deviceCount = static_cast<int>(devices.size());
+        PartMan::Device *selectedDevice = (tui_partitionRow < deviceCount) ? devices[tui_partitionRow] : nullptr;
+
         if (key == TUI_KEY_ALT_LEFT) {
             gotoPage(Step::INSTALLATION);
-        } else if (key == '\n' || key == KEY_ENTER) {
-            // End ncurses temporarily to launch cfdisk
+        } else if (key == '\t' || key == KEY_BTAB) {
+            tui_focusPartitions = (tui_focusPartitions + 1) % 2;
+            if (tui_buttonPartitionsApply) {
+                tui_buttonPartitionsApply->setFocus(tui_focusPartitions == 1);
+            }
+        } else if (tui_focusPartitions == 1 && tui_buttonPartitionsApply) {
+            if (tui_buttonPartitionsApply->handleKey(key)) {
+                // apply handled by button click signal
+            }
+        } else if (tui_partitionEditing && selectedDevice) {
+            // Handle editing navigation first so arrows don't move the row
+            if (tui_partitionEditIsLabel) {
+                if (key == KEY_BACKSPACE || key == 127 || key == 8) {
+                    if (tui_partitionLabelEdit) {
+                        tui_partitionLabelEdit->handleKey(key);
+                    }
+                } else if (key == 27) { // ESC
+                    tui_partitionEditing = false;
+                    tui_partitionEditIsLabel = false;
+                    if (tui_partitionLabelEdit) {
+                        tui_partitionLabelEdit->setText(tui_partitionLabelOriginal);
+                    }
+                } else if (key == '\n' || key == KEY_ENTER) {
+                    if (tui_partitionLabelEdit) {
+                        partman->changeBegin(selectedDevice);
+                        selectedDevice->label = tui_partitionLabelEdit->text().trimmed();
+                        partman->changeEnd();
+                    }
+                    tui_partitionEditing = false;
+                    tui_partitionEditIsLabel = false;
+                } else if (tui_partitionLabelEdit) {
+                    tui_partitionLabelEdit->handleKey(key);
+                }
+            } else {
+                if (key == KEY_UP && tui_partitionEditIndex > 0) {
+                    tui_partitionEditIndex--;
+                } else if (key == KEY_DOWN) {
+                    QStringList options = (tui_partitionCol == PART_COL_USEFOR)
+                        ? selectedDevice->allowedUsesFor()
+                        : selectedDevice->allowedFormats();
+                    if (tui_partitionEditIndex < options.size() - 1) {
+                        tui_partitionEditIndex++;
+                    }
+                } else if (key == KEY_LEFT || key == KEY_RIGHT) {
+                    int maxCol = (selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+                    int nextCol = tui_partitionCol + (key == KEY_LEFT ? -1 : 1);
+                    if (nextCol < 0) nextCol = 0;
+                    if (nextCol > maxCol) nextCol = maxCol;
+                    if (nextCol != tui_partitionCol) {
+                        tui_partitionCol = nextCol;
+                        if (tui_partitionCol == PART_COL_USEFOR) {
+                            QStringList uses = selectedDevice->allowedUsesFor();
+                            tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
+                            if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                        } else if (tui_partitionCol == PART_COL_FORMAT) {
+                            QStringList formats = selectedDevice->allowedFormats();
+                            QString curFmt = selectedDevice->format.isEmpty() ? selectedDevice->curFormat : selectedDevice->format;
+                            tui_partitionEditIndex = formats.indexOf(curFmt);
+                            if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                        }
+                    }
+                } else if (key == 27) { // ESC
+                    tui_partitionEditing = false;
+                    tui_partitionEditIsLabel = false;
+                } else if (key == '\n' || key == KEY_ENTER) {
+                    // Apply edit
+                    partman->changeBegin(selectedDevice);
+                    if (tui_partitionCol == PART_COL_USEFOR) {
+                        QStringList uses = selectedDevice->allowedUsesFor();
+                        if (tui_partitionEditIndex < uses.size()) {
+                            selectedDevice->usefor = uses[tui_partitionEditIndex];
+                        }
+                    } else if (tui_partitionCol == PART_COL_FORMAT) {
+                        QStringList formats = selectedDevice->allowedFormats();
+                        if (tui_partitionEditIndex < formats.size()) {
+                            selectedDevice->format = formats[tui_partitionEditIndex];
+                        }
+                    }
+                    partman->changeEnd();
+                    tui_partitionEditing = false;
+                    tui_partitionEditIsLabel = false;
+                }
+            }
+        } else if (key == KEY_UP && tui_partitionRow > 0) {
+            tui_partitionRow--;
+            tui_partitionEditing = false;
+            tui_partitionEditIsLabel = false;
+            tui_focusPartitions = 0;
+            if (tui_partitionRow < deviceCount) selectedDevice = devices[tui_partitionRow];
+            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+            if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
+        } else if (key == KEY_DOWN && tui_partitionRow < deviceCount - 1) {
+            tui_partitionRow++;
+            tui_partitionEditing = false;
+            tui_partitionEditIsLabel = false;
+            tui_focusPartitions = 0;
+            if (tui_partitionRow < deviceCount) selectedDevice = devices[tui_partitionRow];
+            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+            if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
+        } else if (key == KEY_LEFT) {
+            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+            if (tui_partitionCol > 0) {
+                tui_partitionCol--;
+            }
+            tui_focusPartitions = 0;
+            tui_partitionEditIsLabel = false;
+            if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
+        } else if (key == KEY_RIGHT) {
+            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_USEFOR;
+            if (tui_partitionCol < maxCol) {
+                tui_partitionCol++;
+            }
+            tui_focusPartitions = 0;
+            tui_partitionEditIsLabel = false;
+        } else if (key == ' ' && selectedDevice) {
+            // Toggle encrypt for partitions
+            if (selectedDevice->type == PartMan::Device::PARTITION && selectedDevice->canEncrypt()) {
+                partman->changeBegin(selectedDevice);
+                selectedDevice->encrypt = !selectedDevice->encrypt;
+                partman->changeEnd();
+            }
+        } else if ((key == '\n' || key == KEY_ENTER) && selectedDevice) {
+            if (selectedDevice->type != PartMan::Device::DRIVE) {
+                if (!tui_partitionEditing) {
+                    // Start editing - get current options
+                    if (tui_partitionCol == PART_COL_LABEL) {
+                        bool editableLabel = (selectedDevice->format != "PRESERVE"_L1 && selectedDevice->format != "DELETE"_L1)
+                            && (selectedDevice->type == PartMan::Device::SUBVOLUME || !selectedDevice->usefor.isEmpty());
+                        if (editableLabel && tui_partitionLabelEdit) {
+                            tui_partitionEditing = true;
+                            tui_partitionEditIsLabel = true;
+                            tui_partitionLabelOriginal = selectedDevice->label;
+                            tui_partitionLabelEdit->setText(selectedDevice->label);
+                        }
+                    } else {
+                        tui_partitionEditing = true;
+                        tui_partitionEditIsLabel = false;
+                        tui_partitionEditIndex = 0;
+                        if (tui_partitionCol == PART_COL_USEFOR) {
+                            // Use For column - find current index
+                            QStringList uses = selectedDevice->allowedUsesFor();
+                            tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
+                            if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                        } else if (tui_partitionCol == PART_COL_FORMAT) {
+                            // Format column - find current index
+                            QStringList formats = selectedDevice->allowedFormats();
+                            QString curFmt = selectedDevice->format.isEmpty() ? selectedDevice->curFormat : selectedDevice->format;
+                            tui_partitionEditIndex = formats.indexOf(curFmt);
+                            if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                        }
+                    }
+                }
+            } else {
+                // For drives, try to proceed to next page
+                gotoAfterPartitionsTui();
+            }
+        } else if (key == 'c' || key == 'C') {
+            // Clear drive
+            if (selectedDevice && selectedDevice->type == PartMan::Device::DRIVE) {
+                gui.treePartitions->setCurrentIndex(partman->index(selectedDevice));
+                gui.pushPartClear->click();
+            }
+        } else if (key == 'a' || key == 'A') {
+            // Add partition
+            if (selectedDevice) {
+                gui.treePartitions->setCurrentIndex(partman->index(selectedDevice));
+                gui.pushPartAdd->click();
+            }
+        } else if (key == 'd' || key == 'D') {
+            // Delete partition
+            if (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) {
+                if (!partman || !partman->removeDevice(selectedDevice)) {
+                    beep();
+                }
+            } else {
+                beep();
+            }
+        } else if (key == 'n' || key == 'N') {
+            // New btrfs subvolume
+            if (selectedDevice && partman
+                && selectedDevice->isVolume()
+                && selectedDevice->finalFormat() == "btrfs"_L1) {
+                if (!partman->newSubvolume(selectedDevice)) {
+                    beep();
+                }
+            } else {
+                beep();
+            }
+        } else if (key == 's' || key == 'S') {
+            // Scan btrfs subvolumes
+            if (selectedDevice && partman
+                && selectedDevice->isVolume()
+                && selectedDevice->finalFormat() == "btrfs"_L1
+                && !selectedDevice->willFormat()) {
+                if (!partman->scanSubvolumesFor(selectedDevice)) {
+                    beep();
+                }
+            } else {
+                beep();
+            }
+        } else if (key == 'r' || key == 'R') {
+            // Reload
+            gui.pushPartReload->click();
+            tui_partitionRow = 0;
+        } else if (key == 'p' || key == 'P') {
+            // Launch partition manager
             endwin();
-
-            // Launch cfdisk - let user choose drive
             int result = system("cfdisk");
             (void)result;
-
-            // Restart ncurses
             refresh();
             clear();
-
-            // Notify user to restart installer after partitioning
-            mvprintw(10, 2, "Partitioning complete. Please restart the installer");
-            mvprintw(11, 2, "to use your new partition layout.");
-            mvprintw(13, 2, "Press any key to exit...");
-            refresh();
-            getch();
-
-            // Signal to exit
-            gotoPage(Step::END);
-        } else if (key == KEY_BACKSPACE) {
-            gotoPage(Step::INSTALLATION);
+            gui.pushPartReload->click();
+            tui_partitionRow = 0;
         }
     } else if (currentPageIndex == Step::ENCRYPTION) {
         qtui::TLineEdit* passFields[2] = {nullptr, nullptr};
@@ -4650,7 +5153,7 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         return;
     }
 
-    if (!(mouseState & BUTTON1_CLICKED)) {
+    if (!(mouseState & (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED))) {
         return;
     }
 
@@ -4754,6 +5257,113 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
             auto* checkbox = dynamic_cast<qtui::TCheckBox*>(tui_checkReplacePackages->tuiWidget());
             if (checkbox && checkbox->handleMouse(mouseY, mouseX)) {
                 gui.checkReplacePackages->setChecked(checkbox->isChecked());
+            }
+        }
+    } else if (currentPageIndex == Step::PARTITIONS) {
+        const int startRow = 4;
+        const int maxVisibleRows = 12;
+        const int colUseFor = 30;
+        const int colLabel = 44;
+        const int colFormat = 60;
+        const int colEncrypt = 72;
+
+        std::vector<PartMan::Device*> devices;
+        if (partman) {
+            for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
+                if (device->type == PartMan::Device::DRIVE ||
+                    device->type == PartMan::Device::PARTITION ||
+                    device->type == PartMan::Device::VIRTUAL ||
+                    device->type == PartMan::Device::SUBVOLUME) {
+                    devices.push_back(device);
+                }
+            }
+        }
+
+        if (tui_partitionEditing && tui_partitionPopupVisible && !tui_partitionEditIsLabel) {
+            const int popupWidth = 14;
+            if (mouseY >= tui_partitionPopupRow && mouseY < tui_partitionPopupRow + tui_partitionPopupHeight
+                && mouseX >= tui_partitionPopupCol && mouseX < tui_partitionPopupCol + popupWidth) {
+                int optIdx = tui_partitionPopupScroll + (mouseY - tui_partitionPopupRow);
+                if (optIdx >= 0) {
+                    PartMan::Device *selectedDevice = (tui_partitionRow < static_cast<int>(devices.size()))
+                        ? devices[tui_partitionRow]
+                        : nullptr;
+                    if (selectedDevice) {
+                        QStringList options = (tui_partitionCol == PART_COL_USEFOR)
+                            ? selectedDevice->allowedUsesFor()
+                            : selectedDevice->allowedFormats();
+                        if (optIdx < options.size()) {
+                            tui_partitionEditIndex = optIdx;
+                            partman->changeBegin(selectedDevice);
+                            if (tui_partitionCol == PART_COL_USEFOR) {
+                                selectedDevice->usefor = options[tui_partitionEditIndex];
+                            } else {
+                                selectedDevice->format = options[tui_partitionEditIndex];
+                            }
+                            partman->changeEnd();
+                            tui_partitionEditing = false;
+                            tui_partitionEditIsLabel = false;
+                        }
+                    }
+                }
+                return;
+            }
+        }
+
+        if (tui_buttonPartitionsApply) {
+            if (tui_buttonPartitionsApply->handleMouse(mouseY, mouseX)) {
+                tui_focusPartitions = 1;
+                tui_buttonPartitionsApply->setFocus(true);
+                return;
+            }
+        }
+
+        if (mouseY >= startRow && mouseY < startRow + maxVisibleRows) {
+            int idx = tui_partitionScroll + (mouseY - startRow);
+            if (idx >= 0 && idx < static_cast<int>(devices.size())) {
+                tui_partitionRow = idx;
+                tui_partitionEditing = false;
+                tui_partitionEditIsLabel = false;
+                tui_focusPartitions = 0;
+                if (mouseX >= colUseFor && mouseX < colLabel) {
+                    tui_partitionCol = PART_COL_USEFOR;
+                } else if (mouseX >= colLabel && mouseX < colFormat) {
+                    tui_partitionCol = PART_COL_LABEL;
+                } else if (mouseX >= colFormat && mouseX < colEncrypt) {
+                    tui_partitionCol = PART_COL_FORMAT;
+                }
+
+                if (mouseState & BUTTON1_DOUBLE_CLICKED) {
+                    PartMan::Device *selectedDevice = devices[idx];
+                    if (selectedDevice->type != PartMan::Device::DRIVE) {
+                        if (tui_partitionCol == PART_COL_LABEL) {
+                            bool editableLabel = (selectedDevice->format != "PRESERVE"_L1 && selectedDevice->format != "DELETE"_L1)
+                                && (selectedDevice->type == PartMan::Device::SUBVOLUME || !selectedDevice->usefor.isEmpty());
+                            if (editableLabel && tui_partitionLabelEdit) {
+                                tui_partitionEditing = true;
+                                tui_partitionEditIsLabel = true;
+                                tui_partitionLabelOriginal = selectedDevice->label;
+                                tui_partitionLabelEdit->setText(selectedDevice->label);
+                            }
+                        } else {
+                            tui_partitionEditing = true;
+                            tui_partitionEditIsLabel = false;
+                            tui_partitionEditIndex = 0;
+                            if (tui_partitionCol == PART_COL_USEFOR) {
+                                QStringList uses = selectedDevice->allowedUsesFor();
+                                tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
+                                if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                            } else if (tui_partitionCol == PART_COL_FORMAT) {
+                                QStringList formats = selectedDevice->allowedFormats();
+                                QString curFmt = selectedDevice->format.isEmpty() ? selectedDevice->curFormat : selectedDevice->format;
+                                tui_partitionEditIndex = formats.indexOf(curFmt);
+                                if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                            }
+                        }
+                    } else {
+                        gotoAfterPartitionsTui();
+                    }
+                }
             }
         }
     } else if (currentPageIndex == Step::ENCRYPTION) {

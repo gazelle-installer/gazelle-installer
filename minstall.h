@@ -28,6 +28,8 @@ namespace ui { class QLineEdit; }
 namespace ui { class QComboBox; }
 namespace ui { class QSlider; }
 namespace qtui { class TButtonGroup; }
+namespace qtui { class TPushButton; }
+namespace qtui { class TLineEdit; }
 class QTreeWidgetItem;
 
 class MInstall : public QDialog {
@@ -62,6 +64,7 @@ public:
     int getCurrentPage() const noexcept { return currentPageIndex; }
 
 private:
+    void gotoAfterPartitionsTui() noexcept;
     Ui::MeInstall gui;
     MProcess proc;
     Core core;
@@ -241,6 +244,26 @@ private:
 
     // TUI wrapper widgets for pagePartitions
     class ui::QLabel *tui_labelPartitionsInfo = nullptr;
+    enum PartitionColumn {
+        PART_COL_USEFOR = 0,
+        PART_COL_LABEL = 1,
+        PART_COL_FORMAT = 2
+    };
+    int tui_partitionRow = 0;        // Currently selected row in partition list
+    int tui_partitionCol = 0;        // Currently selected column (for editing)
+    int tui_partitionScroll = 0;     // Scroll offset for the partition list
+    bool tui_partitionEditing = false; // True when editing a cell
+    int tui_partitionEditIndex = 0;  // Index in dropdown when editing
+    bool tui_partitionEditIsLabel = false;
+    QString tui_partitionLabelOriginal;
+    qtui::TLineEdit *tui_partitionLabelEdit = nullptr;
+    bool tui_partitionPopupVisible = false;
+    int tui_partitionPopupRow = 0;
+    int tui_partitionPopupCol = 0;
+    int tui_partitionPopupHeight = 0;
+    int tui_partitionPopupScroll = 0;
+    qtui::TPushButton *tui_buttonPartitionsApply = nullptr;
+    int tui_focusPartitions = 0;     // 0 = table, 1 = apply button
 
     // TUI wrapper widgets for pageSwap
     class ui::QLabel *tui_labelSwapTitle = nullptr;

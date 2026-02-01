@@ -681,15 +681,51 @@ void PartMan::partRemoveClick(bool) noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
     Device *seldev = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (!seldev) return;
-    Device *parent = seldev->parent();
-    if (!parent) return;
-    const bool notSub = (seldev->type != Device::SUBVOLUME);
-    delete seldev;
+    removeDevice(seldev);
+}
+
+bool PartMan::removeDevice(Device *device) noexcept
+{
+    if (!device) return false;
+    if (device->type == Device::DRIVE) return false;
+    if (device->flags.oldLayout) return false;
+    Device *parent = device->parent();
+    if (!parent) return false;
+    const bool notSub = (device->type != Device::SUBVOLUME);
+    delete device;
     if (notSub) {
         parent->labelParts();
         treeSelChange();
     }
+    return true;
+}
+
+bool PartMan::newSubvolume(Device *device) noexcept
+{
+    if (!device) return false;
+    if (!device->isVolume()) return false;
+    if (device->finalFormat() != "btrfs"_L1) return false;
+    changeBegin(device);
+    device->usefor = "FORMAT"_L1;
+    device->format = "btrfs"_L1;
+    changeEnd();
+    Device *subvol = new Device(Device::SUBVOLUME, device);
+    subvol->autoFill();
+    return true;
+}
+
+bool PartMan::scanSubvolumesFor(Device *device) noexcept
+{
+    if (!device) return false;
+    if (!device->isVolume()) return false;
+    if (device->finalFormat() != "btrfs"_L1) return false;
+    if (device->willFormat()) return false;
+    qApp->setOverrideCursor(Qt::WaitCursor);
+    gui.boxMain->setEnabled(false);
+    scanSubvolumes(device);
+    gui.boxMain->setEnabled(true);
+    qApp->restoreOverrideCursor();
+    return true;
 }
 void PartMan::partReloadClick()
 {
