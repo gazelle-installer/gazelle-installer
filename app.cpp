@@ -316,7 +316,11 @@ int main(int argc, char *argv[])
                 timeout(0);
                 int ch1 = getch();
                 if (ch1 == ERR) {
-                    running = false;
+                    if (minstall.tuiWantsEsc()) {
+                        minstall.handleInput(27);
+                    } else {
+                        running = false;
+                    }
                 } else if (ch1 == '[') {
                     int ch2 = getch();
                     int ch3 = getch();

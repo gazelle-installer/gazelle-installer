@@ -62,6 +62,7 @@ public:
     bool processDeferredActions() noexcept;
     bool shouldExit() const noexcept { return tui_exitRequested; }
     int getCurrentPage() const noexcept { return currentPageIndex; }
+    bool tuiWantsEsc() const noexcept;
 
 private:
     void gotoAfterPartitionsTui() noexcept;

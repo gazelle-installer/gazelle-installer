@@ -236,6 +236,48 @@ void MInstall::gotoAfterPartitionsTui() noexcept
     gotoPage(Step::CONFIRM);
 }
 
+bool MInstall::tuiWantsEsc() const noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return false;
+    }
+    if (tui_partitionEditing) {
+        return true;
+    }
+
+    auto popupVisible = [](ui::QComboBox *combo) -> bool {
+        if (!combo) return false;
+        auto *tuiCombo = dynamic_cast<qtui::TComboBox*>(combo->tuiWidget());
+        return tuiCombo && tuiCombo->isPopupVisible();
+    };
+
+    if (popupVisible(tui_comboDriveSystem)
+        || popupVisible(tui_comboDriveHome)
+        || popupVisible(tui_comboBoot)
+        || popupVisible(tui_comboLocale)
+        || popupVisible(tui_comboTimeArea)
+        || popupVisible(tui_comboTimeZone)) {
+        return true;
+    }
+
+    // Treat focused text fields as ESC targets so the app doesn't quit.
+    if (currentPageIndex == Step::ENCRYPTION) {
+        return true;
+    }
+    if (currentPageIndex == Step::SWAP) {
+        return (tui_focusSwap == 1 || tui_focusSwap == 2 || tui_focusSwap == 6 || tui_focusSwap == 8);
+    }
+    if (currentPageIndex == Step::NETWORK) {
+        return (tui_focusNetwork >= 0 && tui_focusNetwork <= 2);
+    }
+    if (currentPageIndex == Step::USER_ACCOUNTS) {
+        return (tui_focusUserAccounts == 0 || tui_focusUserAccounts == 1 || tui_focusUserAccounts == 2
+            || tui_focusUserAccounts == 4 || tui_focusUserAccounts == 5);
+    }
+
+    return false;
+}
+
 void MInstall::runShutdown(const QString &action) noexcept
 {
     if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
@@ -4362,6 +4404,8 @@ void MInstall::handleInput(int key) noexcept
         if (key == TUI_KEY_ALT_LEFT) {
             gotoPage(currentPageIndex - 1);
             return;
+        } else if (key == 27) {
+            tui_focusEncryption = (tui_focusEncryption + 1) % 2;
         } else if (key == '\t' || key == KEY_DOWN) {
             tui_focusEncryption = (tui_focusEncryption + 1) % 2;
         } else if (key == KEY_UP) {
@@ -4573,6 +4617,12 @@ void MInstall::handleInput(int key) noexcept
             gotoPage(Step::BOOT);
             return;
         }
+        if (key == 27 && swapFocusIsEdit) {
+            moveFocus(1);
+            ensureFocus();
+            applyFocus();
+            return;
+        }
         if (key == '\n' || key == KEY_ENTER) {
             gotoPage(Step::SERVICES);
             return;
@@ -4690,6 +4740,9 @@ void MInstall::handleInput(int key) noexcept
 
         if (key == TUI_KEY_ALT_LEFT || (key == KEY_BACKSPACE && !focusIsEdit)) {
             gotoPage(currentPageIndex - 1);
+            return;
+        } else if (key == 27 && focusIsEdit) {
+            moveFocus(1);
             return;
         } else if (key == '\t' || key == KEY_DOWN) {
             moveFocus(1);
@@ -4984,6 +5037,9 @@ void MInstall::handleInput(int key) noexcept
 
         if (key == TUI_KEY_ALT_LEFT || (key == KEY_BACKSPACE && !userFocusIsEdit)) {
             gotoPage(currentPageIndex - 1);
+            return;
+        } else if (key == 27 && userFocusIsEdit) {
+            moveFocus(1);
             return;
         } else if (key == '\t' || key == KEY_DOWN) {
             moveFocus(1);
