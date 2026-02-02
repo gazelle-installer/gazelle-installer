@@ -121,7 +121,7 @@ void TSlider::render() noexcept
             ch = '=';
         } else if (i == sliderPos) {
             if (hasFocus) {
-                attron(A_REVERSE);
+                attron(COLOR_PAIR(2));
                 ch = ' ';
             } else {
                 ch = '|';
@@ -131,7 +131,7 @@ void TSlider::render() noexcept
         }
         mvaddch(row, barCol + 1 + i, ch);
         if (i == sliderPos && hasFocus) {
-            attroff(A_REVERSE);
+            attroff(COLOR_PAIR(2));
         }
     }
 

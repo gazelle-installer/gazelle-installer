@@ -134,6 +134,10 @@ void TComboBox::render() noexcept
         displayText = displayText.left(maxTextWidth - 3) + "...";
     }
 
+    if (focused) {
+        attron(COLOR_PAIR(2));
+    }
+
     mvaddch(row, col, '[');
     move(row, col + 1);
     addstr(displayText.toUtf8().constData());
@@ -154,6 +158,10 @@ void TComboBox::render() noexcept
     printw("%c]", popupVisible ? '^' : 'v');
     if (focused) {
         attroff(A_BOLD);
+    }
+
+    if (focused) {
+        attroff(COLOR_PAIR(2));
     }
 
     if (!enabled) {

@@ -113,6 +113,10 @@ void TLineEdit::render() noexcept
         attron(A_DIM);
     }
 
+    if (focused && enabled) {
+        attron(COLOR_PAIR(2));
+    }
+
     mvaddch(row, col, '[');
     
     QString displayText = getDisplayText();
@@ -143,6 +147,10 @@ void TLineEdit::render() noexcept
         curs_set(1);
     } else {
         curs_set(0);
+    }
+
+    if (focused && enabled) {
+        attroff(COLOR_PAIR(2));
     }
 
     if (!enabled) {

@@ -115,7 +115,7 @@ void TRadioButton::render() noexcept
     if (!visible) return;
 
     if (focused) {
-        attron(A_UNDERLINE);
+        attron(COLOR_PAIR(2));
     }
 
     // Use ASCII-safe characters to avoid encoding issues
@@ -124,7 +124,7 @@ void TRadioButton::render() noexcept
              labelText.toUtf8().constData());
 
     if (focused) {
-        attroff(A_UNDERLINE);
+        attroff(COLOR_PAIR(2));
     }
 }
 

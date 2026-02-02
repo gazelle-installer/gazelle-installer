@@ -31,7 +31,7 @@ void TCheckBox::render() noexcept
     if (!visible) return;
     
     if (focused) {
-        attron(A_UNDERLINE);
+        attron(COLOR_PAIR(2));
     }
     
     QString checkMark = checked ? "[X]" : "[ ]";
@@ -39,7 +39,7 @@ void TCheckBox::render() noexcept
              labelText.toUtf8().constData());
     
     if (focused) {
-        attroff(A_UNDERLINE);
+        attroff(COLOR_PAIR(2));
     }
 }
 
