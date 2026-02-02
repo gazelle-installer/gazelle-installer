@@ -63,6 +63,8 @@ public:
     bool shouldExit() const noexcept { return tui_exitRequested; }
     int getCurrentPage() const noexcept { return currentPageIndex; }
     bool tuiWantsEsc() const noexcept;
+    bool canGoBack() const noexcept;  // Check if backward navigation is allowed
+    bool canGoNext() const noexcept;  // Check if forward navigation is allowed
 
 private:
     void gotoAfterPartitionsTui() noexcept;

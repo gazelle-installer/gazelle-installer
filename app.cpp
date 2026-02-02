@@ -59,8 +59,22 @@ static bool suppressConsoleLogs = false;
 
 int main(int argc, char *argv[])
 {
+    // Check for --tui flag BEFORE creating QApplication to avoid X11/Wayland dependency
+    bool isTuiMode = false;
+    for (int i = 1; i < argc; ++i) {
+        if (QString::fromUtf8(argv[i]) == u"--tui"_s || QString::fromUtf8(argv[i]) == u"-tui"_s) {
+            isTuiMode = true;
+            break;
+        }
+    }
+
+    // If TUI mode, set Qt to use offscreen platform (no X11/Wayland needed)
+    if (isTuiMode) {
+        qputenv("QT_QPA_PLATFORM", "offscreen");
+    }
+
     const bool defskin = (!getenv("QT_QPA_PLATFORMTHEME") && !getenv("XDG_CURRENT_DESKTOP"));
-    if (defskin) {
+    if (defskin && !isTuiMode) {
         // The default style in the OOBE environment is hideous and unusable.
         QApplication::setStyle(u"cde"_s); // Qt docs say do this before the QApplication instance.
         QPalette pal;
@@ -84,7 +98,7 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
-    if (defskin) a.setStyleSheet(u"QDialog { border: 2px ridge gray; }"_s);
+    if (defskin && !isTuiMode) a.setStyleSheet(u"QDialog { border: 2px ridge gray; }"_s);
     //a.setWindowIcon(QIcon(u"/usr/share/gazelle-installer-data/logo.png"_s));
 
     const QString &transpath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
@@ -289,7 +303,17 @@ int main(int argc, char *argv[])
 
         while (running) {
             clear();
-            mvprintw(0, 0, "Gazelle Installer (TUI Mode) - Press ESC to quit (Alt+Left = Back)");
+            // Show header with Alt+Left status
+            if (minstall.canGoBack()) {
+                mvprintw(0, 0, "Gazelle Installer (TUI Mode) - Press Ctrl-C to quit (Alt+Left = Back)");
+            } else {
+                attron(COLOR_PAIR(2));
+                mvprintw(0, 0, "Gazelle Installer (TUI Mode) - Press Ctrl-C to quit");
+                attroff(COLOR_PAIR(2));
+                attron(A_DIM);
+                printw(" (Alt+Left unavailable)");
+                attroff(A_DIM);
+            }
             mvprintw(1, 0, "========================================================");
             minstall.renderCurrentPage();
             int maxY, maxX;
@@ -300,7 +324,28 @@ int main(int argc, char *argv[])
             if (minstall.getCurrentPage() == 14) {  // Step::TIPS
                 mvprintw(maxY - 1, 0, "Installation in progress - please wait");
             } else {
-                mvprintw(maxY - 1, 0, "SPACE: Toggle | ESC: Quit | Alt+Left: Back");
+                // Render Previous button (Ctrl-P)
+                move(maxY - 1, 0);
+                if (minstall.canGoBack()) {
+                    printw("[ Previous (Ctrl-P) ]");
+                } else {
+                    attron(A_DIM);
+                    printw("[ Previous (Ctrl-P) ]");
+                    attroff(A_DIM);
+                }
+
+                printw(" ");
+
+                // Render Next button (Ctrl-N)
+                if (minstall.canGoNext()) {
+                    printw("[ Next (Ctrl-N) ]");
+                } else {
+                    attron(A_DIM);
+                    printw("[ Next (Ctrl-N) ]");
+                    attroff(A_DIM);
+                }
+
+                printw(" | SPACE: Toggle | Ctrl-C: Quit");
             }
             refresh();
 
@@ -316,11 +361,8 @@ int main(int argc, char *argv[])
                 timeout(0);
                 int ch1 = getch();
                 if (ch1 == ERR) {
-                    if (minstall.tuiWantsEsc()) {
-                        minstall.handleInput(27);
-                    } else {
-                        running = false;
-                    }
+                    // Standalone Esc - let the page handle it (close popups, exit fields, etc.)
+                    minstall.handleInput(27);
                 } else if (ch1 == '[') {
                     int ch2 = getch();
                     int ch3 = getch();
@@ -329,14 +371,49 @@ int main(int argc, char *argv[])
                     if (ch2 == '1' && ch3 == ';' && ch4 == '3' && ch5 == 'D') {
                         minstall.handleInput(MInstall::TUI_KEY_ALT_LEFT);
                     }
-                } else {
-                    running = false;
                 }
+                // Ignore unrecognized escape sequences
                 timeout(-1);
             } else if (ch == KEY_MOUSE) {
                 MEVENT event;
                 if (getmouse(&event) == OK) {
-                    minstall.handleMouse(event.y, event.x, event.bstate);
+                    // Check if click was on Previous or Next buttons in footer
+                    int maxY, maxX;
+                    getmaxyx(stdscr, maxY, maxX);
+                    (void)maxX;
+
+                    if (event.y == maxY - 1 && (event.bstate & (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED))) {
+                        // Previous button is at columns 0-20: "[ Previous (Ctrl-P) ]"
+                        if (event.x >= 0 && event.x <= 20) {
+                            if (minstall.canGoBack()) {
+                                minstall.handleInput(MInstall::TUI_KEY_ALT_LEFT);
+                            }
+                        }
+                        // Next button is at columns 22-38: "[ Next (Ctrl-N) ]"
+                        else if (event.x >= 22 && event.x <= 38) {
+                            if (minstall.canGoNext()) {
+                                // Simulate Enter key to advance
+                                minstall.handleInput('\n');
+                            }
+                        }
+                        // If not on buttons, pass to page-specific mouse handler
+                        else {
+                            minstall.handleMouse(event.y, event.x, event.bstate);
+                        }
+                    } else {
+                        // Not in footer, pass to page-specific mouse handler
+                        minstall.handleMouse(event.y, event.x, event.bstate);
+                    }
+                }
+            } else if (ch == 16) {
+                // Ctrl-P = Previous
+                if (minstall.canGoBack()) {
+                    minstall.handleInput(MInstall::TUI_KEY_ALT_LEFT);
+                }
+            } else if (ch == 14) {
+                // Ctrl-N = Next
+                if (minstall.canGoNext()) {
+                    minstall.handleInput('\n');
                 }
             } else {
                 minstall.handleInput(ch);

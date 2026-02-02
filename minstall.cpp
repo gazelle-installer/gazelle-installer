@@ -279,6 +279,94 @@ bool MInstall::tuiWantsEsc() const noexcept
     return false;
 }
 
+bool MInstall::canGoBack() const noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return false;
+    }
+
+    // Can't go back from SPLASH page
+    if (currentPageIndex == Step::SPLASH) {
+        return false;
+    }
+
+    // Can't go back once installation starts
+    if (currentPageIndex == Step::BOOT) {
+        return false;
+    }
+
+    // Can't go back from SWAP unless in advanced mode
+    if (currentPageIndex == Step::SWAP && !advanced) {
+        return false;
+    }
+
+    return true;
+}
+
+bool MInstall::canGoNext() const noexcept
+{
+    if (!ui::Context::isTUI()) {
+        return false;
+    }
+
+    switch (currentPageIndex) {
+    case Step::ENCRYPTION:
+        // Can't proceed without valid encryption
+        return crypto && crypto->valid();
+
+    case Step::TIPS:
+        // Can't proceed during installation
+        return false;
+
+    case Step::USER_ACCOUNTS:
+        // Check password validation
+        if (oobe) {
+            // In TUI mode, check if passwords are valid
+            const QString userName = gui.textUserName->text();
+            const QString userPass1 = gui.textUserPass->text();
+            const QString userPass2 = gui.textUserPass2->text();
+            const QString rootPass1 = gui.textRootPass->text();
+            const QString rootPass2 = gui.textRootPass2->text();
+
+            // Username must not be empty
+            if (userName.isEmpty()) {
+                return false;
+            }
+
+            // User passwords must match
+            if (userPass1 != userPass2) {
+                return false;
+            }
+
+            // Root passwords must match
+            if (rootPass1 != rootPass2) {
+                return false;
+            }
+        }
+        return true;
+
+    case Step::OLD_HOME:
+        // Check if an old home option is selected
+        if (gui.radioOldHomeUse && gui.radioOldHomeUse->isChecked()) {
+            return true;
+        }
+        if (gui.radioOldHomeSave && gui.radioOldHomeSave->isChecked()) {
+            return true;
+        }
+        if (gui.radioOldHomeDelete && gui.radioOldHomeDelete->isChecked()) {
+            return true;
+        }
+        return false;
+
+    case Step::END:
+        // Can't proceed past the end
+        return false;
+
+    default:
+        return true;
+    }
+}
+
 void MInstall::runShutdown(const QString &action) noexcept
 {
     if (QFile::exists(u"/usr/local/bin/persist-config"_s)) {
