@@ -198,6 +198,9 @@ void BootMan::install(const QStringList &cmdextra)
                 u"--no-floppy"_s, u"--force"_s, u"--boot-directory=/mnt/antiX/boot"_s, bootdev});
         } else {
             if (efivars_ismounted) {
+                //enusre efivarsfs mounted as read-write
+                //issue with some init systems
+                proc.exec(u"mount"_s, {u"-o"_s, {u"remount,rw"_s,u"-t"_s,u"efivarsfs"_s,u"efivarfs"_s,u"/sys/firmware/efi/efivars"}});
                 // remove any efivars-dump-entries in NVRAM
                 sect.setExceptionStrict(false);
                 proc.shell(u"ls /sys/firmware/efi/efivars | grep dump"_s, nullptr, true);
