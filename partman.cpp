@@ -2162,7 +2162,7 @@ QStringList PartMan::Device::allowedUsesFor(bool all) const noexcept
             }
             if (all || size <= 8*GB) {
                 if (size < (2*TB - 512)) {
-                    if (all || flags.sysEFI || size <= 512*MB) checkAndAdd(u"ESP"_s);
+                    if (all || flags.sysEFI || size <= 1024*MB) checkAndAdd(u"ESP"_s);
                 }
                 checkAndAdd(u"/boot"_s); // static files of the boot loader
             }
