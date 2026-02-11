@@ -21,18 +21,18 @@ if [ "$EUID" != 0 ]; then
     # normal user
 
     ##disable Xfce automount features
-    if command -v xfconf-query >/dev/null; then
-        unset AUTO PROP XFCQ
-        XFCQ="xfconf-query --channel thunar-volman"
-        AUTO=($(${XFCQ} --list 2>/dev/null | grep /auto))
-        PROP=()
-        for prop in "${AUTO[@]}";  do
-            auto=$(${XFCQ} --property $prop)
-            [ "$auto" = "true" ] || continue
-            ${XFCQ} --property "$prop" --set "false"
-            PROP+=("$prop")
-        done
-    fi
+    #if command -v xfconf-query >/dev/null; then
+        #unset AUTO PROP XFCQ
+        #XFCQ="xfconf-query --channel thunar-volman"
+        #AUTO=($(${XFCQ} --list 2>/dev/null | grep /auto))
+        #PROP=()
+        #for prop in "${AUTO[@]}";  do
+            #auto=$(${XFCQ} --property $prop)
+            #[ "$auto" = "true" ] || continue
+            #${XFCQ} --property "$prop" --set "false"
+            #PROP+=("$prop")
+        #done
+    #fi
     ###end Xfce automount feature
 
     # wayland fix (AK-47)
@@ -68,11 +68,11 @@ if [ "$EUID" != 0 ]; then
     $AUTHENTICATION /usr/bin/minstall-launcher
 
     ##re-enable Xfce automount feature, if it was enabled in the first place
-    if command -v xfconf-query >/dev/null; then
-        for prop in "${PROP[@]}"; do
-            ${XFCQ} --property "$prop" --set "true"
-        done
-    fi
+    #if command -v xfconf-query >/dev/null; then
+        #for prop in "${PROP[@]}"; do
+            #${XFCQ} --property "$prop" --set "true"
+        #done
+    #fi
     ##end Xfce automount feaure
 
 else
