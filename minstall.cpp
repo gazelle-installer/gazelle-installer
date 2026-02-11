@@ -352,14 +352,34 @@ void MInstall::setupAutoMount(bool enabled)
         }
 
         if (udisksd_running) {
-            proc.shell(u"echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/91-mx-udisks-inhibit.rules"_s);
-            proc.exec(u"udevadm"_s, {u"control"_s, u"--reload"_s});
+            proc.shell(
+                u"echo -e '#\n"
+                u"# This file contains custom mount options for udisks 2.x\n"
+                u"#\n"
+                u"# Skip if not a block device or if requested by other rules\n"
+                u"#\n"
+                u"SUBSYSTEM!=\"block\", GOTO=\"udisks_no_automount_options_end\"\n"
+                u"ENV{DM_MULTIPATH_DEVICE_PATH}==\"1\", "
+                u"GOTO=\"udisks_no_automount_options_end\"\n"
+                u"ENV{DM_UDEV_DISABLE_OTHER_RULES_FLAG}==\"?*\", "
+                u"GOTO=\"udisks_no_automount_options_end\"\n"
+                u"\n"
+                u"# disable automounting during minstall-launcher run\n"
+                u"# activate with\n"
+                u"# sudo udevadm control --reload\n"
+                u"# sudo udevadm trigger\n"
+                u"\n"
+                u"SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"\n"
+                u"\n"
+                u"LABEL=\"udisks_no_automount_options_end\"'"
+                u" > /run/udev/rules.d/99-mx-automount-inhibit.rules"_s
+                );            proc.exec(u"udevadm"_s, {u"control"_s, u"--reload"_s});
             proc.exec(u"udevadm"_s, {u"trigger"_s, u"--subsystem-match=block"_s});
         }
     } else {
         // enable auto-mount
         if (udisksd_running) {
-            proc.exec(u"rm"_s, {u"-f"_s, u"/run/udev/rules.d/91-mx-udisks-inhibit.rules"_s});
+            proc.exec(u"rm"_s, {u"-f"_s, u"/run/udev/rules.d/99-mx-automount-inhibit.rules"_s});
             proc.exec(u"udevadm"_s, {u"control"_s, u"--reload"_s});
             // For partitions to appear in the file manager.
             proc.exec(u"udevadm"_s, {u"trigger"_s});
