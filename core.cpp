@@ -163,10 +163,15 @@ void Core::setService(const QString &service, bool enabled) const
         QString effectiveUnit = unitName;
         const QFileInfo unitInfo(unitPath);
         if (unitInfo.isSymLink()) {
-            const QString targetName = QFileInfo(unitInfo.symLinkTarget()).fileName();
-            if (!targetName.isEmpty()) {
-                effectiveUnit = targetName;
-                qDebug() << "Follow systemd unit alias:" << unitName << "->" << effectiveUnit;
+            const QString target = unitInfo.symLinkTarget();
+            if (target == "/dev/null"_L1) {
+                qDebug() << "Systemd unit is masked:" << unitName;
+            } else {
+                const QString targetName = QFileInfo(target).fileName();
+                if (!targetName.isEmpty()) {
+                    effectiveUnit = targetName;
+                    qDebug() << "Follow systemd unit alias:" << unitName << "->" << effectiveUnit;
+                }
             }
         }
         if (enabled) {
