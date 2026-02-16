@@ -134,6 +134,8 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     }
     gui.textHelp->installEventFilter(this);
     gui.boxInstall->hide();
+    gui.checkExitReboot->setChecked(false);
+    gui.checkExitReboot->hide();
 
     advanced = args.isSet(u"advanced"_s);
     modeOOBE = args.isSet(u"oobe"_s);
@@ -706,6 +708,12 @@ void MInstall::processNextPhase() noexcept
             // TUI mode: check if automatic reboot checkbox is selected
             if (ui::Context::isTUI() && tui_checkTipsReboot && tui_checkTipsReboot->isChecked()) {
                 runShutdown(u"reboot"_s);
+            }
+            // GUI mode: skip END page and reboot if checkbox was checked
+            if (ui::Context::isGUI() && gui.checkExitReboot->isChecked()) {
+                if (!pretend) runShutdown(u"reboot"_s);
+                qApp->exit(EXIT_SUCCESS);
+                return;
             }
             gotoPage(Step::END);
         }
@@ -1332,6 +1340,11 @@ void MInstall::pageDisplayed(int next) noexcept
             + "</p><p>"_L1
             + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
             + "</p>"_L1);
+        if (ui::Context::isGUI() && gui.checkExitReboot->isHidden()) {
+            gui.checkExitReboot->setText(tr("Automatically restart when the installation is done"));
+            gui.boxTips->layout()->addWidget(gui.checkExitReboot);
+            gui.checkExitReboot->show();
+        }
         enableNext = false;
         break;
 
