@@ -3007,8 +3007,8 @@ void MInstall::renderPageNetwork() noexcept
         }
     }
 
-    // Render line edits
-    if (tui_textComputerName && tui_focusNetwork != 0) {
+    // Render line edits (sync from GUI when unfocused, or when TUI text is still empty)
+    if (tui_textComputerName && (tui_focusNetwork != 0 || tui_textComputerName->text().isEmpty())) {
         tui_textComputerName->setText(gui.textComputerName->text());
     }
     if (tui_textComputerName) {
@@ -3018,7 +3018,7 @@ void MInstall::renderPageNetwork() noexcept
         }
     }
 
-    if (tui_textComputerDomain && tui_focusNetwork != 1) {
+    if (tui_textComputerDomain && (tui_focusNetwork != 1 || tui_textComputerDomain->text().isEmpty())) {
         tui_textComputerDomain->setText(gui.textComputerDomain->text());
     }
     if (tui_textComputerDomain) {
@@ -3034,7 +3034,7 @@ void MInstall::renderPageNetwork() noexcept
             tuiWidget->render();
         }
     }
-    if (tui_textComputerGroup && tui_focusNetwork != 2) {
+    if (tui_textComputerGroup && (tui_focusNetwork != 2 || tui_textComputerGroup->text().isEmpty())) {
         tui_textComputerGroup->setText(gui.textComputerGroup->text());
     }
     if (tui_textComputerGroup) {
