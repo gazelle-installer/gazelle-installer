@@ -68,6 +68,11 @@ int main(int argc, char *argv[])
         }
     }
 
+    // Auto-detect TUI mode if no display server is available
+    if (!isTuiMode && !getenv("DISPLAY") && !getenv("WAYLAND_DISPLAY")) {
+        isTuiMode = true;
+    }
+
     // If TUI mode, set Qt to use offscreen platform (no X11/Wayland needed)
     if (isTuiMode) {
         qputenv("QT_QPA_PLATFORM", "offscreen");
@@ -152,8 +157,8 @@ int main(int argc, char *argv[])
     parser.addPositionalArgument(u"config-file"_s, QObject::tr("Load a configuration file as specified by <config-file>."), u"<config-file>"_s);
     parser.process(a);
     
-    // Force TUI mode if --tui flag is present (do this EARLY, before any UI)
-    if (parser.isSet(u"tui"_s)) {
+    // Force TUI mode if --tui flag is present or no display server detected
+    if (isTuiMode || parser.isSet(u"tui"_s)) {
         ui::Context::forceTUI();
         suppressConsoleLogs = true;  // Suppress console output for clean TUI
     }
