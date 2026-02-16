@@ -2495,82 +2495,86 @@ void MInstall::setupPageUserAccountsTUI() noexcept
 
     qInfo() << "Setting up TUI widgets for pageUserAccounts...";
 
+    const int labelCol = 2;
+    const int fieldCol = 28;
+    const int fieldWidth = 25;
+
     // Label and LineEdit for Username
     tui_labelUserName = new ui::QLabel();
-    tui_labelUserName->setPosition(3, 2);
+    tui_labelUserName->setPosition(3, labelCol);
     tui_labelUserName->setText(gui.labelUserName->text());
     tui_labelUserName->show();
 
     tui_textUserName = new ui::QLineEdit();
-    tui_textUserName->setPosition(3, 20);
-    tui_textUserName->setWidth(30);
+    tui_textUserName->setPosition(3, fieldCol);
+    tui_textUserName->setWidth(fieldWidth);
     tui_textUserName->setPlaceholderText(tr("Enter username"));
     tui_textUserName->show();
     tui_textUserName->setFocus();
 
     // Label and LineEdit for Password
     tui_labelUserPass = new ui::QLabel();
-    tui_labelUserPass->setPosition(5, 2);
+    tui_labelUserPass->setPosition(5, labelCol);
     tui_labelUserPass->setText(gui.labelUserPass->text());
     tui_labelUserPass->show();
 
     tui_textUserPass = new ui::QLineEdit();
-    tui_textUserPass->setPosition(5, 20);
-    tui_textUserPass->setWidth(30);
+    tui_textUserPass->setPosition(5, fieldCol);
+    tui_textUserPass->setWidth(fieldWidth);
     tui_textUserPass->setEchoMode(QLineEdit::Password);
     tui_textUserPass->setPlaceholderText(tr("Enter password"));
     tui_textUserPass->show();
 
     // Label and LineEdit for Password Confirmation
     tui_labelUserPass2 = new ui::QLabel();
-    tui_labelUserPass2->setPosition(7, 2);
+    tui_labelUserPass2->setPosition(7, labelCol);
     tui_labelUserPass2->setText(gui.labelUserPass2->text());
     tui_labelUserPass2->show();
 
     tui_textUserPass2 = new ui::QLineEdit();
-    tui_textUserPass2->setPosition(7, 20);
-    tui_textUserPass2->setWidth(30);
+    tui_textUserPass2->setPosition(7, fieldCol);
+    tui_textUserPass2->setWidth(fieldWidth);
     tui_textUserPass2->setEchoMode(QLineEdit::Password);
     tui_textUserPass2->setPlaceholderText(tr("Re-enter password"));
     tui_textUserPass2->show();
 
-    // Checkbox for Auto Login
+    // Checkbox for root account
     tui_checkRootAccount = new ui::QCheckBox();
-    tui_checkRootAccount->setPosition(9, 2);
+    tui_checkRootAccount->setPosition(9, labelCol);
     tui_checkRootAccount->setText(gui.boxRootAccount->title());
     tui_checkRootAccount->setChecked(false);
     tui_checkRootAccount->show();
 
     tui_labelRootPass = new ui::QLabel();
-    tui_labelRootPass->setPosition(11, 2);
+    tui_labelRootPass->setPosition(11, labelCol);
     tui_labelRootPass->setText(gui.labelRootPass->text());
     tui_labelRootPass->show();
 
     tui_textRootPass = new ui::QLineEdit();
-    tui_textRootPass->setPosition(11, 20);
-    tui_textRootPass->setWidth(30);
+    tui_textRootPass->setPosition(11, fieldCol);
+    tui_textRootPass->setWidth(fieldWidth);
     tui_textRootPass->setEchoMode(QLineEdit::Password);
     tui_textRootPass->show();
 
     tui_labelRootPass2 = new ui::QLabel();
-    tui_labelRootPass2->setPosition(13, 2);
+    tui_labelRootPass2->setPosition(13, labelCol);
     tui_labelRootPass2->setText(gui.labelRootPass2->text());
     tui_labelRootPass2->show();
 
     tui_textRootPass2 = new ui::QLineEdit();
-    tui_textRootPass2->setPosition(13, 20);
-    tui_textRootPass2->setWidth(30);
+    tui_textRootPass2->setPosition(13, fieldCol);
+    tui_textRootPass2->setWidth(fieldWidth);
     tui_textRootPass2->setEchoMode(QLineEdit::Password);
     tui_textRootPass2->show();
 
     tui_checkAutoLogin = new ui::QCheckBox();
-    tui_checkAutoLogin->setPosition(15, 2);
+    tui_checkAutoLogin->setPosition(15, labelCol);
     tui_checkAutoLogin->setText(gui.checkAutoLogin->text());
     tui_checkAutoLogin->setChecked(false);
     tui_checkAutoLogin->show();
 
     tui_checkSaveDesktop = new ui::QCheckBox();
-    tui_checkSaveDesktop->setPosition(17, 2);
+    tui_checkSaveDesktop->setPosition(17, labelCol);
     tui_checkSaveDesktop->setText(gui.checkSaveDesktop->text());
     tui_checkSaveDesktop->setChecked(false);
     tui_checkSaveDesktop->show();
@@ -3903,7 +3907,7 @@ void MInstall::renderPageUserAccounts() noexcept
     if (!tui_userError.isEmpty()) {
         mvprintw(18, 2, "%s", tui_userError.toUtf8().constData());
     }
-    mvprintw(19, 2, "TAB to switch fields, SPACE to toggle, ENTER to continue");
+    mvprintw(19, 2, "TAB to switch fields, SPACE to toggle, ENTER for next field/continue");
 }
 
 void MInstall::renderPageOldHome() noexcept
@@ -5343,52 +5347,84 @@ void MInstall::handleInput(int key) noexcept
             const QString userPass2 = gui.textUserPass2->text();
             const QString rootPass1 = gui.textRootPass->text();
             const QString rootPass2 = gui.textRootPass2->text();
-            const bool userMatch = (userPass1 == userPass2);
-            const bool rootMatch = (rootPass1 == rootPass2);
-            static const QRegularExpression usertest(u"^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"_s);
+            const bool rootEnabled = gui.boxRootAccount->isChecked();
+            const bool allRequiredFilled = !userName.isEmpty()
+                && !userPass1.isEmpty()
+                && !userPass2.isEmpty()
+                && (!rootEnabled || (!rootPass1.isEmpty() && !rootPass2.isEmpty()));
 
-            if (!userName.contains(usertest)) {
-                tui_userError = tr("The user name cannot contain special characters or spaces.");
-                tui_focusUserAccounts = 0;
-            } else if (!userMatch) {
-                tui_userError = tr("Please ensure the passwords match.");
-                tui_focusUserAccounts = 1;
-            } else if (gui.boxRootAccount->isChecked() && !rootMatch) {
-                tui_userError = tr("Please ensure the passwords match.");
-                tui_focusUserAccounts = 4;
-            } else {
-                QFile file(u"/etc/passwd"_s);
-                bool inUse = false;
-                if (file.open(QFile::ReadOnly | QFile::Text)) {
-                    const QByteArray match = QStringLiteral("%1:").arg(userName).toUtf8();
-                    while (!file.atEnd()) {
-                        if (file.readLine().startsWith(match)) {
-                            inUse = true;
-                            break;
-                        }
+            if (!allRequiredFilled) {
+                auto isRequiredField = [&](int index) -> bool {
+                    return index == 0 || index == 1 || index == 2 || (rootEnabled && (index == 4 || index == 5));
+                };
+                auto isFieldEmpty = [&](int index) -> bool {
+                    switch (index) {
+                        case 0: return gui.textUserName->text().isEmpty();
+                        case 1: return gui.textUserPass->text().isEmpty();
+                        case 2: return gui.textUserPass2->text().isEmpty();
+                        case 4: return gui.textRootPass->text().isEmpty();
+                        case 5: return gui.textRootPass2->text().isEmpty();
+                        default: return false;
+                    }
+                };
+                for (int i = 1; i <= 8; ++i) {
+                    const int idx = (tui_focusUserAccounts + i) % 8;
+                    if (isRequiredField(idx) && isFieldEmpty(idx)) {
+                        tui_focusUserAccounts = idx;
+                        break;
                     }
                 }
-                if (inUse) {
-                    tui_userError = tr("The chosen user name is in use.");
+                if (isRequiredField(tui_focusUserAccounts) && isFieldEmpty(tui_focusUserAccounts)) {
+                    tui_userError = tr("Please fill in all required fields before continuing.");
+                }
+            } else {
+                const bool userMatch = (userPass1 == userPass2);
+                const bool rootMatch = (rootPass1 == rootPass2);
+                static const QRegularExpression usertest(u"^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"_s);
+
+                if (!userName.contains(usertest)) {
+                    tui_userError = tr("The user name cannot contain special characters or spaces.");
                     tui_focusUserAccounts = 0;
-                } else if (!automatic && userPass1.isEmpty()) {
-                    if (!tui_confirmEmptyUserPass) {
-                        tui_userError = tr("You did not provide a passphrase for %1.").arg(userName);
-                        tui_confirmEmptyUserPass = true;
-                        tui_focusUserAccounts = 1;
-                    } else {
-                        gotoPage(currentPageIndex + 1);
-                    }
-                } else if (!automatic && gui.boxRootAccount->isChecked() && rootPass1.isEmpty()) {
-                    if (!tui_confirmEmptyRootPass) {
-                        tui_userError = tr("You did not provide a password for the root account.");
-                        tui_confirmEmptyRootPass = true;
-                        tui_focusUserAccounts = 4;
-                    } else {
-                        gotoPage(currentPageIndex + 1);
-                    }
+                } else if (!userMatch) {
+                    tui_userError = tr("Please ensure the passwords match.");
+                    tui_focusUserAccounts = 1;
+                } else if (rootEnabled && !rootMatch) {
+                    tui_userError = tr("Please ensure the passwords match.");
+                    tui_focusUserAccounts = 4;
                 } else {
-                    gotoPage(currentPageIndex + 1);
+                    QFile file(u"/etc/passwd"_s);
+                    bool inUse = false;
+                    if (file.open(QFile::ReadOnly | QFile::Text)) {
+                        const QByteArray match = QStringLiteral("%1:").arg(userName).toUtf8();
+                        while (!file.atEnd()) {
+                            if (file.readLine().startsWith(match)) {
+                                inUse = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (inUse) {
+                        tui_userError = tr("The chosen user name is in use.");
+                        tui_focusUserAccounts = 0;
+                    } else if (!automatic && userPass1.isEmpty()) {
+                        if (!tui_confirmEmptyUserPass) {
+                            tui_userError = tr("You did not provide a passphrase for %1.").arg(userName);
+                            tui_confirmEmptyUserPass = true;
+                            tui_focusUserAccounts = 1;
+                        } else {
+                            gotoPage(currentPageIndex + 1);
+                        }
+                    } else if (!automatic && rootEnabled && rootPass1.isEmpty()) {
+                        if (!tui_confirmEmptyRootPass) {
+                            tui_userError = tr("You did not provide a password for the root account.");
+                            tui_confirmEmptyRootPass = true;
+                            tui_focusUserAccounts = 4;
+                        } else {
+                            gotoPage(currentPageIndex + 1);
+                        }
+                    } else {
+                        gotoPage(currentPageIndex + 1);
+                    }
                 }
             }
         } else if (tui_focusUserAccounts >= 0 && tui_focusUserAccounts <= 2) {
