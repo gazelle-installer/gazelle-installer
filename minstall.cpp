@@ -3378,10 +3378,6 @@ void MInstall::renderPagePartitions() noexcept
         int row = startRow + i;
         bool selected = (idx == tui_partitionRow);
 
-        if (selected) {
-            attron(A_REVERSE);
-        }
-
         // Clear the row
         move(row, colDevice);
         clrtoeol();
@@ -3414,11 +3410,11 @@ void MInstall::renderPagePartitions() noexcept
                 sizeStr = QString::number(dev->size / (double)KB, 'f', 0) + " KB";
             }
             if (selected && tui_partitionCol == PART_COL_SIZE) {
-                attron(A_BOLD);
+                attron(A_REVERSE);
             }
             mvprintw(row, colSize, "%-10s", sizeStr.toUtf8().constData());
             if (selected && tui_partitionCol == PART_COL_SIZE) {
-                attroff(A_BOLD);
+                attroff(A_REVERSE);
             }
         }
 
@@ -3426,11 +3422,11 @@ void MInstall::renderPagePartitions() noexcept
         if (dev->type != PartMan::Device::DRIVE) {
             QString useFor = dev->usefor.isEmpty() ? "-" : dev->usefor;
             if (selected && tui_partitionCol == PART_COL_USEFOR) {
-                attron(A_BOLD);
+                attron(A_REVERSE);
             }
             mvprintw(row, colUseFor, "%-12s", useFor.left(12).toUtf8().constData());
             if (selected && tui_partitionCol == PART_COL_USEFOR) {
-                attroff(A_BOLD);
+                attroff(A_REVERSE);
             }
         }
 
@@ -3446,11 +3442,11 @@ void MInstall::renderPagePartitions() noexcept
             }
             if (label.isEmpty()) label = "-";
             if (selected && tui_partitionCol == PART_COL_LABEL) {
-                attron(A_BOLD);
+                attron(A_REVERSE);
             }
             mvprintw(row, colLabel, "%-12s", label.left(12).toUtf8().constData());
             if (selected && tui_partitionCol == PART_COL_LABEL) {
-                attroff(A_BOLD);
+                attroff(A_REVERSE);
             }
         }
 
@@ -3458,11 +3454,11 @@ void MInstall::renderPagePartitions() noexcept
         if (dev->type != PartMan::Device::DRIVE) {
             QString fmt = dev->format.isEmpty() ? (dev->curFormat.isEmpty() ? "-" : dev->curFormat) : dev->format;
             if (selected && tui_partitionCol == PART_COL_FORMAT) {
-                attron(A_BOLD);
+                attron(A_REVERSE);
             }
             mvprintw(row, colFormat, "%-10s", fmt.left(10).toUtf8().constData());
             if (selected && tui_partitionCol == PART_COL_FORMAT) {
-                attroff(A_BOLD);
+                attroff(A_REVERSE);
             }
         }
 
@@ -3471,9 +3467,6 @@ void MInstall::renderPagePartitions() noexcept
             mvprintw(row, colEncrypt, "[%c]", dev->encrypt ? 'X' : ' ');
         }
 
-        if (selected) {
-            attroff(A_REVERSE);
-        }
     }
 
     // Scroll indicators
