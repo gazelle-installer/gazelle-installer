@@ -1750,11 +1750,7 @@ void MInstall::setupPageTermsTUI() noexcept
         " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     tui_textCopyright->show();
     
-    // Create TUI label for keyboard info
-    tui_keyboardInfo = new ui::QLabel();
-    tui_keyboardInfo->setPosition(10, 2);
-    tui_keyboardInfo->setText("Keyboard settings will be displayed here.\nPress ENTER or SPACE to continue.");
-    tui_keyboardInfo->show();
+    // Keyboard settings not available in TUI mode
 }
 
 void MInstall::setupPageInstallationTUI() noexcept
@@ -2704,12 +2700,6 @@ void MInstall::renderPageTerms() noexcept
         }
     }
 
-    if (tui_keyboardInfo) {
-        auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_keyboardInfo->tuiWidget());
-        if (tuiWidget) {
-            tuiWidget->render();
-        }
-    }
 }
 
 void MInstall::renderPageInstallation() noexcept
