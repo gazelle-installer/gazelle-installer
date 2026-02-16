@@ -1888,8 +1888,12 @@ void MInstall::syncInstallationTuiFromGui() noexcept
     tui_comboDriveSystem->setEnabled(autoPartEnabled);
     if (tui_labelDriveHome) tui_labelDriveHome->setEnabled(autoPartEnabled && dualDrive);
     tui_comboDriveHome->setEnabled(autoPartEnabled && dualDrive);
-    // Slider only enabled when not using dual drives (single drive partitioning)
-    if (tui_sliderPart) tui_sliderPart->setEnabled(autoPartEnabled && !dualDrive);
+    // Slider only visible for regular install without dual drives
+    if (tui_sliderPart) {
+        const bool showSlider = autoPartEnabled && !dualDrive && gui.radioEntireDrive->isChecked();
+        if (showSlider) tui_sliderPart->show();
+        else tui_sliderPart->hide();
+    }
     if (tui_checkDualDrive) tui_checkDualDrive->setEnabled(autoPartEnabled);
     if (tui_checkEncryptAuto) tui_checkEncryptAuto->setEnabled(autoPartEnabled);
 }
@@ -4145,7 +4149,7 @@ void MInstall::handleInput(int key) noexcept
                 case 3: return dualDrive && dualDrive->isEnabled();
                 case 4: return comboSystem && comboSystem->isEnabled();
                 case 5: return comboHome && comboHome->isEnabled();
-                case 6: return slider && slider->isEnabled();
+                case 6: return slider && slider->isEnabled() && slider->isVisible();
                 case 7: return encryptAuto && encryptAuto->isEnabled();
                 default: return false;
             }
