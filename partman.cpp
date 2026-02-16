@@ -988,10 +988,11 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
             ui::QMessageBox::StandardButton result = ui::QMessageBox::warning(
                 ui::Context::isGUI() ? gui.boxMain : nullptr,
                 tr("Warning"),
-                tr("You must choose a separate boot partition when encrypting root."),
+                tr("Encrypting root without a separate unencrypted boot partition is not supported."
+                    "\n\nDo you want to go back and select a boot partition?"),
                 ui::QMessageBox::Yes | ui::QMessageBox::No,
-                ui::QMessageBox::No);
-            if (result != ui::QMessageBox::Yes) return false;
+                ui::QMessageBox::Yes);
+            if (result == ui::QMessageBox::Yes) return false;
         }
         if (!confirmBootable()) return false;
         if (!confirmSpace()) return false;
