@@ -1,8 +1,8 @@
 # Maintainer: dolphinoracle <dolphinoracle@gmail.com>
 pkgname=gazelle-installer
-pkgver=26.1.5
+pkgver=26.02
 pkgrel=1
-pkgdesc="Customizable GUI installer for MX Linux and antiX Linux"
+pkgdesc="Customizable GUI installer ported from MX Linux and antiX"
 arch=('x86_64' 'i686')
 url="https://github.com/gazelle-installer"
 license=('Apache')
