@@ -184,6 +184,11 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     // Qt will delete the heap-allocated event object when posted
     qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
 
+    //automount disalbe
+    autoMountEnabled = true; // disable auto mount by force
+    setupAutoMount(false);
+
+
     // Auto-start in both GUI and TUI mode
     if (ui::Context::isGUI()) {
         QTimer::singleShot(0, this, [this]() noexcept {
@@ -659,8 +664,6 @@ void MInstall::processNextPhase() noexcept
             swapman->setupZRam();
 
             if (!partman->checkTargetDrivesOK()) throw "";
-            autoMountEnabled = true; // disable auto mount by force
-            setupAutoMount(false);
 
             // the core of the installation
             phase = PH_INSTALLING;
