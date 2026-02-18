@@ -130,14 +130,16 @@ void CheckMD5::check(QPromise<CheckResult> &promise) const noexcept
         size_t blksize;
     };
     std::vector<HashTarget> targets;
-    // Obtain a list of MD5 hashes and their files.
-    QDirIterator it(path, {u"*.md5"_s}, QDir::Files);
+    // For Arch, prefer SHA-512 checksums; fall back to MD5 if unavailable.
+    const bool useSha512 = archMedia && QDirIterator(path, {u"*.sha512"_s}, QDir::Files).hasNext();
+    // Obtain a list of hashes and their files.
+    QDirIterator it(path, {useSha512 ? u"*.sha512"_s : u"*.md5"_s}, QDir::Files);
     QStringList missing(sqfile);
     if (!archMedia && (!QFile::exists(u"/live/config/did-toram"_s) || QFile::exists(u"/live/config/toram-all"_s))) {
         missing << u"vmlinuz"_s << u"initrd.gz"_s;
     }
     size_t bufsize = 0;
-    // Minimum optimum block size for MD5 processing is 64 bytes.
+    // Minimum optimum block size for hash processing is 64 bytes (MD5) or 128 bytes (SHA-512).
     const long pagesize = std::max<long>(sysconf(_SC_PAGESIZE), 64);
 
     while (it.hasNext()) {
@@ -172,7 +174,7 @@ void CheckMD5::check(QPromise<CheckResult> &promise) const noexcept
         promise.emplaceResult(mpath, CheckState::MISSING);
     }
 
-    // Check the MD5 hash of each file.
+    // Check the hash of each file.
     std::unique_ptr<char[]> buf(new char[bufsize]);
     void *const buffer = std::aligned_alloc(static_cast<size_t>(pagesize), bufsize);
     if (!buffer) {
@@ -194,7 +196,7 @@ void CheckMD5::check(QPromise<CheckResult> &promise) const noexcept
         }
         posix_fadvise(fd, 0, 0, POSIX_FADV_SEQUENTIAL);
 
-        QCryptographicHash hash(QCryptographicHash::Md5);
+        QCryptographicHash hash(useSha512 ? QCryptographicHash::Sha512 : QCryptographicHash::Md5);
         bool okIO = true;
         for (off_t remain = target.size; remain>0 && !promise.isCanceled();) {
             const ssize_t rlen = read(fd, buffer, target.blksize);
