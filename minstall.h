@@ -18,6 +18,7 @@
 #include "ui_meinstall.h"
 #include "mprocess.h"
 #include "core.h"
+#include "partman.h"
 #include <QVector>
 
 // Forward declare UI wrapper classes for TUI support
@@ -276,6 +277,12 @@ private:
     int tui_partitionPopupScroll = 0;
     qtui::TPushButton *tui_buttonPartitionsApply = nullptr;
     int tui_focusPartitions = 0;     // 0 = table, 1 = apply button
+    bool tui_partitionUnlocking = false;
+    bool tui_unlockFocusPass = true;
+    bool tui_unlockAddCrypttab = true;
+    PartMan::Device *tui_unlockDevice = nullptr;
+    QString tui_unlockError;
+    qtui::TLineEdit *tui_unlockPassEdit = nullptr;
 
     // TUI wrapper widgets for pageSwap
     class ui::QLabel *tui_labelSwapTitle = nullptr;

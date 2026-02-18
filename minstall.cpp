@@ -2211,6 +2211,9 @@ void MInstall::setupPagePartitionsTUI() noexcept
     tui_partitionEditing = false;
     tui_partitionEditIsLabel = false;
     tui_partitionEditIsSize = false;
+    tui_partitionUnlocking = false;
+    tui_unlockDevice = nullptr;
+    tui_unlockError.clear();
 
     if (!tui_buttonPartitionsApply) {
         tui_buttonPartitionsApply = new qtui::TPushButton(tr("Apply"));
@@ -2228,6 +2231,11 @@ void MInstall::setupPagePartitionsTUI() noexcept
     if (!tui_partitionSizeEdit) {
         tui_partitionSizeEdit = new qtui::TLineEdit();
         tui_partitionSizeEdit->setWidth(8);
+    }
+    if (!tui_unlockPassEdit) {
+        tui_unlockPassEdit = new qtui::TLineEdit();
+        tui_unlockPassEdit->setWidth(24);
+        tui_unlockPassEdit->setEchoMode(qtui::TLineEdit::Password);
     }
 }
 
@@ -3501,6 +3509,7 @@ void MInstall::renderPagePartitions() noexcept
 
         if (tui_partitionCol == PART_COL_USEFOR) {
             options = dev->allowedUsesFor();
+            options.prepend(u"-"_s);
         } else {
             options = dev->allowedFormats();
         }
@@ -3581,45 +3590,88 @@ void MInstall::renderPagePartitions() noexcept
     }
 
     // Instructions and action keys
-    if (tui_partitionEditing) {
-        if (tui_partitionEditIsSize) {
-            mvprintw(17, 2, "Type number | G/M: switch units | X: MAX | ENTER: apply | ESC: cancel");
-        } else {
-            mvprintw(17, 2, "UP/DOWN: select option | ENTER: apply | ESC: cancel");
+    if (tui_partitionUnlocking) {
+        move(17, 0); clrtoeol();
+        move(18, 0); clrtoeol();
+        move(19, 0); clrtoeol();
+
+        mvprintw(17, 2, "Password:");
+        if (tui_unlockPassEdit) {
+            tui_unlockPassEdit->setPosition(17, 12);
+            tui_unlockPassEdit->show();
+            tui_unlockPassEdit->setFocus(tui_unlockFocusPass);
+            tui_unlockPassEdit->render();
         }
-        move(18, 2); clrtoeol();
+        if (!tui_unlockFocusPass) attron(A_REVERSE);
+        mvprintw(17, 38, "[%c] Add to crypttab", tui_unlockAddCrypttab ? 'X' : ' ');
+        if (!tui_unlockFocusPass) attroff(A_REVERSE);
+
+        mvprintw(18, 2, "ENTER: unlock | TAB: switch focus | ESC: cancel");
+
+        if (!tui_unlockError.isEmpty()) {
+            mvprintw(19, 2, "%s", tui_unlockError.left(74).toUtf8().constData());
+        }
     } else {
-        mvprintw(17, 2, "UP/DOWN: select | LEFT/RIGHT: column | ENTER: edit | SPACE: toggle encrypt");
-
-        PartMan::Device *selectedDevice = nullptr;
-        if (tui_partitionRow < static_cast<int>(devices.size())) {
-            selectedDevice = devices[tui_partitionRow];
+        if (tui_unlockPassEdit) {
+            tui_unlockPassEdit->setFocus(false);
+            tui_unlockPassEdit->hide();
         }
-        const bool canClear = selectedDevice && selectedDevice->type == PartMan::Device::DRIVE && !selectedDevice->isLocked();
-        const bool canAdd = selectedDevice && !selectedDevice->flags.oldLayout
-            && selectedDevice->driveFreeSpace(true) >= 1 * MB;
-        const bool canDelete = selectedDevice && selectedDevice->type != PartMan::Device::DRIVE
-            && !selectedDevice->flags.oldLayout;
-        const bool canNewSubvol = selectedDevice && selectedDevice->isVolume()
-            && selectedDevice->finalFormat() == "btrfs"_L1;
-        const bool canScanSubvols = canNewSubvol && !selectedDevice->willFormat();
+        move(19, 0); clrtoeol();
 
-        int col = 2;
-        auto printAction = [&](const char *text, bool enabled) {
-            if (!enabled) attron(A_DIM);
-            mvprintw(18, col, "%s", text);
-            if (!enabled) attroff(A_DIM);
-            col += static_cast<int>(std::strlen(text));
-        };
+        if (tui_partitionEditing) {
+            if (tui_partitionEditIsSize) {
+                mvprintw(17, 2, "Type number | G/M: switch units | X: MAX | ENTER: apply | ESC: cancel");
+            } else {
+                mvprintw(17, 2, "UP/DOWN: select option | ENTER: apply | ESC: cancel");
+            }
+            move(18, 2); clrtoeol();
+        } else {
+            mvprintw(17, 2, "UP/DOWN: select | LEFT/RIGHT: column | ENTER: edit | SPACE: toggle encrypt");
 
-        printAction("C: clear drive", canClear);
-        printAction(" | A: add partition", canAdd);
-        printAction(" | D: delete", canDelete);
-        printAction(" | N: new subvol", canNewSubvol);
-        printAction(" | S: scan subvols", canScanSubvols);
-        printAction(" | R: reload", true);
-        printAction(" | P: partition manager", true);
-        printAction(" | TAB: focus apply", true);
+            PartMan::Device *selectedDevice = nullptr;
+            if (tui_partitionRow < static_cast<int>(devices.size())) {
+                selectedDevice = devices[tui_partitionRow];
+            }
+            const bool canClear = selectedDevice && selectedDevice->type == PartMan::Device::DRIVE && !selectedDevice->isLocked();
+            const bool canAdd = selectedDevice && !selectedDevice->flags.oldLayout
+                && selectedDevice->driveFreeSpace(true) >= 1 * MB;
+            const bool canDelete = selectedDevice && selectedDevice->type != PartMan::Device::DRIVE
+                && !selectedDevice->flags.oldLayout;
+            const bool canNewSubvol = selectedDevice && selectedDevice->isVolume()
+                && selectedDevice->finalFormat() == "btrfs"_L1;
+            const bool canScanSubvols = canNewSubvol && !selectedDevice->willFormat();
+            const bool canUnlock = selectedDevice
+                && selectedDevice->type == PartMan::Device::PARTITION
+                && selectedDevice->flags.oldLayout
+                && selectedDevice->curFormat == "crypto_LUKS"_L1
+                && !selectedDevice->mapCount;
+            const bool canLock = selectedDevice
+                && selectedDevice->type == PartMan::Device::VIRTUAL
+                && selectedDevice->flags.volCrypto;
+            const bool canCrypttab = selectedDevice
+                && (selectedDevice->encrypt
+                    || (selectedDevice->flags.oldLayout && selectedDevice->curFormat == "crypto_LUKS"_L1));
+
+            int col = 2;
+            auto printAction = [&](const char *text, bool enabled) {
+                if (!enabled) attron(A_DIM);
+                mvprintw(18, col, "%s", text);
+                if (!enabled) attroff(A_DIM);
+                col += static_cast<int>(std::strlen(text));
+            };
+
+            printAction("C: clear drive", canClear);
+            printAction(" | A: add partition", canAdd);
+            printAction(" | D: delete", canDelete);
+            printAction(" | N: new subvol", canNewSubvol);
+            printAction(" | S: scan subvols", canScanSubvols);
+            printAction(" | R: reload", true);
+            printAction(" | P: partition manager", true);
+            printAction(" | TAB: focus apply", true);
+            if (canUnlock) printAction(" | U: unlock", true);
+            if (canLock) printAction(" | L: lock", true);
+            if (canCrypttab) printAction(" | T: crypttab", true);
+        }
     }
 }
 
@@ -4308,6 +4360,38 @@ void MInstall::handleInput(int key) noexcept
             if (tui_buttonPartitionsApply->handleKey(key)) {
                 // apply handled by button click signal
             }
+        } else if (tui_partitionUnlocking) {
+            if (key == 27) { // ESC
+                tui_partitionUnlocking = false;
+                tui_unlockDevice = nullptr;
+                tui_unlockError.clear();
+            } else if (key == '\t') {
+                tui_unlockFocusPass = !tui_unlockFocusPass;
+            } else if (key == ' ' && !tui_unlockFocusPass) {
+                tui_unlockAddCrypttab = !tui_unlockAddCrypttab;
+            } else if (key == '\n' || key == KEY_ENTER) {
+                if (tui_unlockFocusPass) {
+                    if (!tui_unlockPassEdit || tui_unlockPassEdit->text().isEmpty()) {
+                        beep();
+                    } else if (tui_unlockDevice && crypto && partman) {
+                        const QByteArray password = tui_unlockPassEdit->text().toUtf8();
+                        if (crypto->open(tui_unlockDevice, password)) {
+                            tui_unlockDevice->usefor.clear();
+                            tui_unlockDevice->addToCrypttab = tui_unlockAddCrypttab;
+                            partman->scanVirtualDevices(true);
+                            tui_partitionUnlocking = false;
+                            tui_unlockDevice = nullptr;
+                            tui_unlockError.clear();
+                        } else {
+                            tui_unlockError = tr("Could not unlock device. Incorrect password?");
+                        }
+                    }
+                } else {
+                    tui_unlockAddCrypttab = !tui_unlockAddCrypttab;
+                }
+            } else if (tui_unlockFocusPass && tui_unlockPassEdit) {
+                tui_unlockPassEdit->handleKey(key);
+            }
         } else if (tui_partitionEditing && selectedDevice) {
             // Handle editing navigation first so arrows don't move the row
             if (tui_partitionEditIsSize) {
@@ -4462,9 +4546,13 @@ void MInstall::handleInput(int key) noexcept
                 if (key == KEY_UP && tui_partitionEditIndex > 0) {
                     tui_partitionEditIndex--;
                 } else if (key == KEY_DOWN) {
-                    QStringList options = (tui_partitionCol == PART_COL_USEFOR)
-                        ? selectedDevice->allowedUsesFor()
-                        : selectedDevice->allowedFormats();
+                    QStringList options;
+                    if (tui_partitionCol == PART_COL_USEFOR) {
+                        options = selectedDevice->allowedUsesFor();
+                        options.prepend(u"-"_s);
+                    } else {
+                        options = selectedDevice->allowedFormats();
+                    }
                     if (tui_partitionEditIndex < options.size() - 1) {
                         tui_partitionEditIndex++;
                     }
@@ -4474,8 +4562,13 @@ void MInstall::handleInput(int key) noexcept
                         tui_partitionCol = nextCol;
                         if (tui_partitionCol == PART_COL_USEFOR) {
                             QStringList uses = selectedDevice->allowedUsesFor();
-                            tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
-                            if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                            uses.prepend(u"-"_s);
+                            if (selectedDevice->usefor.isEmpty()) {
+                                tui_partitionEditIndex = 0;
+                            } else {
+                                tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
+                                if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                            }
                         } else if (tui_partitionCol == PART_COL_FORMAT) {
                             QStringList formats = selectedDevice->allowedFormats();
                             QString curFmt = selectedDevice->format.isEmpty() ? selectedDevice->curFormat : selectedDevice->format;
@@ -4492,8 +4585,13 @@ void MInstall::handleInput(int key) noexcept
                     partman->changeBegin(selectedDevice);
                     if (tui_partitionCol == PART_COL_USEFOR) {
                         QStringList uses = selectedDevice->allowedUsesFor();
+                        uses.prepend(u"-"_s);
                         if (tui_partitionEditIndex < uses.size()) {
-                            selectedDevice->usefor = uses[tui_partitionEditIndex];
+                            if (tui_partitionEditIndex == 0) {
+                                selectedDevice->usefor.clear();
+                            } else {
+                                selectedDevice->usefor = uses[tui_partitionEditIndex];
+                            }
                         }
                     } else if (tui_partitionCol == PART_COL_FORMAT) {
                         QStringList formats = selectedDevice->allowedFormats();
@@ -4591,10 +4689,15 @@ void MInstall::handleInput(int key) noexcept
                         tui_partitionEditIsSize = false;
                         tui_partitionEditIndex = 0;
                         if (tui_partitionCol == PART_COL_USEFOR) {
-                            // Use For column - find current index
+                            // Use For column - find current index ("-" at index 0 for empty)
                             QStringList uses = selectedDevice->allowedUsesFor();
-                            tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
-                            if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                            uses.prepend(u"-"_s);
+                            if (selectedDevice->usefor.isEmpty()) {
+                                tui_partitionEditIndex = 0;
+                            } else {
+                                tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
+                                if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                            }
                         } else if (tui_partitionCol == PART_COL_FORMAT) {
                             // Format column - find current index
                             QStringList formats = selectedDevice->allowedFormats();
@@ -4688,6 +4791,46 @@ void MInstall::handleInput(int key) noexcept
             clear();
             gui.pushPartReload->click();
             tui_partitionRow = 0;
+        } else if (key == 'u' || key == 'U') {
+            // Unlock LUKS partition
+            if (selectedDevice
+                && selectedDevice->type == PartMan::Device::PARTITION
+                && selectedDevice->flags.oldLayout
+                && selectedDevice->curFormat == "crypto_LUKS"_L1
+                && !selectedDevice->mapCount) {
+                tui_partitionUnlocking = true;
+                tui_partitionEditing = false;
+                tui_unlockDevice = selectedDevice;
+                tui_unlockAddCrypttab = true;
+                tui_unlockFocusPass = true;
+                tui_unlockError.clear();
+                if (tui_unlockPassEdit) tui_unlockPassEdit->setText(QString());
+            } else {
+                beep();
+            }
+        } else if (key == 'l' || key == 'L') {
+            // Lock LUKS virtual volume
+            if (selectedDevice
+                && selectedDevice->type == PartMan::Device::VIRTUAL
+                && selectedDevice->flags.volCrypto
+                && crypto && partman) {
+                if (!crypto->close(selectedDevice)) {
+                    beep();
+                }
+                partman->scanVirtualDevices(true);
+            } else {
+                beep();
+            }
+        } else if (key == 't' || key == 'T') {
+            // Toggle add-to-crypttab for LUKS partition
+            if (selectedDevice
+                && (selectedDevice->encrypt
+                    || (selectedDevice->flags.oldLayout
+                        && selectedDevice->curFormat == "crypto_LUKS"_L1))) {
+                selectedDevice->addToCrypttab = !selectedDevice->addToCrypttab;
+            } else {
+                beep();
+            }
         }
     } else if (currentPageIndex == Step::ENCRYPTION) {
         qtui::TLineEdit* passFields[2] = {nullptr, nullptr};
