@@ -1,6 +1,6 @@
 # Maintainer: dolphinoracle <dolphinoracle@gmail.com>
 pkgname=gazelle-installer
-pkgver=26.02
+pkgver=26.02.1
 pkgrel=1
 pkgdesc="Customizable GUI installer ported from MX Linux and antiX"
 arch=('x86_64' 'i686')
@@ -86,5 +86,5 @@ package() {
     # Install documentation
     install -Dm644 "LICENSE" "${pkgdir}/usr/share/doc/gazelle-installer/LICENSE"
     install -Dm644 "NOTICE" "${pkgdir}/usr/share/doc/gazelle-installer/NOTICE"
-    install -Dm644 "debian/copyright" "${pkgdir}/usr/share/doc/gazelle-installer/copyright"
+
 }
