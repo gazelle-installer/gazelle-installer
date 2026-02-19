@@ -55,21 +55,54 @@ function(build_compilation_setup target)
 endfunction()
 
 function(build_version_definition target definition)
-	# Get version from debian/changelog
-	execute_process(
-		COMMAND dpkg-parsechangelog -SVersion
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		OUTPUT_VARIABLE pkg_version
-		OUTPUT_STRIP_TRAILING_WHITESPACE
-		RESULT_VARIABLE dpkg_result
-	)
-	if((NOT dpkg_result EQUAL 0) OR (pkg_version STREQUAL ""))
-		message(WARNING "Failed to get version from debian/changelog using dpkg-parsechangelog")
-		set(pkg_version "${PROJECT_VERSION}")
+	set(options)
+	set(oneValueArgs SOURCE TAG)
+	cmake_parse_arguments(BVD "${options}" "${oneValueArgs}" "" ${ARGN})
+
+	if(BVD_SOURCE STREQUAL "")
+		set(BVD_SOURCE "debian_changelog")
 	endif()
+
+	if(BVD_SOURCE STREQUAL "tag")
+		if(DEFINED BVD_TAG)
+			set(pkg_version "${BVD_TAG}")
+		else()
+			execute_process(
+				COMMAND git tag --sort=-v:refname
+				WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+				OUTPUT_VARIABLE tag_output
+				OUTPUT_STRIP_TRAILING_WHITESPACE
+				RESULT_VARIABLE git_result
+			)
+			string(REGEX MATCH "^[^\n]+" pkg_version "${tag_output}")
+			string(REGEX REPLACE "^v" "" pkg_version "${pkg_version}")
+			if((NOT git_result EQUAL 0) OR (pkg_version STREQUAL ""))
+				message(WARNING "Failed to get latest tag using git tag --sort=-v:refname")
+				set(pkg_version "${PROJECT_VERSION}")
+			endif()
+		endif()
+	elseif(BVD_SOURCE STREQUAL "debian_changelog")
+		execute_process(
+			COMMAND dpkg-parsechangelog -SVersion
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			OUTPUT_VARIABLE pkg_version
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			RESULT_VARIABLE dpkg_result
+		)
+		if((NOT dpkg_result EQUAL 0) OR (pkg_version STREQUAL ""))
+			message(WARNING "Failed to get version from debian/changelog using dpkg-parsechangelog")
+			set(pkg_version "${PROJECT_VERSION}")
+		endif()
+	else()
+		message(FATAL_ERROR
+			"Unknown version source '${BVD_SOURCE}'. Expected 'debian_changelog' or 'tag'."
+		)
+	endif()
+
 	if(pkg_version STREQUAL "")
-		message(FATAL_ERROR "Cannot add ${definition} compile definition: PROJECT_VERSION empty")
+		message(FATAL_ERROR "Cannot add ${definition} compile definition: project version is empty")
 	endif()
+
 	target_compile_definitions(${target} PRIVATE
 		${definition}="${pkg_version}"
 	)

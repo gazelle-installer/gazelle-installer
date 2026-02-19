@@ -30,12 +30,23 @@ source=()
 sha256sums=()
 
 pkgver() {
-    sed -n '1s/.*(\([^)]*\)).*/\1/p' "${startdir}/debian/changelog" | sed 's/mx.*//'
+    local tag
+    tag="$(git -C "${startdir}" tag --sort=-v:refname | head -n1)"
+    if [ -n "${tag}" ]; then
+        printf '%s\n' "${tag#v}"
+    else
+        printf '%s\n' "${pkgver}"
+    fi
 }
 
 build() {
     cd "${startdir}"
-    cmake --preset arch -DUSE_ZXCVBN=OFF
+    local version_tag
+    version_tag="$(pkgver)"
+    cmake --preset arch \
+        -DUSE_ZXCVBN=OFF \
+        -DGAZELLE_VERSION_SOURCE=tag \
+        -DGAZELLE_VERSION_TAG="${version_tag}"
     cmake --build --preset arch
 }
 
