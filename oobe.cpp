@@ -148,7 +148,10 @@ Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, MIni &appConf, bool 
 
     // Current user details
     curUser = getlogin();
-    if (curUser.isEmpty()) {
+    // Fall back to "demo" if running directly as root (TUI mode) or if getlogin() returns empty,
+    // since using "root" as the template user would corrupt /etc/passwd and other system files
+    // in the installed system by replacing all occurrences of "root" with the new username.
+    if (curUser.isEmpty() || curUser == "root"_L1) {
         curUser = "demo"_L1;
     }
     // Using $HOME results in the wrong directory when run as root (with su).
