@@ -8,6 +8,13 @@ project(minstall
 )
 
 option(USE_ZXCVBN "Use zxcvbn for password strength estimation" ON)
+set(GAZELLE_VERSION_SOURCE "debian_changelog" CACHE STRING
+	"Source for VERSION compile definition: debian_changelog or tag"
+)
+set_property(CACHE GAZELLE_VERSION_SOURCE PROPERTY STRINGS debian_changelog tag)
+set(GAZELLE_VERSION_TAG "" CACHE STRING
+	"Explicit tag version (used when GAZELLE_VERSION_SOURCE=tag)"
+)
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Concurrent LinguistTools)
 set(CMAKE_AUTORCC ON)
@@ -67,7 +74,16 @@ if(USE_ZXCVBN)
 endif()
 
 build_compilation_setup(minstall)
-build_version_definition(minstall VERSION)
+if(GAZELLE_VERSION_TAG STREQUAL "")
+	build_version_definition(minstall VERSION
+		SOURCE "${GAZELLE_VERSION_SOURCE}"
+	)
+else()
+	build_version_definition(minstall VERSION
+		SOURCE "${GAZELLE_VERSION_SOURCE}"
+		TAG "${GAZELLE_VERSION_TAG}"
+	)
+endif()
 build_translation_files(minstall translations)
 
 target_compile_definitions(minstall PRIVATE
