@@ -44,10 +44,8 @@ compile_commands.json
 _build_/*
 
 # Debian folder
-debian/.debhelper/
-debian/files
-debian/*.log
-debian/*.substvars
+debian
+debs
 
 # Transifex ignore
 .tx/
