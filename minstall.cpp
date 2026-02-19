@@ -233,6 +233,13 @@ void MInstall::gotoAfterPartitionsTui() noexcept
     if (!partman->validate(false)) {
         return;
     }
+    if (!pretend && base && !base->saveHomeBasic()) {
+        ui::QMessageBox::critical(nullptr,
+            tr("Error"),
+            tr("The data in /home cannot be preserved because"
+                " the required information could not be obtained."));
+        return;
+    }
     for (PartMan::Iterator it(*partman); *it; it.next()) {
         PartMan::Device *device = *it;
         if (device && device->type == PartMan::Device::PARTITION
