@@ -32,6 +32,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QProcessEnvironment>
 #include <QRegularExpression>
 #include <QMessageBox>
 #include <QPainter>
@@ -700,6 +701,10 @@ void PartMan::partReloadClick()
 void PartMan::partManRunClick()
 {
     gui.boxMain->setEnabled(false);
+    // Restore the user's locale so the partition editor opens in their language.
+    QProcessEnvironment env = proc.processEnvironment();
+    env.remove(u"LC_ALL"_s);
+    proc.setProcessEnvironment(env);
     if (QFile::exists(u"/usr/bin/gparted"_s)) {
         proc.exec(u"/usr/bin/gparted"_s);
     } else if (QFile::exists(u"/usr/sbin/gparted"_s)) {
@@ -707,6 +712,8 @@ void PartMan::partManRunClick()
     } else {
         proc.exec(u"partitionmanager"_s);
     }
+    env.insert(u"LC_ALL"_s, u"C.UTF-8"_s);
+    proc.setProcessEnvironment(env);
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     scan();
     gui.boxMain->setEnabled(true);
