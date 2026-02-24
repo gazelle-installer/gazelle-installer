@@ -762,6 +762,7 @@ void Oobe::setUserInfo() const
     replaceStringInFile(curUser, username, rootpath + "/etc/slim.conf"_L1);
     replaceStringInFile(curUser, username, rootpath + "/etc/slimski.local.conf"_L1);
     replaceStringInFile(curUser, username, rootpath + "/etc/lightdm/lightdm.conf"_L1);
+    replaceStringInFile(curUser, username, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
     replaceStringInFile(curUser, username, rootpath + "/home/*/.gtkrc-2.0"_L1);
     replaceStringInFile(curUser, username, rootpath + "/root/.gtkrc-2.0"_L1);
     if (gui.checkAutoLogin->isChecked()) {
@@ -770,6 +771,7 @@ void Oobe::setUserInfo() const
         replaceStringInFile(u"#autologin_enabled"_s, u"autologin_enabled"_s, rootpath + "/etc/slimski.local.conf"_L1);
         replaceStringInFile(u"#default_user "_s, u"default_user "_s, rootpath + "/etc/slimski.local.conf"_L1);
         replaceStringInFile(u"User="_s, "User="_L1 + username, rootpath + "/etc/sddm.conf"_L1);
+        replaceStringInFile(u"User="_s, "User="_L1 + username, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
     }
     else {
         replaceStringInFile(u"auto_login"_s, u"#auto_login"_s, rootpath + "/etc/slim.conf"_L1);
@@ -778,6 +780,7 @@ void Oobe::setUserInfo() const
         replaceStringInFile(u"default_user "_s, u"#default_user "_s, rootpath + "/etc/slimski.local.conf"_L1);
         replaceStringInFile(u"autologin-user="_s, u"#autologin-user="_s, rootpath + "/etc/lightdm/lightdm.conf"_L1);
         replaceStringInFile(u"User=.*"_s, u"User="_s, rootpath + "/etc/sddm.conf"_L1);
+        replaceStringInFile(u"User=.*"_s, u"User="_s, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
     }
     proc.exec(u"touch"_s, {rootpath + "/var/mail/"_L1 + username});
 }
