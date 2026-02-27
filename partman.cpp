@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <QDebug>
 #include <QLocale>
+#include <QFile>
 #include <QFileInfo>
 #include <QDir>
 #include <QJsonDocument>
@@ -104,6 +105,22 @@ PartMan::PartMan(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, Crypto &cman,
     // UUID of the device that the live system is booted from.
     const MIni livecfg(u"/live/config/initrd.out"_s, MIni::ReadOnly);
     bootUUID = livecfg.getString(u"BOOT_UUID"_s);
+    // Fallback: detect live boot partition from /proc/mounts when BOOT_UUID is unavailable.
+    // Checks both the Debian/MX live-boot mountpoint and the Arch (archiso) mountpoint.
+    if (bootUUID.isEmpty()) {
+        QFile mounts(u"/proc/mounts"_s);
+        if (mounts.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            for (const QByteArray &line : mounts.readAll().split('\n')) {
+                const QList<QByteArray> parts = line.split(' ');
+                if (parts.size() > 1
+                    && (parts.at(1) == "/live/boot-dev"
+                        || parts.at(1) == "/run/archiso/bootmnt")) {
+                    bootPartPath = QString::fromLatin1(parts.at(0));
+                    break;
+                }
+            }
+        }
+    }
 }
 PartMan::~PartMan()
 {
@@ -196,7 +213,8 @@ void PartMan::scan(Device *drvstart)
             if ((partflags & 0x80) || (partflags & 0x04)) part->setActive(true);
             part->mapCount = jsonPart[u"children"_s].toArray().count();
             part->flags.sysEFI = part->flags.curESP = partTypeName.startsWith("EFI "_L1); // "System"/"(FAT-12/16/32)"
-            part->flags.bootRoot = (!bootUUID.isEmpty() && part->uuid == bootUUID);
+            part->flags.bootRoot = (!bootUUID.isEmpty() && part->uuid == bootUUID)
+                || (!bootPartPath.isEmpty() && part->path == bootPartPath);
             part->curFormat = jsonPart[u"fstype"_s].toString();
             if (part->curFormat == "vfat"_L1) part->curFormat = jsonPart[u"fsver"_s].toString();
             if (partTypeName == "BIOS boot"_L1) part->curFormat = "BIOS-GRUB"_L1;
@@ -294,7 +312,8 @@ void PartMan::scanVirtualDevices(bool rescan)
             device->discgran = discgran;
             device->size = size;
             device->physec = physec;
-            device->flags.bootRoot = (!bootUUID.isEmpty() && device->uuid == bootUUID);
+            device->flags.bootRoot = (!bootUUID.isEmpty() && device->uuid == bootUUID)
+                || (!bootPartPath.isEmpty() && device->path == bootPartPath);
             device->curLabel = label;
             device->curFormat = jsonDev[u"fstype"_s].toString();
             device->flags.volCrypto = crypto;

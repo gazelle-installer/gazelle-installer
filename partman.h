@@ -87,6 +87,7 @@ public:
     };
     std::map<QString, struct VolumeSpec> volSpecs;
     QString bootUUID;
+    QString bootPartPath;
     class AutoPart *autopart = nullptr;
     PartMan(class MProcess &mproc, class Core &mcore, class Ui::MeInstall &ui, class Crypto &cman,
         const class MIni &appConf, const QCommandLineParser &appArgs, QObject *parent = nullptr);
