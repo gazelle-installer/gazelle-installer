@@ -115,6 +115,11 @@ else
     unset k v
     unset __ENVIRONEMENT_PATTERN__
 
+    # unset QT_QPA_PLATFORM to let Qt auto-detect; a user-set value (e.g. wayland)
+    # can cause failures when running as root since the Wayland socket belongs to
+    # the user session and qt6-wayland may not be present on the live ISO
+    unset QT_QPA_PLATFORM
+
     # set XDG_RUNTIME_DIR - create a valid runtime dir
     if [ "$XDG_RUNTIME_DIR" != "/run/user/0" ]; then
         XDG_RUNTIME_DIR=/run/user/0
