@@ -771,7 +771,7 @@ void Oobe::setUserInfo() const
         replaceStringInFile(u"#autologin_enabled"_s, u"autologin_enabled"_s, rootpath + "/etc/slimski.local.conf"_L1);
         replaceStringInFile(u"#default_user "_s, u"default_user "_s, rootpath + "/etc/slimski.local.conf"_L1);
         replaceStringInFile(u"User="_s, "User="_L1 + username, rootpath + "/etc/sddm.conf"_L1);
-        replaceStringInFile(u"User="_s, "User="_L1 + username, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
+        replaceStringInFile(u"User=.*"_s, "User="_L1 + username, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
     }
     else {
         replaceStringInFile(u"auto_login"_s, u"#auto_login"_s, rootpath + "/etc/slim.conf"_L1);
