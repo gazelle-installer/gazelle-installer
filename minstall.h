@@ -174,6 +174,7 @@ private:
     class ui::QLabel *tui_labelRootPass2 = nullptr;
     class ui::QLineEdit *tui_textRootPass2 = nullptr;
     class ui::QCheckBox *tui_checkSaveDesktop = nullptr;
+    class ui::QCheckBox *tui_checkCopyLiveUsb = nullptr;
 
     // TUI wrapper widgets for pageOldHome
     class ui::QLabel *tui_labelOldHomeTitle = nullptr;

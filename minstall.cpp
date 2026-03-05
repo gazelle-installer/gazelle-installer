@@ -2610,6 +2610,13 @@ void MInstall::setupPageUserAccountsTUI() noexcept
     tui_checkSaveDesktop->setChecked(false);
     tui_checkSaveDesktop->show();
 
+    tui_checkCopyLiveUsb = new ui::QCheckBox();
+    tui_checkCopyLiveUsb->setPosition(19, labelCol);
+    tui_checkCopyLiveUsb->setText(gui.checkCopyLiveUsb->text());
+    tui_checkCopyLiveUsb->setChecked(true);
+    // Visibility is determined later based on whether Live-usb-storage symlinks are present.
+    tui_checkCopyLiveUsb->hide();
+
     tui_userError.clear();
     tui_confirmEmptyUserPass = false;
     tui_confirmEmptyRootPass = false;
@@ -3867,6 +3874,14 @@ void MInstall::renderPageUserAccounts() noexcept
     if (tui_checkSaveDesktop) {
         tui_checkSaveDesktop->setChecked(gui.checkSaveDesktop->isChecked());
     }
+    if (tui_checkCopyLiveUsb) {
+        if (gui.checkCopyLiveUsb->isVisible()) {
+            tui_checkCopyLiveUsb->setChecked(gui.checkCopyLiveUsb->isChecked());
+            tui_checkCopyLiveUsb->show();
+        } else {
+            tui_checkCopyLiveUsb->hide();
+        }
+    }
 
     const bool rootEnabled = gui.boxRootAccount->isChecked();
     if (tui_labelRootPass) tui_labelRootPass->setEnabled(rootEnabled);
@@ -3977,12 +3992,18 @@ void MInstall::renderPageUserAccounts() noexcept
             tuiWidget->render();
         }
     }
+    if (tui_checkCopyLiveUsb && gui.checkCopyLiveUsb->isVisible()) {
+        auto* tuiWidget = dynamic_cast<qtui::TCheckBox*>(tui_checkCopyLiveUsb->tuiWidget());
+        if (tuiWidget) {
+            tuiWidget->render();
+        }
+    }
 
     // Instructions
     if (!tui_userError.isEmpty()) {
-        mvprintw(18, 2, "%s", tui_userError.toUtf8().constData());
+        mvprintw(20, 2, "%s", tui_userError.toUtf8().constData());
     }
-    mvprintw(19, 2, "TAB to switch fields, SPACE to toggle, ENTER for next field/continue");
+    mvprintw(21, 2, "TAB to switch fields, SPACE to toggle, ENTER for next field/continue");
 }
 
 void MInstall::renderPageOldHome() noexcept
@@ -5429,6 +5450,7 @@ void MInstall::handleInput(int key) noexcept
         qtui::TCheckBox* rootCheck = nullptr;
         qtui::TCheckBox* autoLogin = nullptr;
         qtui::TCheckBox* saveDesktop = nullptr;
+        qtui::TCheckBox* copyLiveUsb = nullptr;
 
         if (tui_textUserName) {
             edits[0] = dynamic_cast<qtui::TLineEdit*>(tui_textUserName->tuiWidget());
@@ -5454,6 +5476,9 @@ void MInstall::handleInput(int key) noexcept
         if (tui_checkSaveDesktop) {
             saveDesktop = dynamic_cast<qtui::TCheckBox*>(tui_checkSaveDesktop->tuiWidget());
         }
+        if (tui_checkCopyLiveUsb && gui.checkCopyLiveUsb->isVisible()) {
+            copyLiveUsb = dynamic_cast<qtui::TCheckBox*>(tui_checkCopyLiveUsb->tuiWidget());
+        }
 
         auto isFocusable = [&](int index) -> bool {
             switch (index) {
@@ -5465,14 +5490,15 @@ void MInstall::handleInput(int key) noexcept
                 case 5: return edits[4] && edits[4]->isEnabled();
                 case 6: return autoLogin && autoLogin->isEnabled();
                 case 7: return saveDesktop && saveDesktop->isEnabled();
+                case 8: return copyLiveUsb && copyLiveUsb->isEnabled();
                 default: return false;
             }
         };
 
         auto moveFocus = [&](int delta) {
             int idx = tui_focusUserAccounts;
-            for (int i = 0; i < 8; ++i) {
-                idx = (idx + delta + 8) % 8;
+            for (int i = 0; i < 9; ++i) {
+                idx = (idx + delta + 9) % 9;
                 if (isFocusable(idx)) {
                     tui_focusUserAccounts = idx;
                     break;
@@ -5507,6 +5533,9 @@ void MInstall::handleInput(int key) noexcept
         } else if (key == ' ' && saveDesktop && tui_focusUserAccounts == 7) {
             saveDesktop->toggle();
             gui.checkSaveDesktop->setChecked(saveDesktop->isChecked());
+        } else if (key == ' ' && copyLiveUsb && tui_focusUserAccounts == 8) {
+            copyLiveUsb->toggle();
+            gui.checkCopyLiveUsb->setChecked(copyLiveUsb->isChecked());
         } else if (key == '\n' || key == KEY_ENTER) {
             const QString &userName = gui.textUserName->text();
             const QString userPass1 = gui.textUserPass->text();
@@ -5533,8 +5562,8 @@ void MInstall::handleInput(int key) noexcept
                         default: return false;
                     }
                 };
-                for (int i = 1; i <= 8; ++i) {
-                    const int idx = (tui_focusUserAccounts + i) % 8;
+                for (int i = 1; i <= 9; ++i) {
+                    const int idx = (tui_focusUserAccounts + i) % 9;
                     if (isRequiredField(idx) && isFieldEmpty(idx)) {
                         tui_focusUserAccounts = idx;
                         break;
@@ -5628,6 +5657,7 @@ void MInstall::handleInput(int key) noexcept
         if (edits[4]) edits[4]->setFocus(tui_focusUserAccounts == 5);
         if (autoLogin) autoLogin->setFocus(tui_focusUserAccounts == 6);
         if (saveDesktop) saveDesktop->setFocus(tui_focusUserAccounts == 7);
+        if (copyLiveUsb) copyLiveUsb->setFocus(tui_focusUserAccounts == 8);
     } else if (currentPageIndex == Step::OLD_HOME) {
         // pageOldHome: UP/DOWN to navigate, SPACE to select
         qtui::TRadioButton* radios[3] = {nullptr, nullptr, nullptr};
@@ -6219,6 +6249,7 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         qtui::TCheckBox* rootCheck = nullptr;
         qtui::TCheckBox* autoLogin = nullptr;
         qtui::TCheckBox* saveDesktop = nullptr;
+        qtui::TCheckBox* copyLiveUsb = nullptr;
 
         if (tui_textUserName) {
             edits[0] = dynamic_cast<qtui::TLineEdit*>(tui_textUserName->tuiWidget());
@@ -6244,6 +6275,9 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         if (tui_checkSaveDesktop) {
             saveDesktop = dynamic_cast<qtui::TCheckBox*>(tui_checkSaveDesktop->tuiWidget());
         }
+        if (tui_checkCopyLiveUsb && gui.checkCopyLiveUsb->isVisible()) {
+            copyLiveUsb = dynamic_cast<qtui::TCheckBox*>(tui_checkCopyLiveUsb->tuiWidget());
+        }
 
         for (int i = 0; i < 5; ++i) {
             if (edits[i] && edits[i]->handleMouse(mouseY, mouseX)) {
@@ -6268,6 +6302,9 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         } else if (saveDesktop && saveDesktop->handleMouse(mouseY, mouseX)) {
             tui_focusUserAccounts = 7;
             gui.checkSaveDesktop->setChecked(saveDesktop->isChecked());
+        } else if (copyLiveUsb && copyLiveUsb->handleMouse(mouseY, mouseX)) {
+            tui_focusUserAccounts = 8;
+            gui.checkCopyLiveUsb->setChecked(copyLiveUsb->isChecked());
         }
 
         for (int i = 0; i < 3; ++i) {
@@ -6280,6 +6317,7 @@ void MInstall::handleMouse(int mouseY, int mouseX, int mouseState) noexcept
         if (edits[4]) edits[4]->setFocus(tui_focusUserAccounts == 5);
         if (autoLogin) autoLogin->setFocus(tui_focusUserAccounts == 6);
         if (saveDesktop) saveDesktop->setFocus(tui_focusUserAccounts == 7);
+        if (copyLiveUsb) copyLiveUsb->setFocus(tui_focusUserAccounts == 8);
     } else if (currentPageIndex == Step::OLD_HOME) {
         qtui::TRadioButton* radios[3] = {nullptr, nullptr, nullptr};
 
