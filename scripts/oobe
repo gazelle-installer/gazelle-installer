@@ -11,11 +11,14 @@
 # Description:       Debian init script for the Out-of-Box Experience
 ### END INIT INFO
 
-PATH=/sbin:/bin:/usr/bin:/usr/sbin
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
 #don't start on rpi first boot
 FILE="/etc/rpi_skip_first_boot"
 if [ -e "$FILE" ]; then
+	if [ -x /etc/resize-root-fs ]; then
+		/etc/resize-root-fs
+	fi
 	rm "$FILE"
 	exit 0
 fi
