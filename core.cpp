@@ -32,7 +32,7 @@ using namespace Qt::Literals::StringLiterals;
 Core::Core(MProcess &mproc) : proc(mproc)
 {
     // These SysVinit files are present as symlinks on systemd-only systems.
-    for (const auto &path : {u"/usr/bin/init"_s, u"/usr/sbin/init"_s, u"/live/aufs/usr/sbin/init"_s}) {
+    for (const auto &path : {u"/usr/lib/sysvinit/init"_s,u"/usr/bin/init"_s, u"/usr/sbin/init"_s, u"/live/aufs/usr/sbin/init"_s,u"/live/aufs/usr/lib/sysvinit/init"_s}) {
         const QFileInfo initfile(path); // Online and Offline respectively
         if (!initfile.isSymbolicLink() && initfile.isExecutable()) {
             containsSysVinit = true;
@@ -153,7 +153,6 @@ void Core::setService(const QString &service, bool enabled) const
     };
 
     if (containsSysVinit) {
-        qDebug() << "service is:  " << service;
         if (QFileInfo::exists(u"/etc/init.d/"_s + service)) {
             proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
         } else{
