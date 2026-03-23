@@ -60,6 +60,14 @@ SwapMan::SwapMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui,
         gui.labelZramRecSize->setText(tr("Unable to query RAM size."));
         gui.spinZramSize->setMaximum(0);
     }
+    //don't allow configuration of zramswap if zramswap components are not present
+    //check for zramswap configuration file
+    if (!QFile(u"/etc/default/zramswap"_s).exists()) {
+        gui.boxSwapZram->setChecked(false);
+        gui.boxSwapZram->setEnabled(false);
+        gui.radioZramSize->setEnabled(false);
+        gui.labelZramRecSize->setEnabled(false);
+    }
 }
 
 void SwapMan::manageConfig(MSettings &config) noexcept

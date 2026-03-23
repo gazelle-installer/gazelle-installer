@@ -139,10 +139,11 @@ void Core::setService(const QString &service, bool enabled) const
     const QString chroot(sect.root());
     const QString unitName = service.endsWith(u".service"_s) ? service : service + u".service"_s;
     const auto systemdUnitPath = [&](const QString &name) -> QString {
+        //use the system locations first to avoid masked file issues, which will be under /etc
         const QStringList bases = {
-            u"/etc/systemd/system/"_s,
             u"/usr/lib/systemd/system/"_s,
-            u"/lib/systemd/system/"_s
+            u"/lib/systemd/system/"_s,
+            u"/etc/systemd/system/"_s,
         };
         for (const QString &base : bases) {
             const QString path = chroot + base + name;
@@ -152,8 +153,14 @@ void Core::setService(const QString &service, bool enabled) const
     };
 
     if (containsSysVinit) {
-        proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
+        qDebug() << "service is:  " << service;
+        if (QFileInfo::exists(u"/etc/init.d/"_s + service)) {
+            proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
+        } else{
+            qDebug() << "Skip sysV service (unit missing):" << service;
+        }
     }
+
     if (containsSystemd) {
         const QString unitPath = systemdUnitPath(unitName);
         if (unitPath.isEmpty()) {
@@ -167,6 +174,8 @@ void Core::setService(const QString &service, bool enabled) const
             if (!targetName.isEmpty()) {
                 effectiveUnit = targetName;
                 qDebug() << "Follow systemd unit alias:" << unitName << "->" << effectiveUnit;
+            } else {
+
             }
         }
         if (enabled) {
