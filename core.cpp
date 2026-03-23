@@ -32,7 +32,7 @@ using namespace Qt::Literals::StringLiterals;
 Core::Core(MProcess &mproc) : proc(mproc)
 {
     // These SysVinit files are present as symlinks on systemd-only systems.
-    for (const auto &path : {u"/usr/bin/init"_s, u"/usr/sbin/init"_s, u"/live/aufs/usr/sbin/init"_s}) {
+    for (const auto &path : {u"/usr/lib/sysvinit/init"_s,u"/usr/bin/init"_s, u"/usr/sbin/init"_s, u"/live/aufs/usr/sbin/init"_s,u"/live/aufs/usr/lib/sysvinit/init"_s}) {
         const QFileInfo initfile(path); // Online and Offline respectively
         if (!initfile.isSymbolicLink() && initfile.isExecutable()) {
             containsSysVinit = true;
@@ -139,10 +139,11 @@ void Core::setService(const QString &service, bool enabled) const
     const QString chroot(sect.root());
     const QString unitName = service.endsWith(u".service"_s) ? service : service + u".service"_s;
     const auto systemdUnitPath = [&](const QString &name) -> QString {
+        //use the system locations first to avoid masked file issues, which will be under /etc
         const QStringList bases = {
-            u"/etc/systemd/system/"_s,
             u"/usr/lib/systemd/system/"_s,
-            u"/lib/systemd/system/"_s
+            u"/lib/systemd/system/"_s,
+            u"/etc/systemd/system/"_s,
         };
         for (const QString &base : bases) {
             const QString path = chroot + base + name;
@@ -152,7 +153,12 @@ void Core::setService(const QString &service, bool enabled) const
     };
 
     if (containsSysVinit) {
-        proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
+        qDebug() << "service is:  " << service;
+        if (QFileInfo::exists(u"/etc/init.d/"_s + service)) {
+            proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
+        } else{
+            qDebug() << "Skip sysV service (unit missing):" << service;
+        }
     }
     if (containsSystemd) {
         const QString unitPath = systemdUnitPath(unitName);
