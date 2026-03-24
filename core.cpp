@@ -198,18 +198,20 @@ void Core::setService(const QString &service, bool enabled) const
     }
 
     if (containsRunit) {
-        if (enabled) {
-            QFile::remove(chroot + "/etc/sv/"_L1 + service + "/down"_L1);
-            if (!QFile::exists(chroot + "/etc/sv/"_L1 + service)) {
-                mkpath(chroot + "/etc/sv/"_L1 + service);
-                proc.exec(u"ln"_s, {u"-fs"_s, "/etc/sv/"_L1 + service, u"/etc/service/"_s});
+        if (QFile::exists(u"/etc/sv/"_s + service)){
+            if (enabled) {
+                QFile::remove(chroot + "/etc/sv/"_L1 + service + "/down"_L1);
+                if (!QFile::exists(chroot + "/etc/sv/"_L1 + service)) {
+                    mkpath(chroot + "/etc/sv/"_L1 + service);
+                    proc.exec(u"ln"_s, {u"-fs"_s, "/etc/sv/"_L1 + service, u"/etc/service/"_s});
+                }
+            } else {
+                if (!QFile::exists(chroot + "/etc/sv/"_L1 + service)) {
+                    mkpath(chroot + "/etc/sv/"_L1 + service);
+                    proc.exec(u"unlink"_s, {"/etc/sv/"_L1 + service, u"/etc/service/"_s});
+                }
+                proc.exec(u"touch"_s, {"/etc/sv/"_L1 + service + u"/down"_s});
             }
-        } else {
-            if (!QFile::exists(chroot + "/etc/sv/"_L1 + service)) {
-                mkpath(chroot + "/etc/sv/"_L1 + service);
-                proc.exec(u"unlink"_s, {"/etc/sv/"_L1 + service, u"/etc/service/"_s});
-            }
-            proc.exec(u"touch"_s, {"/etc/sv/"_L1 + service + u"/down"_s});
         }
     }
 }
