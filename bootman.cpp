@@ -195,6 +195,9 @@ void BootMan::install(const QStringList &cmdextra)
     if (gui.boxBoot->isChecked()) {
         proc.status(tr("Installing GRUB"));
 
+        // Clean up any corrupted locale dirs left by a previous grub-install run.
+        proc.shell(u"find /boot/grub/locale -type d -name '*.mo' -exec rmdir {} + 2>/dev/null"_s, nullptr, true);
+
         // install new Grub now
         const int efisize = core.detectEFI(true);
         const QString &bootdev = "/dev/"_L1 + gui.comboBoot->currentData().toString();
