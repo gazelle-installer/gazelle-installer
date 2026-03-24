@@ -41,7 +41,7 @@ Core::Core(MProcess &mproc) : proc(mproc)
 
     // Cannot assume SysVinit OR systemd because some MX Linux images contain both.
     containsSystemd = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable() // Online
-        || QFileInfo(u"/live/aufs/usr/bin/systemctl"_s).isExecutable(); // Offline
+                      || QFileInfo(u"/live/aufs/usr/bin/systemctl"_s).isExecutable(); // Offline
 
     // Online
     if (QFile::exists(u"/etc/service"_s) && QFile::exists(u"/lib/runit/runit-init"_s)) {
@@ -178,13 +178,14 @@ void Core::setService(const QString &service, bool enabled) const
                     effectiveUnit = targetName;
                     qDebug() << "Follow systemd unit alias:" << unitName << "->" << effectiveUnit;
                 }
-        }
-        if (enabled) {
-            proc.exec(u"systemctl"_s, {u"unmask"_s, effectiveUnit});
-            proc.exec(u"systemctl"_s, {u"enable"_s, effectiveUnit});
-        } else {
-            proc.exec(u"systemctl"_s, {u"disable"_s, effectiveUnit});
-            proc.exec(u"systemctl"_s, {u"mask"_s, effectiveUnit});
+            }
+            if (enabled) {
+                proc.exec(u"systemctl"_s, {u"unmask"_s, effectiveUnit});
+                proc.exec(u"systemctl"_s, {u"enable"_s, effectiveUnit});
+            } else {
+                proc.exec(u"systemctl"_s, {u"disable"_s, effectiveUnit});
+                proc.exec(u"systemctl"_s, {u"mask"_s, effectiveUnit});
+            }
         }
     }
     if (containsRunit) {
