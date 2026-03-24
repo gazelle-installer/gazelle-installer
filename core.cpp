@@ -172,6 +172,10 @@ void Core::setService(const QString &service, bool enabled) const
             const QString target = unitInfo.symLinkTarget();
             if (target == "/dev/null"_L1) {
                 qDebug() << "Systemd unit is masked:" << unitName;
+                //check to make sure unit exists elsewhere
+                if (!QFileInfo::exists(u"/usr/lib/systemd/system/"_s + unitName)) {
+                    effectiveUnit = "";
+                }
             } else {
                 const QString targetName = QFileInfo(target).fileName();
                 if (!targetName.isEmpty()) {
@@ -179,15 +183,20 @@ void Core::setService(const QString &service, bool enabled) const
                     qDebug() << "Follow systemd unit alias:" << unitName << "->" << effectiveUnit;
                 }
             }
-            if (enabled) {
-                proc.exec(u"systemctl"_s, {u"unmask"_s, effectiveUnit});
-                proc.exec(u"systemctl"_s, {u"enable"_s, effectiveUnit});
+            if (effectiveUnit.isEmpty()){
+                qDebug() << "Skip systemd service (unit missing):" << unitName;
             } else {
-                proc.exec(u"systemctl"_s, {u"disable"_s, effectiveUnit});
-                proc.exec(u"systemctl"_s, {u"mask"_s, effectiveUnit});
+                if (enabled) {
+                    proc.exec(u"systemctl"_s, {u"unmask"_s, effectiveUnit});
+                    proc.exec(u"systemctl"_s, {u"enable"_s, effectiveUnit});
+                } else {
+                    proc.exec(u"systemctl"_s, {u"disable"_s, effectiveUnit});
+                    proc.exec(u"systemctl"_s, {u"mask"_s, effectiveUnit});
+                }
             }
         }
     }
+
     if (containsRunit) {
         if (enabled) {
             QFile::remove(chroot + "/etc/sv/"_L1 + service + "/down"_L1);
