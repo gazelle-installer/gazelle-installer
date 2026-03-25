@@ -195,15 +195,19 @@ void BootMan::install(const QStringList &cmdextra)
     if (gui.boxBoot->isChecked()) {
         proc.status(tr("Installing GRUB"));
 
-        // Clean up any corrupted locale dirs left by a previous grub-install run.
-        proc.shell(u"find /boot/grub/locale -type d -name '*.mo' -exec rmdir {} + 2>/dev/null"_s, nullptr, true);
-
         // install new Grub now
         const int efisize = core.detectEFI(true);
         const QString &bootdev = "/dev/"_L1 + gui.comboBoot->currentData().toString();
         if (!useEsp) {
+            // Skip locales to avoid grub-install failing on stray *.gmo directories in /usr/share/locale.
             proc.exec(u"grub-install"_s, {u"--target=i386-pc"_s, u"--recheck"_s,
-                u"--no-floppy"_s, u"--force"_s, u"--boot-directory=/mnt/antiX/boot"_s, bootdev});
+                u"--no-floppy"_s, u"--force"_s, u"--locales="_s,
+                u"--boot-directory=/mnt/antiX/boot"_s, bootdev});
+            // Manually install GRUB locale files, skipping any non-file entries.
+            proc.shell(u"for f in /usr/share/locale/*/LC_MESSAGES/grub.mo; do "
+                u"[ -f \"$f\" ] && install -Dm644 \"$f\" "
+                u"\"/mnt/antiX/boot/grub/locale/$(basename $(dirname $(dirname \"$f\"))).mo\"; "
+                u"done"_s, nullptr, true);
         } else {
             if (efivars_ismounted) {
                 //ensure efivarfs mounted as read-write
@@ -221,9 +225,10 @@ void BootMan::install(const QStringList &cmdextra)
 
             sect.setRoot("/mnt/antiX");
 
+            // Skip locales to avoid grub-install failing on stray *.gmo directories in /usr/share/locale.
             QStringList grubinstargs({u"--no-nvram"_s, u"--force-extra-removable"_s,
                 (efisize==32 ? u"--target=i386-efi"_s : u"--target=x86_64-efi"_s),
-                "--bootloader-id="_L1 + loaderID, u"--recheck"_s});
+                "--bootloader-id="_L1 + loaderID, u"--recheck"_s, u"--locales="_s});
             {
                 // Drop flags not supported by some grub builds (e.g. Arch) to avoid fatal errors.
                 bool supportsForceExtra = true;
@@ -243,6 +248,11 @@ void BootMan::install(const QStringList &cmdextra)
             }
             grubinstargs << "--efi-directory="_L1 + efiDir;
             proc.exec(u"grub-install"_s, grubinstargs);
+            // Manually install GRUB locale files, skipping any non-file entries.
+            proc.shell(u"for f in /usr/share/locale/*/LC_MESSAGES/grub.mo; do "
+                u"[ -f \"$f\" ] && install -Dm644 \"$f\" "
+                u"\"/boot/grub/locale/$(basename $(dirname $(dirname \"$f\"))).mo\"; "
+                u"done"_s, nullptr, true);
 
             // Copy fallback files (not copied above because of --no-nvram switch).
             if (espdev != nullptr) {
