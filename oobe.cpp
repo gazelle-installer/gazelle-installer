@@ -255,19 +255,20 @@ void Oobe::enable() const
     MProcess::Section sect(proc);
     sect.setRoot("/mnt/antiX");
     QTreeWidgetItemIterator it(gui.treeServices);
-    //comment for now, don't disable services
-    //for (; *it; ++it) {
-        //if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
-    //}
-    //setService(u"smbd"_s, false);
-    //setService(u"nmbd"_s, false);
-    //setService(u"samba-ad-dc"_s, false);
     const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
         || QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
         || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
     if (haveUpdateRc) {
         proc.exec(u"update-rc.d"_s, {u"-f"_s, u"oobe"_s, u"defaults"_s});
     }
+    //check for systemd service file
+    if (QFileInfo::exists(u"/usr/lib/systemd/system/oobe.service"_s)){
+        const bool haveSystemCtl = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable();
+        if (haveSystemCtl){
+            proc.exec(u"systemctl"_s, {u"enable"_s, u"oobe.service"_s});
+        }
+    }
+
 }
 
 void Oobe::process() const
@@ -309,6 +310,13 @@ void Oobe::process() const
             || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
         if (haveUpdateRc) {
             proc.exec(u"update-rc.d"_s, {u"oobe"_s, u"disable"_s});
+        }
+        //check for systemd service file
+        if (QFileInfo::exists(u"/usr/lib/systemd/system/oobe.service"_s)){
+            const bool haveSystemCtl = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable();
+            if (haveSystemCtl){
+                proc.exec(u"systemctl"_s, {u"disable"_s, u"oobe.service"_s});
+            }
         }
     }
 }
