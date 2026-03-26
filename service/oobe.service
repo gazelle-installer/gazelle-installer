@@ -1,0 +1,12 @@
+[Unit]
+Description=finish oem user setup
+After=local-fs.target
+Before=lightdm.service sddm.service gdm.service plasmalogin.service
+
+[Service]
+Type=oneshot
+ExecStart=/etc/init.d/oobe start
+ExecStop=/bin/true
+
+[Install]
+WantedBy=multi-user.target
