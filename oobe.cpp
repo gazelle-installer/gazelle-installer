@@ -734,7 +734,7 @@ void Oobe::setUserInfo() const
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox'"
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'"
-            " --exclude '.config/session' --exclude '.runit/usersv/rc-local' | xargs -I '$' sed -i 's|%1|/home/"_L1
+            " --exclude '.config/session' --exclude '.runit' --exclude '.66' --exclude '.s6-rc' --exclude '.dinit.d' --exclude '.user-session.d' | xargs -I '$' sed -i 's|%1|/home/"_L1
             + username + "|g' %2/$"_L1).arg(curHome, dpath);
         proc.shell(cmd);
     }
