@@ -746,15 +746,14 @@ void Oobe::setUserInfo() const
     if (gui.checkSaveDesktop->isChecked()) {
         resetBlueman();
         // rsync home folder
-        QString cmd = ("rsync -a --info=name1 %1/ %2"
-            " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
-            " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
-            " --exclude '.idesktop/gazelle.lnk' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
-            " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox'"
-            " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
-            " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'"
-            " --exclude '.config/session' --exclude '.runit' --exclude '.66' --exclude '.s6-rc' --exclude '.dinit.d' --exclude '.user-session.d' | xargs -I '$' sed -i 's|%1|/home/"_L1
-            + username + "|g' %2/$"_L1).arg(curHome, dpath);
+        QString cmd = ("rsync -a %1/ %2 "
+               "--exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' "
+               "--exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' "
+               "--exclude '.idesktop/gazelle.lnk' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' "
+               "--exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' "
+               "--exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' "
+               "--exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' "
+               "&& find %2 -type f -print0 | xargs -0 -I '$' sed -i 's|%1|/home/"_L1 + username + "|g' '$'").arg(curHome, dpath);
         proc.shell(cmd);
     }
 
