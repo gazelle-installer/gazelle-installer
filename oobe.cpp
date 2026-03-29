@@ -262,13 +262,14 @@ void Oobe::enable() const
         proc.exec(u"update-rc.d"_s, {u"-f"_s, u"oobe"_s, u"defaults"_s});
     }
     //check for systemd service file
-    if (QFileInfo::exists(u"/usr/lib/systemd/system/oobe.service"_s)){
+    if (QFileInfo::exists(u"/usr/share/gazelle-installer/service/oobe.service"_s)){
         const bool haveSystemCtl = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable();
         if (haveSystemCtl){
+            proc.exec(u"cp"_s, {u"/usr/share/gazelle-intaller/service/oobe.service"_s, u"/usr/lib/systemd/system/oobe.service"_s});
             proc.exec(u"systemctl"_s, {u"enable"_s, u"oobe.service"_s});
         }
     }
-
+update-rc.d
 }
 
 void Oobe::process() const
@@ -313,6 +314,7 @@ void Oobe::process() const
         }
         //check for systemd service file
         if (QFileInfo::exists(u"/usr/lib/systemd/system/oobe.service"_s)){
+            proc.exec(u"rm"_s, {u"-f"_s, u"/usr/lib/systemd/system/oobe.service"_s});
             const bool haveSystemCtl = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable();
             if (haveSystemCtl){
                 proc.exec(u"systemctl"_s, {u"disable"_s, u"oobe.service"_s});
