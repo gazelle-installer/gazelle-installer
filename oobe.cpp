@@ -255,12 +255,7 @@ void Oobe::enable() const
     MProcess::Section sect(proc);
     sect.setRoot("/mnt/antiX");
     QTreeWidgetItemIterator it(gui.treeServices);
-    const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
-        || QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
-        || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
-    if (haveUpdateRc) {
-        proc.exec(u"update-rc.d"_s, {u"-f"_s, u"oobe"_s, u"defaults"_s});
-    }
+
     //check for systemd service file
     if (QFileInfo::exists(u"/usr/share/gazelle-installer/service/oobe.service"_s)){
         const bool haveSystemCtl = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable();
@@ -269,6 +264,13 @@ void Oobe::enable() const
             proc.exec(u"systemctl"_s, {u"enable"_s, u"oobe.service"_s});
         }
     }
+    const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
+        || QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
+        || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
+    if (haveUpdateRc) {
+        proc.exec(u"update-rc.d"_s, {u"-f"_s, u"oobe"_s, u"defaults"_s});
+    }
+
 }
 
 void Oobe::process() const
