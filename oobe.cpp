@@ -269,7 +269,6 @@ void Oobe::enable() const
             proc.exec(u"systemctl"_s, {u"enable"_s, u"oobe.service"_s});
         }
     }
-update-rc.d
 }
 
 void Oobe::process() const
@@ -306,20 +305,23 @@ void Oobe::process() const
     handleLiveUsbStorage();
     if (online) {
         proc.shell(u"sed -i 's/nosplash\\b/splash/g' /boot/grub/grub.cfg"_s);
+
+        //check for systemd service file
+        if (QFileInfo::exists(u"/usr/lib/systemd/system/oobe.service"_s)){
+            const bool haveSystemCtl = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable();
+            if (haveSystemCtl){
+                proc.exec(u"systemctl"_s, {u"disable"_s, u"oobe.service"_s});
+            }
+            proc.exec(u"rm"_s, {u"-f"_s, u"/usr/lib/systemd/system/oobe.service"_s});
+        }
+
         const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
             || QFileInfo(u"/usr/sbin/update-rc.d"_s).isExecutable()
             || QFileInfo(u"/sbin/update-rc.d"_s).isExecutable();
         if (haveUpdateRc) {
             proc.exec(u"update-rc.d"_s, {u"oobe"_s, u"disable"_s});
         }
-        //check for systemd service file
-        if (QFileInfo::exists(u"/usr/lib/systemd/system/oobe.service"_s)){
-            proc.exec(u"rm"_s, {u"-f"_s, u"/usr/lib/systemd/system/oobe.service"_s});
-            const bool haveSystemCtl = QFileInfo(u"/usr/bin/systemctl"_s).isExecutable();
-            if (haveSystemCtl){
-                proc.exec(u"systemctl"_s, {u"disable"_s, u"oobe.service"_s});
-            }
-        }
+
     }
 }
 
