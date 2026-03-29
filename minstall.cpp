@@ -2295,7 +2295,7 @@ void MInstall::setupPageSwapTUI() noexcept
 
     tui_labelSwapReset = new ui::QLabel();
     tui_labelSwapReset->setPosition(8, 40);
-    tui_labelSwapReset->setText(tr("R: reset size"));
+    tui_labelSwapReset->setText("R: " + tr("reset size"));
     tui_labelSwapReset->show();
 
     // Hibernation support
