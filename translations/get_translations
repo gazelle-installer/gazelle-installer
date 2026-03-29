@@ -28,8 +28,12 @@ if [ -z "$(grep minimum_perc .tx/config)" ]; then
         echo "minimum_perc = 25" >> .tx/config
 fi
 
-# Remove existing translations
-find . -type f -name '*.ts' -not -name '*en.ts' -delete
+# Remove existing translations, but keep the source English catalog and
+# the en_US override catalog used for regional string adjustments.
+find . -type f -name '*.ts' \
+    -not -name '*en.ts' \
+    -not -name '*en_US.ts' \
+    -delete
 
 # Get all translations
 if command -v tx >/dev/null; then
