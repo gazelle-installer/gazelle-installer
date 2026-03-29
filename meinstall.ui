@@ -1831,6 +1831,19 @@ QSlider::handle:horizontal:disabled {
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="checkCopyLiveUsb">
+             <property name="toolTip">
+              <string>Copy the contents of Live-usb-storage from the live medium to the installed system's home directory</string>
+             </property>
+             <property name="text">
+              <string>Copy Live-usb-storage to installed system</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer>
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>
@@ -2046,6 +2059,7 @@ QSlider::handle:horizontal:disabled {
   <tabstop>textRootPass2</tabstop>
   <tabstop>checkAutoLogin</tabstop>
   <tabstop>checkSaveDesktop</tabstop>
+  <tabstop>checkCopyLiveUsb</tabstop>
   <tabstop>textReminders</tabstop>
   <tabstop>textCopyright</tabstop>
   <tabstop>treeServices</tabstop>

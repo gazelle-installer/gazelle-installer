@@ -69,7 +69,12 @@ void BootMan::selectBootMain() noexcept
     if (!device) {
         device = partman.findByMount(u"/"_s);
     }
-    assert(device != nullptr);
+    if (!device) {
+        if (gui.comboBoot->count() > 0) {
+            gui.comboBoot->setCurrentIndex(0);
+        }
+        return;
+    }
 
     if (device->origin) device = device->origin;
     while (device && device->type != PartMan::Device::PARTITION) {

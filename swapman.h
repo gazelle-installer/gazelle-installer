@@ -41,6 +41,7 @@ public:
         Ui::MeInstall &ui, QObject *parent = nullptr) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void setupDefaults() noexcept;
+    bool updateBounds() noexcept;
     void install(QStringList &cmdboot_out);
     void setupZRam() const;
     static long long recommended(bool hibernation) noexcept;

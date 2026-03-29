@@ -181,7 +181,7 @@ update_aur_package() {
     # Update PKGBUILD pkgver to match tag and remove pkgver() if present
     if [ -f PKGBUILD ]; then
         print_step "Updating PKGBUILD pkgver to $version..."
-        if rg -q "^pkgver=" PKGBUILD; then
+        if grep -q "^pkgver=" PKGBUILD; then
             sed -i "s/^pkgver=.*/pkgver=${version}/" PKGBUILD
         else
             awk -v ver="$version" '
@@ -190,10 +190,10 @@ update_aur_package() {
             ' PKGBUILD > PKGBUILD.tmp && mv PKGBUILD.tmp PKGBUILD
         fi
 
-        if rg -q "^pkgver\\(\\)" PKGBUILD; then
+        if grep -q "^pkgver()" PKGBUILD; then
             awk '
                 BEGIN { in_pkgver = 0 }
-                /^pkgver\\(\\)/ { in_pkgver = 1; next }
+                /^pkgver\(\)/ { in_pkgver = 1; next }
                 in_pkgver && /^}/ { in_pkgver = 0; next }
                 !in_pkgver { print }
             ' PKGBUILD > PKGBUILD.tmp && mv PKGBUILD.tmp PKGBUILD

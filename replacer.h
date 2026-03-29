@@ -35,6 +35,10 @@ public:
     void scan(bool full, bool allowUnlock = false) noexcept;
     void clean() noexcept;
     bool validate() const noexcept;
+    // TUI accessors
+    size_t installationCount() const noexcept { return bases.size(); }
+    QString installationRelease(size_t index) const noexcept;
+    void setSelectedInstallation(int row) noexcept;
     bool preparePartMan() noexcept;
     class PartMan::Device *resolveDevSource(const QString &source) const noexcept;
     bool openEncrypted(class RootBase &base) noexcept;

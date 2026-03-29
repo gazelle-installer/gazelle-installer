@@ -85,6 +85,11 @@ void SwapMan::setupDefaults() noexcept
     sizeResetClicked();
 }
 
+bool SwapMan::updateBounds() noexcept
+{
+    return setupBounds();
+}
+
 bool SwapMan::setupBounds() noexcept
 {
     const PartMan::Device *device = partman.findHostDev(gui.textSwapFile->text());

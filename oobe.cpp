@@ -23,6 +23,7 @@
 #include <utility>
 #include <sys/stat.h>
 #include <QDebug>
+#include <QDir>
 #include <QMessageBox>
 #include <QFile>
 #include <QFileInfo>
@@ -162,6 +163,22 @@ Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, MIni &appConf, bool 
         curHome = "/home/"_L1 + curUser;
     }
     qDebug() << "Current user:" << curUser << curHome;
+
+    // Detect Live-usb-storage symlinks in live user homes
+    bool hasLiveUsbStorage = false;
+    {
+        const QDir homeDir(u"/home"_s);
+        const QStringList users = homeDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const QString &user : users) {
+            if (QFileInfo(u"/home/"_s + user + u"/Live-usb-storage"_s).isSymLink()) {
+                hasLiveUsbStorage = true;
+                break;
+            }
+        }
+    }
+    if (online || !hasLiveUsbStorage) {
+        gui.checkCopyLiveUsb->hide();
+    }
 }
 
 void Oobe::manageConfig(MSettings &config) const noexcept
@@ -212,6 +229,7 @@ void Oobe::manageConfig(MSettings &config) const noexcept
         config.manageLineEdit(u"Username"_s, gui.textUserName);
         config.manageCheckBox(u"Autologin"_s, gui.checkAutoLogin);
         config.manageCheckBox(u"SaveDesktop"_s, gui.checkSaveDesktop);
+        config.manageCheckBox(u"CopyLiveUsb"_s, gui.checkCopyLiveUsb);
         if (online) {
             gui.checkSaveDesktop->setCheckState(Qt::Unchecked);
         }
@@ -284,6 +302,7 @@ void Oobe::process() const
     } else if (!oem) {
         setUserInfo();
     }
+    handleLiveUsbStorage();
     if (online) {
         proc.shell(u"sed -i 's/nosplash\\b/splash/g' /boot/grub/grub.cfg"_s);
         const bool haveUpdateRc = QFileInfo(u"/usr/bin/update-rc.d"_s).isExecutable()
@@ -778,7 +797,7 @@ void Oobe::setUserInfo() const
         replaceStringInFile(u"#autologin_enabled"_s, u"autologin_enabled"_s, rootpath + "/etc/slimski.local.conf"_L1);
         replaceStringInFile(u"#default_user "_s, u"default_user "_s, rootpath + "/etc/slimski.local.conf"_L1);
         replaceStringInFile(u"User="_s, "User="_L1 + username, rootpath + "/etc/sddm.conf"_L1);
-        replaceStringInFile(u"User="_s, "User="_L1 + username, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
+        replaceStringInFile(u"User=.*"_s, "User="_L1 + username, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
     }
     else {
         replaceStringInFile(u"auto_login"_s, u"#auto_login"_s, rootpath + "/etc/slim.conf"_L1);
@@ -790,6 +809,27 @@ void Oobe::setUserInfo() const
         replaceStringInFile(u"User=.*"_s, u"User="_s, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
     }
     proc.exec(u"touch"_s, {rootpath + "/var/mail/"_L1 + username});
+}
+
+void Oobe::handleLiveUsbStorage() const
+{
+    if (gui.checkCopyLiveUsb->isHidden()) return;
+    const bool doCopy = gui.checkCopyLiveUsb->isChecked();
+    const QString installHome = online ? u"/home"_s : u"/mnt/antiX/home"_s;
+    const QDir homeDir(installHome);
+    const QStringList users = homeDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (const QString &user : users) {
+        const QString installedStorage = installHome + u'/' + user + u"/Live-usb-storage"_s;
+        const QFileInfo fi(installedStorage);
+        if (!fi.isSymLink()) continue;
+        proc.exec(u"rm"_s, {u"-f"_s, installedStorage});
+        if (doCopy) {
+            const QString source = fi.symLinkTarget();
+            if (!source.isEmpty() && QFileInfo::exists(source)) {
+                proc.exec(u"cp"_s, {u"-a"_s, source, installedStorage});
+            }
+        }
+    }
 }
 
 void Oobe::resetBlueman() const

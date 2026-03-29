@@ -153,6 +153,7 @@ void Core::setService(const QString &service, bool enabled) const
     };
 
     if (containsSysVinit) {
+        qDebug() << "service is:  " << service;
         if (QFileInfo::exists(u"/etc/init.d/"_s + service)) {
             proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
         } else{

@@ -127,23 +127,23 @@ Najmanj: %2</translation>
         <translation>Nameščam GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="338"/>
+        <location filename="../bootman.cpp" line="341"/>
         <source>Updating initramfs</source>
         <translation>Posodabljam initramfs</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="339"/>
+        <location filename="../bootman.cpp" line="342"/>
         <source>Failed to update initramfs.</source>
         <translation>Ni bilo mogoče posodopbiti initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="369"/>
+        <location filename="../bootman.cpp" line="372"/>
         <source>System boot disk:</source>
         <translation>Zagonski disk sistema:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="384"/>
-        <location filename="../bootman.cpp" line="394"/>
+        <location filename="../bootman.cpp" line="387"/>
+        <location filename="../bootman.cpp" line="397"/>
         <source>Partition to use:</source>
         <translation>Razdelek za uporabo:</translation>
     </message>
@@ -197,32 +197,32 @@ Najmanj: %2</translation>
 <context>
     <name>Device</name>
     <message>
-        <location filename="../partman.cpp" line="2236"/>
+        <location filename="../partman.cpp" line="2239"/>
         <source>Overwrite</source>
         <translation>Prepišem</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2236"/>
+        <location filename="../partman.cpp" line="2239"/>
         <source>Create</source>
         <translation>Ustvari</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2237"/>
+        <location filename="../partman.cpp" line="2240"/>
         <source>Delete</source>
         <translation>Izbriši</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2240"/>
+        <location filename="../partman.cpp" line="2243"/>
         <source>Preserve</source>
         <translation>Ohrani</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2241"/>
+        <location filename="../partman.cpp" line="2244"/>
         <source>Preserve (%1)</source>
         <translation>Ohrani (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2242"/>
+        <location filename="../partman.cpp" line="2245"/>
         <source>Preserve /home (%1)</source>
         <translation>Ohrani /home (%1)</translation>
     </message>
@@ -2139,92 +2139,92 @@ Uživajte v sistemu %1!</translation>
         <translation>Pripravljanje podpogonov</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1522"/>
+        <location filename="../partman.cpp" line="1525"/>
         <source>Failed to mount partition.</source>
         <translation>Priklapljanje razdelka ni uspelo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1535"/>
+        <location filename="../partman.cpp" line="1538"/>
         <source>Mounting: %1</source>
         <translation>Priklapljanje: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1710"/>
+        <location filename="../partman.cpp" line="1713"/>
         <source>Model: %1</source>
         <translation>Model: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1718"/>
+        <location filename="../partman.cpp" line="1721"/>
         <source>Free space: %1</source>
         <translation>Prostor na voljo: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1818"/>
+        <location filename="../partman.cpp" line="1821"/>
         <source>Device</source>
         <translation>Naprava</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1819"/>
+        <location filename="../partman.cpp" line="1822"/>
         <source>Size</source>
         <translation>Velikost</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1820"/>
+        <location filename="../partman.cpp" line="1823"/>
         <source>Active</source>
         <translation>Aktivno</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1821"/>
+        <location filename="../partman.cpp" line="1824"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1822"/>
+        <location filename="../partman.cpp" line="1825"/>
         <source>Use For</source>
         <translation>Uporabi za</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1823"/>
+        <location filename="../partman.cpp" line="1826"/>
         <source>Label</source>
         <translation>Vrsta</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1824"/>
+        <location filename="../partman.cpp" line="1827"/>
         <source>Encrypt</source>
         <translation>Šifriranje</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1825"/>
+        <location filename="../partman.cpp" line="1828"/>
         <source>Format</source>
         <translation>Format</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1826"/>
+        <location filename="../partman.cpp" line="1829"/>
         <source>Check</source>
         <translation>Preveri</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1827"/>
+        <location filename="../partman.cpp" line="1830"/>
         <source>Options</source>
         <translation>Možnosti</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1828"/>
+        <location filename="../partman.cpp" line="1831"/>
         <source>Dump</source>
         <translation>Deponiraj</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1829"/>
+        <location filename="../partman.cpp" line="1832"/>
         <source>Pass</source>
         <translation>Prehod</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1837"/>
+        <location filename="../partman.cpp" line="1840"/>
         <source>Active partition</source>
         <translation>Aktivni razdelek</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1838"/>
+        <location filename="../partman.cpp" line="1841"/>
         <source>EFI System Partition</source>
         <translation>EFI sistemski razdelek</translation>
     </message>
@@ -2232,22 +2232,22 @@ Uživajte v sistemu %1!</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2656"/>
+        <location filename="../partman.cpp" line="2659"/>
         <source>&amp;Templates</source>
         <translation>&amp;Predloge</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2663"/>
+        <location filename="../partman.cpp" line="2666"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Stiskanje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2665"/>
+        <location filename="../partman.cpp" line="2668"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Stiskanje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2667"/>
+        <location filename="../partman.cpp" line="2670"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Stiskanje (&amp;ZLIB)</translation>
     </message>

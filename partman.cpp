@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <QDebug>
 #include <QLocale>
+#include <QFile>
 #include <QFileInfo>
 #include <QDir>
 #include <QJsonDocument>
@@ -39,6 +40,8 @@
 #include <QMenu>
 #include <QSpinBox>
 #include <QComboBox>
+#include "ui/qmessagebox.h"
+#include "ui/context.h"
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -102,6 +105,22 @@ PartMan::PartMan(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, Crypto &cman,
     // UUID of the device that the live system is booted from.
     const MIni livecfg(u"/live/config/initrd.out"_s, MIni::ReadOnly);
     bootUUID = livecfg.getString(u"BOOT_UUID"_s);
+    // Fallback: detect live boot partition from /proc/mounts when BOOT_UUID is unavailable.
+    // Checks both the Debian/MX live-boot mountpoint and the Arch (archiso) mountpoint.
+    if (bootUUID.isEmpty()) {
+        QFile mounts(u"/proc/mounts"_s);
+        if (mounts.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            for (const QByteArray &line : mounts.readAll().split('\n')) {
+                const QList<QByteArray> parts = line.split(' ');
+                if (parts.size() > 1
+                    && (parts.at(1) == "/live/boot-dev"
+                        || parts.at(1) == "/run/archiso/bootmnt")) {
+                    bootPartPath = QString::fromLatin1(parts.at(0));
+                    break;
+                }
+            }
+        }
+    }
 }
 PartMan::~PartMan()
 {
@@ -194,7 +213,8 @@ void PartMan::scan(Device *drvstart)
             if ((partflags & 0x80) || (partflags & 0x04)) part->setActive(true);
             part->mapCount = jsonPart[u"children"_s].toArray().count();
             part->flags.sysEFI = part->flags.curESP = partTypeName.startsWith("EFI "_L1); // "System"/"(FAT-12/16/32)"
-            part->flags.bootRoot = (!bootUUID.isEmpty() && part->uuid == bootUUID);
+            part->flags.bootRoot = (!bootUUID.isEmpty() && part->uuid == bootUUID)
+                || (!bootPartPath.isEmpty() && part->path == bootPartPath);
             part->curFormat = jsonPart[u"fstype"_s].toString();
             if (part->curFormat == "vfat"_L1) part->curFormat = jsonPart[u"fsver"_s].toString();
             if (partTypeName == "BIOS boot"_L1) part->curFormat = "BIOS-GRUB"_L1;
@@ -292,7 +312,8 @@ void PartMan::scanVirtualDevices(bool rescan)
             device->discgran = discgran;
             device->size = size;
             device->physec = physec;
-            device->flags.bootRoot = (!bootUUID.isEmpty() && device->uuid == bootUUID);
+            device->flags.bootRoot = (!bootUUID.isEmpty() && device->uuid == bootUUID)
+                || (!bootPartPath.isEmpty() && device->path == bootPartPath);
             device->curLabel = label;
             device->curFormat = jsonDev[u"fstype"_s].toString();
             device->flags.volCrypto = crypto;
@@ -680,15 +701,63 @@ void PartMan::partRemoveClick(bool) noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
     Device *seldev = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (!seldev) return;
-    Device *parent = seldev->parent();
-    if (!parent) return;
-    const bool notSub = (seldev->type != Device::SUBVOLUME);
-    delete seldev;
+    removeDevice(seldev);
+}
+
+bool PartMan::removeDevice(Device *device) noexcept
+{
+    if (!device) return false;
+    if (device->type == Device::DRIVE) return false;
+    if (device->flags.oldLayout) return false;
+    Device *parent = device->parent();
+    if (!parent) return false;
+    const bool notSub = (device->type != Device::SUBVOLUME);
+    delete device;
     if (notSub) {
         parent->labelParts();
         treeSelChange();
     }
+    return true;
+}
+
+bool PartMan::newSubvolume(Device *device) noexcept
+{
+    if (!device) return false;
+    if (!device->isVolume()) return false;
+    if (device->finalFormat() != "btrfs"_L1) return false;
+    changeBegin(device);
+    device->usefor = "FORMAT"_L1;
+    device->format = "btrfs"_L1;
+    changeEnd();
+    Device *subvol = new Device(Device::SUBVOLUME, device);
+    subvol->autoFill();
+    const QModelIndex idx = index(subvol);
+    if (idx.isValid()) {
+        gui.treePartitions->selectionModel()->select(idx,
+            QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    }
+    return true;
+}
+
+bool PartMan::scanSubvolumesFor(Device *device) noexcept
+{
+    if (!device) return false;
+    if (!device->isVolume()) return false;
+    if (device->finalFormat() != "btrfs"_L1) return false;
+    if (device->willFormat()) return false;
+    qApp->setOverrideCursor(Qt::WaitCursor);
+    gui.boxMain->setEnabled(false);
+    scanSubvolumes(device);
+    gui.boxMain->setEnabled(true);
+    qApp->restoreOverrideCursor();
+    return true;
+}
+
+PartMan::Device *PartMan::selectedDevice() const noexcept
+{
+    const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
+    if (indexes.size() < 1) return nullptr;
+    return item(indexes.at(0));
 }
 void PartMan::partReloadClick()
 {
@@ -798,8 +867,17 @@ void PartMan::partMenuLock(Device *volume)
 
 bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
 {
-    QMessageBox msgbox(gui.boxMain);
-    msgbox.setIcon(QMessageBox::Critical);
+    auto showError = [&](const QString &text) -> bool {
+        if (ui::Context::isGUI()) {
+            QMessageBox msgbox(gui.boxMain);
+            msgbox.setIcon(QMessageBox::Critical);
+            msgbox.setText(text);
+            msgbox.exec();
+        } else {
+            ui::QMessageBox::critical(nullptr, tr("Error"), text);
+        }
+        return false;
+    };
     if (!confroot) confroot = gui.treeConfirm->invisibleRootItem();
     std::map<QString, Device *> mounts;
     // Partition use and other validation
@@ -815,9 +893,7 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
             if (cmptext.count(labeltest)) ok = false;
             if (cmptext.startsWith('/') || cmptext.endsWith('/')) ok = false;
             if (!ok) {
-                msgbox.setText(tr("Invalid subvolume label"));
-                msgbox.exec();
-                return false;
+                return showError(tr("Invalid subvolume label"));
             }
             // Check for duplicate subvolume label entries.
             Device *pit = volume->parentItem;
@@ -825,9 +901,7 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
             for (Device *sdevice : pit->children) {
                 if (sdevice == volume) continue;
                 if (sdevice->label.trimmed().compare(cmptext, Qt::CaseInsensitive) == 0) {
-                    msgbox.setText(tr("Duplicate subvolume label"));
-                    msgbox.exec();
-                    return false;
+                    return showError(tr("Duplicate subvolume label"));
                 }
             }
         }
@@ -836,18 +910,14 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
         if (mount == "/"_L1) {
             rootdev = volume;
         } else if (!mount.startsWith("/"_L1) && !volume->allowedUsesFor().contains(volume->usefor)) {
-            msgbox.setText(tr("Invalid use for %1: %2").arg(volume->shownDevice(), mount));
-            msgbox.exec();
-            return false;
+            return showError(tr("Invalid use for %1: %2").arg(volume->shownDevice(), mount));
         }
 
         // The mount can only be selected once.
         const auto fit = mounts.find(mount);
         if (fit != mounts.cend()) {
-            msgbox.setText(tr("%1 is already selected for: %2")
+            return showError(tr("%1 is already selected for: %2")
                 .arg(fit->second->shownDevice(), fit->second->usefor));
-            msgbox.exec();
-            return false;
         } else if(volume->canMount(true)) {
             mounts[mount] = volume;
         }
@@ -857,9 +927,7 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
         const long long rootMin = volSpecTotal(u"/"_s).minimum;
         const QString &tMinRoot = QLocale::system().formattedDataSize(rootMin,
             1, QLocale::DataSizeTraditionalFormat);
-        msgbox.setText(tr("A root partition of at least %1 is required.").arg(tMinRoot));
-        msgbox.exec();
-        return false;
+        return showError(tr("A root partition of at least %1 is required.").arg(tMinRoot));
     }
 
     if (!rootdev->willFormat() && mounts.count(u"/home"_s) > 0) {
@@ -876,10 +944,8 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
             }
         }
         if (!allowSharedSubvol) {
-            msgbox.setText(tr("Cannot preserve /home inside root (/)"
+            return showError(tr("Cannot preserve /home inside root (/)"
                 " if a separate /home partition is also mounted."));
-            msgbox.exec();
-            return false;
         }
     }
 
@@ -945,11 +1011,14 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
     if (!automatic) {
         // Warning messages
         if (rootdev->willEncrypt() && mounts.count(u"/boot"_s)==0) {
-            msgbox.setIcon(QMessageBox::Warning);
-            msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-            msgbox.setDefaultButton(QMessageBox::No);
-            msgbox.setText(tr("You must choose a separate boot partition when encrypting root."));
-            if (msgbox.exec() != QMessageBox::Yes) return false;
+            ui::QMessageBox::StandardButton result = ui::QMessageBox::warning(
+                ui::Context::isGUI() ? gui.boxMain : nullptr,
+                tr("Warning"),
+                tr("Encrypting root without a separate unencrypted boot partition is not supported."
+                    "\n\nDo you want to go back and select a boot partition?"),
+                ui::QMessageBox::Yes | ui::QMessageBox::No,
+                ui::QMessageBox::Yes);
+            if (result == ui::QMessageBox::Yes) return false;
         }
         if (!confirmBootable()) return false;
         if (!confirmSpace()) return false;
@@ -959,11 +1028,6 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
 }
 bool PartMan::confirmSpace() const noexcept
 {
-    QMessageBox msgbox(gui.boxMain);
-    msgbox.setIcon(QMessageBox::Warning);
-    msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-    msgbox.setDefaultButton(QMessageBox::No);
-
     // Isolate used points from each other in total calculations
     QStringList excludes;
     for (Iterator it(*this); *it; it.next()) {
@@ -1012,20 +1076,22 @@ bool PartMan::confirmSpace() const noexcept
 
     if (!toosmall.isEmpty()) {
         toosmall.sort();
-        msgbox.setText(tr("The installation may fail because the following volumes are too small:")
+        const QString text = tr("The installation may fail because the following volumes are too small:")
             + "<br/><ul style='margin:0'><li>"_L1 + toosmall.join(u"</li><li>"_s) + "</li></ul><br/>"_L1
-            + tr("Are you sure you want to continue?"));
-        if (msgbox.exec() != QMessageBox::Yes) return false;
+            + tr("Are you sure you want to continue?");
+        ui::QMessageBox::StandardButton result = ui::QMessageBox::warning(
+            ui::Context::isGUI() ? gui.boxMain : nullptr,
+            tr("Warning"),
+            text,
+            ui::QMessageBox::Yes | ui::QMessageBox::No,
+            ui::QMessageBox::No);
+        if (result != ui::QMessageBox::Yes) return false;
     }
     return true;
 }
 bool PartMan::confirmBootable() const noexcept
 {
-    QMessageBox msgbox(gui.boxMain);
-    msgbox.setIcon(QMessageBox::Warning);
-    msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-    msgbox.setDefaultButton(QMessageBox::No);
-    msgbox.setText(tr("This setup may produce an unbootable system. Do you want to continue?"));
+    const QString baseText = tr("This setup may produce an unbootable system. Do you want to continue?");
 
     if (core.detectEFI()) {
         const char *msgtext = nullptr;
@@ -1038,8 +1104,24 @@ bool PartMan::confirmBootable() const noexcept
                 " is not a valid EFI system partition.");
         }
         if (msgtext) {
-            msgbox.setInformativeText(msgtext);
-            if (msgbox.exec() != QMessageBox::Yes) return false;
+            if (ui::Context::isGUI()) {
+                QMessageBox msgbox(gui.boxMain);
+                msgbox.setIcon(QMessageBox::Warning);
+                msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+                msgbox.setDefaultButton(QMessageBox::No);
+                msgbox.setText(baseText);
+                msgbox.setInformativeText(tr(msgtext));
+                if (msgbox.exec() != QMessageBox::Yes) return false;
+            } else {
+                const QString text = baseText + "\n\n"_L1 + tr(msgtext);
+                ui::QMessageBox::StandardButton result = ui::QMessageBox::warning(
+                    nullptr,
+                    tr("Warning"),
+                    text,
+                    ui::QMessageBox::Yes | ui::QMessageBox::No,
+                    ui::QMessageBox::No);
+                if (result != ui::QMessageBox::Yes) return false;
+            }
         }
         return true;
     }
@@ -1064,8 +1146,24 @@ bool PartMan::confirmBootable() const noexcept
         biosgpt.prepend(tr("The following drives are, or will be, setup with GPT,"
             " but do not have a BIOS-GRUB partition:") + "\n\n"_L1);
         biosgpt += "\n\n"_L1 + tr("This system may not boot from GPT drives without a BIOS-GRUB partition.");
-        msgbox.setInformativeText(biosgpt);
-        if (msgbox.exec() != QMessageBox::Yes) return false;
+        if (ui::Context::isGUI()) {
+            QMessageBox msgbox(gui.boxMain);
+            msgbox.setIcon(QMessageBox::Warning);
+            msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+            msgbox.setDefaultButton(QMessageBox::No);
+            msgbox.setText(baseText);
+            msgbox.setInformativeText(biosgpt);
+            if (msgbox.exec() != QMessageBox::Yes) return false;
+        } else {
+            const QString text = baseText + "\n\n"_L1 + biosgpt;
+            ui::QMessageBox::StandardButton result = ui::QMessageBox::warning(
+                nullptr,
+                tr("Warning"),
+                text,
+                ui::QMessageBox::Yes | ui::QMessageBox::No,
+                ui::QMessageBox::No);
+            if (result != ui::QMessageBox::Yes) return false;
+        }
     }
     return true;
 }

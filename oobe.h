@@ -61,6 +61,7 @@ private:
     void resetBlueman() const;
     void setComputerName() const;
     void setLocale() const;
+    void handleLiveUsbStorage() const;
     void setUserClockFormat(const QString &skelpath) const noexcept;
     void setUserInfo() const;
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath) const noexcept;

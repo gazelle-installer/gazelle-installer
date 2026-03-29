@@ -55,6 +55,11 @@ void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall) noexcept
     });
 }
 
+void MProcess::setProgressCallback(const std::function<void()> &callback) noexcept
+{
+    progressCallback = callback;
+}
+
 void MProcess::syncRoot() noexcept
 {
     if (section && section->rootdir) {
@@ -80,6 +85,17 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     const QByteArray *input, bool needRead, QListWidgetItem *logEntry)
 {
     QEventLoop eloop;
+    QTimer tick;
+    if (progressCallback) {
+        tick.setInterval(250);
+        connect(&tick, &QTimer::timeout, this, [this]() {
+            if (progressCallback) {
+                progressCallback();
+            }
+            qApp->processEvents();
+        });
+        tick.start();
+    }
     connect(this, QOverload<QProcess::ProcessError>::of(&QProcess::errorOccurred), &eloop, &QEventLoop::quit);
     connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     start(program, arguments);
@@ -90,6 +106,7 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     if (input && !(input->isEmpty())) write(*input);
     closeWriteChannel();
     eloop.exec();
+    if (tick.isActive()) tick.stop();
     disconnect(&eloop);
 
     if (debugUnusedOutput) {
@@ -258,6 +275,9 @@ void MProcess::status(long progress) noexcept
         slice = static_cast<int>((progSlicePos * progSliceSpace) / progSliceSteps);
     }
     if (progBar) progBar->setValue(progSliceStart + slice);
+    if (progressCallback) {
+        progressCallback();
+    }
     qApp->processEvents();
 }
 void MProcess::advance(int space, long steps) noexcept
@@ -267,7 +287,10 @@ void MProcess::advance(int space, long steps) noexcept
     progSliceSpace = space;
     progSliceSteps = steps;
     progSlicePos = -1;
-    progBar->setValue(progSliceStart);
+    if (progBar) progBar->setValue(progSliceStart);
+    if (progressCallback) {
+        progressCallback();
+    }
     qApp->processEvents();
 }
 

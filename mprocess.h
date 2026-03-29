@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QProcess>
+#include <functional>
 
 class MProcess : public QProcess
 {
@@ -43,6 +44,7 @@ public:
 
     MProcess(QObject *parent = nullptr);
     void setupUI(class QListWidget *listLog, class QProgressBar *progInstall) noexcept;
+    void setProgressCallback(const std::function<void()> &callback) noexcept;
     bool exec(const QString &program, const QStringList &arguments = {},
         const QByteArray *input = nullptr, bool needRead = false);
     bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false);
@@ -69,6 +71,7 @@ private:
     bool debugUnusedOutput = true;
     class QListWidget *logView = nullptr;
     class QProgressBar *progBar = nullptr;
+    std::function<void()> progressCallback;
     int progSliceStart = 0, progSliceSpace = 0;
     long progSlicePos = 0, progSliceSteps = 0;
     int prevScrollMax = 0;
