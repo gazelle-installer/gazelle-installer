@@ -2365,6 +2365,7 @@ QString PartMan::Device::shownFormat(const QString &fmt) const noexcept
 {
     if (fmt == "CREATE"_L1) return flags.oldLayout ? tr("Overwrite") : tr("Create");
     else if (fmt == "DELETE"_L1) return tr("Delete");
+    else if (fmt == "DOS"_L1) return u"MBR"_s;
     else if (fmt != "PRESERVE"_L1) return fmt;
     else {
         if (type == SUBVOLUME) return tr("Preserve");

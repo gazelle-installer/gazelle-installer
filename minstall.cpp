@@ -3487,14 +3487,21 @@ void MInstall::renderPagePartitions() noexcept
         }
 
         // Format
-        if (dev->type != PartMan::Device::DRIVE) {
-            QString fmt = dev->format.isEmpty() ? (dev->curFormat.isEmpty() ? "-" : dev->curFormat) : dev->format;
-            if (selected && tui_partitionCol == PART_COL_FORMAT) {
-                attron(A_REVERSE);
+        {
+            QString fmt;
+            if (dev->type == PartMan::Device::DRIVE) {
+                fmt = dev->shownFormat(dev->format.isEmpty() ? dev->curFormat : dev->format);
+            } else {
+                fmt = dev->format.isEmpty() ? (dev->curFormat.isEmpty() ? "-" : dev->curFormat) : dev->format;
             }
-            mvprintw(row, colFormat, "%-10s", fmt.left(10).toUtf8().constData());
-            if (selected && tui_partitionCol == PART_COL_FORMAT) {
-                attroff(A_REVERSE);
+            if (!fmt.isEmpty()) {
+                if (selected && tui_partitionCol == PART_COL_FORMAT) {
+                    attron(A_REVERSE);
+                }
+                mvprintw(row, colFormat, "%-10s", fmt.left(10).toUtf8().constData());
+                if (selected && tui_partitionCol == PART_COL_FORMAT) {
+                    attroff(A_REVERSE);
+                }
             }
         }
 
@@ -3560,7 +3567,9 @@ void MInstall::renderPagePartitions() noexcept
                     attroff(A_REVERSE);
                     attron(A_BOLD);
                 }
-                mvprintw(popupRow + i, popupCol, "%-14s", options[optIdx].left(14).toUtf8().constData());
+                QString displayOpt = (tui_partitionCol == PART_COL_FORMAT)
+                    ? dev->shownFormat(options[optIdx]) : options[optIdx];
+                mvprintw(popupRow + i, popupCol, "%-14s", displayOpt.left(14).toUtf8().constData());
                 if (highlighted) {
                     attroff(A_BOLD);
                     attron(A_REVERSE);
@@ -4585,23 +4594,25 @@ void MInstall::handleInput(int key) noexcept
                         tui_partitionEditIndex++;
                     }
                 } else if (key == KEY_LEFT || key == KEY_RIGHT) {
-                    int nextCol = (key == KEY_LEFT) ? PART_COL_USEFOR : PART_COL_FORMAT;
-                    if (nextCol != tui_partitionCol) {
-                        tui_partitionCol = nextCol;
-                        if (tui_partitionCol == PART_COL_USEFOR) {
-                            QStringList uses = selectedDevice->allowedUsesFor();
-                            uses.prepend(u"-"_s);
-                            if (selectedDevice->usefor.isEmpty()) {
-                                tui_partitionEditIndex = 0;
-                            } else {
-                                tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
+                    if (selectedDevice->type != PartMan::Device::DRIVE) {
+                        int nextCol = (key == KEY_LEFT) ? PART_COL_USEFOR : PART_COL_FORMAT;
+                        if (nextCol != tui_partitionCol) {
+                            tui_partitionCol = nextCol;
+                            if (tui_partitionCol == PART_COL_USEFOR) {
+                                QStringList uses = selectedDevice->allowedUsesFor();
+                                uses.prepend(u"-"_s);
+                                if (selectedDevice->usefor.isEmpty()) {
+                                    tui_partitionEditIndex = 0;
+                                } else {
+                                    tui_partitionEditIndex = uses.indexOf(selectedDevice->usefor);
+                                    if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
+                                }
+                            } else if (tui_partitionCol == PART_COL_FORMAT) {
+                                QStringList formats = selectedDevice->allowedFormats();
+                                QString curFmt = selectedDevice->format.isEmpty() ? selectedDevice->curFormat : selectedDevice->format;
+                                tui_partitionEditIndex = formats.indexOf(curFmt);
                                 if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
                             }
-                        } else if (tui_partitionCol == PART_COL_FORMAT) {
-                            QStringList formats = selectedDevice->allowedFormats();
-                            QString curFmt = selectedDevice->format.isEmpty() ? selectedDevice->curFormat : selectedDevice->format;
-                            tui_partitionEditIndex = formats.indexOf(curFmt);
-                            if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
                         }
                     }
                 } else if (key == 27) { // ESC
@@ -4640,8 +4651,10 @@ void MInstall::handleInput(int key) noexcept
             tui_partitionEditIsSize = false;
             tui_focusPartitions = 0;
             if (tui_partitionRow < deviceCount) selectedDevice = devices[tui_partitionRow];
-            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_SIZE;
-            if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
+            if (selectedDevice && selectedDevice->type == PartMan::Device::DRIVE
+                && tui_partitionCol > PART_COL_SIZE && tui_partitionCol < PART_COL_FORMAT) {
+                tui_partitionCol = PART_COL_FORMAT;
+            }
         } else if (key == KEY_DOWN && tui_partitionRow < deviceCount - 1) {
             tui_partitionRow++;
             tui_partitionEditing = false;
@@ -4649,20 +4662,23 @@ void MInstall::handleInput(int key) noexcept
             tui_partitionEditIsSize = false;
             tui_focusPartitions = 0;
             if (tui_partitionRow < deviceCount) selectedDevice = devices[tui_partitionRow];
-            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_SIZE;
-            if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
+            if (selectedDevice && selectedDevice->type == PartMan::Device::DRIVE
+                && tui_partitionCol > PART_COL_SIZE && tui_partitionCol < PART_COL_FORMAT) {
+                tui_partitionCol = PART_COL_FORMAT;
+            }
         } else if (key == KEY_LEFT) {
-            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_SIZE;
-            if (tui_partitionCol > 0) {
+            if (selectedDevice && selectedDevice->type == PartMan::Device::DRIVE) {
+                if (tui_partitionCol >= PART_COL_FORMAT) tui_partitionCol = PART_COL_SIZE;
+            } else if (tui_partitionCol > 0) {
                 tui_partitionCol--;
             }
             tui_focusPartitions = 0;
             tui_partitionEditIsLabel = false;
             tui_partitionEditIsSize = false;
-            if (tui_partitionCol > maxCol) tui_partitionCol = maxCol;
         } else if (key == KEY_RIGHT) {
-            int maxCol = (selectedDevice && selectedDevice->type != PartMan::Device::DRIVE) ? PART_COL_FORMAT : PART_COL_SIZE;
-            if (tui_partitionCol < maxCol) {
+            if (selectedDevice && selectedDevice->type == PartMan::Device::DRIVE) {
+                if (tui_partitionCol <= PART_COL_SIZE) tui_partitionCol = PART_COL_FORMAT;
+            } else if (tui_partitionCol < PART_COL_FORMAT) {
                 tui_partitionCol++;
             }
             tui_focusPartitions = 0;
@@ -4735,6 +4751,15 @@ void MInstall::handleInput(int key) noexcept
                         }
                     }
                 }
+            } else if (tui_partitionCol == PART_COL_FORMAT
+                && selectedDevice->allowedFormats().size() > 1) {
+                // Edit partition table type for cleared drives
+                tui_partitionEditing = true;
+                tui_partitionEditIsLabel = false;
+                tui_partitionEditIsSize = false;
+                QStringList formats = selectedDevice->allowedFormats();
+                tui_partitionEditIndex = formats.indexOf(selectedDevice->format);
+                if (tui_partitionEditIndex < 0) tui_partitionEditIndex = 0;
             } else {
                 // For drives, try to proceed to next page
                 gotoAfterPartitionsTui();
@@ -4808,7 +4833,7 @@ void MInstall::handleInput(int key) noexcept
             }
         } else if (key == 'r' || key == 'R') {
             // Reload
-            gui.pushPartReload->click();
+            partman->scan();
             tui_partitionRow = 0;
         } else if (key == 'p' || key == 'P') {
             // Launch partition manager
