@@ -4200,8 +4200,9 @@ void MInstall::handleInput(int key) noexcept
             tui_exitRequested = true;
         }
     } else if (currentPageIndex == Step::TERMS) {
-        // pageTerms: Enter/Space to accept and go to next page
-        if (key == ' ' || key == '\n' || key == KEY_ENTER) {
+        if (key == TUI_KEY_ALT_LEFT || key == KEY_BACKSPACE) {
+            gotoPage(currentPageIndex - 1);
+        } else if (key == ' ' || key == '\n' || key == KEY_ENTER) {
             gotoPage(currentPageIndex + 1);
         }
     } else if (currentPageIndex == Step::SPLASH) {
@@ -4388,7 +4389,8 @@ void MInstall::handleInput(int key) noexcept
         const int deviceCount = static_cast<int>(devices.size());
         PartMan::Device *selectedDevice = (tui_partitionRow < deviceCount) ? devices[tui_partitionRow] : nullptr;
 
-        if (key == TUI_KEY_ALT_LEFT) {
+        if (key == TUI_KEY_ALT_LEFT
+            || (key == KEY_BACKSPACE && !tui_partitionEditing && !tui_partitionUnlocking)) {
             gotoPage(Step::INSTALLATION);
         } else if (key == '\t' || key == KEY_BTAB) {
             tui_focusPartitions = (tui_focusPartitions + 1) % 2;

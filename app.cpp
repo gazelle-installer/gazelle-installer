@@ -374,7 +374,13 @@ int main(int argc, char *argv[])
                     int ch4 = getch();
                     int ch5 = getch();
                     if (ch2 == '1' && ch3 == ';' && ch4 == '3' && ch5 == 'D') {
-                        minstall.handleInput(MInstall::TUI_KEY_ALT_LEFT);
+                        if (minstall.canGoBack()) {
+                            minstall.handleInput(MInstall::TUI_KEY_ALT_LEFT);
+                        }
+                    } else if (ch2 == '1' && ch3 == ';' && ch4 == '3' && ch5 == 'C') {
+                        if (minstall.canGoNext()) {
+                            minstall.handleInput('\n');
+                        }
                     }
                 }
                 // Ignore unrecognized escape sequences

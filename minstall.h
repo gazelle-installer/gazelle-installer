@@ -45,6 +45,7 @@ public:
     ~MInstall();
 
     static constexpr int TUI_KEY_ALT_LEFT = 10001;
+    static constexpr int TUI_KEY_ALT_RIGHT = 10002;
 
     QString PROJECTFORUM;
     QString PROJECTNAME;
