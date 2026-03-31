@@ -1958,7 +1958,7 @@ QSlider::handle:horizontal:disabled {
                  <string>Automatically reboot the system when the installer is closed</string>
                 </property>
                 <property name="checked">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>

@@ -2715,8 +2715,10 @@ void MInstall::renderPageEnd() noexcept
         return;  // Only render in TUI mode
     }
 
-    // Note: Reboot checkbox removed from END page (now on TIPS page)
-    
+    attron(A_BOLD);
+    mvprintw(2, 2, "%s", tr("Installation complete").toUtf8().constData());
+    attroff(A_BOLD);
+
     if (tui_textReminders) {
         auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_textReminders->tuiWidget());
         if (tuiWidget) {
