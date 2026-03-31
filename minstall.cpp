@@ -1403,7 +1403,7 @@ void MInstall::gotoPage(int next) noexcept
     if (ui::Context::isTUI()) {
         gui.widgetStack->setCurrentIndex(next);
         clear();  // Clear screen before rendering new page
-        mvprintw(0, 0, "Gazelle Installer (TUI Mode) - Press ESC to quit (Alt+Left = Back)");
+        mvprintw(0, 0, "%s (TUI Mode) - Press ESC to quit (Alt+Left = Back)", QApplication::applicationDisplayName().toUtf8().constData());
         mvprintw(1, 0, "========================================================");
         renderCurrentPage();
         

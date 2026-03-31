@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
         auto spinnerThread = std::thread([&]() {
             while (!startupComplete.load()) {
                 clear();
-                mvprintw(0, 0, "Gazelle Installer (TUI Mode)");
+                mvprintw(0, 0, "%s (TUI Mode)", a.applicationDisplayName().toUtf8().constData());
                 mvprintw(1, 0, "============================");
                 mvprintw(10, 30, "Loading... %c", spinChars[spinIdx % 4]);
                 mvprintw(12, 25, "Scanning disk drives...");
@@ -310,10 +310,10 @@ int main(int argc, char *argv[])
             clear();
             // Show header with Alt+Left status
             if (minstall.canGoBack()) {
-                mvprintw(0, 0, "Gazelle Installer (TUI Mode) - Press Ctrl-C to quit (Alt+Left = Back)");
+                mvprintw(0, 0, "%s (TUI Mode) - Press Ctrl-C to quit (Alt+Left = Back)", a.applicationDisplayName().toUtf8().constData());
             } else {
                 attron(COLOR_PAIR(2));
-                mvprintw(0, 0, "Gazelle Installer (TUI Mode) - Press Ctrl-C to quit");
+                mvprintw(0, 0, "%s (TUI Mode) - Press Ctrl-C to quit", a.applicationDisplayName().toUtf8().constData());
                 attroff(COLOR_PAIR(2));
                 attron(A_DIM);
                 printw(" (Alt+Left unavailable)");
