@@ -1006,9 +1006,7 @@ int MInstall::showPage(int curr, int next) noexcept
             }
         } else {
             // Going back from CONFIRM
-            if (ui::Context::isTUI()) {
-                return Step::INSTALLATION;
-            } else if (gui.radioEntireDrive->isChecked()) {
+            if (gui.radioEntireDrive->isChecked()) {
                 return Step::INSTALLATION;
             } else if (gui.radioCustomPart->isChecked()) {
                 return Step::PARTITIONS;
