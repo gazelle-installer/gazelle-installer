@@ -3489,10 +3489,12 @@ void MInstall::renderPagePartitions() noexcept
         // Format
         {
             QString fmt;
-            if (dev->type == PartMan::Device::DRIVE) {
-                fmt = dev->shownFormat(dev->format.isEmpty() ? dev->curFormat : dev->format);
+            if (dev->format.isEmpty() && dev->curFormat.isEmpty()) {
+                fmt = "-";
+            } else if (dev->format.isEmpty()) {
+                fmt = dev->curFormat;
             } else {
-                fmt = dev->format.isEmpty() ? (dev->curFormat.isEmpty() ? "-" : dev->curFormat) : dev->format;
+                fmt = dev->shownFormat(dev->format);
             }
             if (!fmt.isEmpty()) {
                 if (selected && tui_partitionCol == PART_COL_FORMAT) {
