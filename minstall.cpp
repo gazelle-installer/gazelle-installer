@@ -4817,7 +4817,7 @@ void MInstall::handleInput(int key) noexcept
             (void)result;
             refresh();
             clear();
-            gui.pushPartReload->click();
+            partman->scan();
             tui_partitionRow = 0;
         } else if (key == 'u' || key == 'U') {
             // Unlock LUKS partition
