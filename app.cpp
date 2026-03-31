@@ -250,6 +250,10 @@ int main(int argc, char *argv[])
         cbreak();
         noecho();
         keypad(stdscr, TRUE);
+        set_escdelay(25);
+        // Register Alt+Arrow key sequences as custom key codes
+        define_key("\033[1;3D", MInstall::TUI_KEY_ALT_LEFT);
+        define_key("\033[1;3C", MInstall::TUI_KEY_ALT_RIGHT);
         curs_set(0);
 
         // Show loading message with spinner
@@ -363,28 +367,16 @@ int main(int argc, char *argv[])
             int ch = getch();
 
             if (ch == 27) {
-                timeout(0);
-                int ch1 = getch();
-                if (ch1 == ERR) {
-                    // Standalone Esc - let the page handle it (close popups, exit fields, etc.)
-                    minstall.handleInput(27);
-                } else if (ch1 == '[') {
-                    int ch2 = getch();
-                    int ch3 = getch();
-                    int ch4 = getch();
-                    int ch5 = getch();
-                    if (ch2 == '1' && ch3 == ';' && ch4 == '3' && ch5 == 'D') {
-                        if (minstall.canGoBack()) {
-                            minstall.handleInput(MInstall::TUI_KEY_ALT_LEFT);
-                        }
-                    } else if (ch2 == '1' && ch3 == ';' && ch4 == '3' && ch5 == 'C') {
-                        if (minstall.canGoNext()) {
-                            minstall.handleInput('\n');
-                        }
-                    }
+                // Standalone Esc - let the page handle it (close popups, exit fields, etc.)
+                minstall.handleInput(27);
+            } else if (ch == MInstall::TUI_KEY_ALT_LEFT) {
+                if (minstall.canGoBack()) {
+                    minstall.handleInput(MInstall::TUI_KEY_ALT_LEFT);
                 }
-                // Ignore unrecognized escape sequences
-                timeout(-1);
+            } else if (ch == MInstall::TUI_KEY_ALT_RIGHT) {
+                if (minstall.canGoNext()) {
+                    minstall.handleInput('\n');
+                }
             } else if (ch == KEY_MOUSE) {
                 MEVENT event;
                 if (getmouse(&event) == OK) {

@@ -44,8 +44,8 @@ public:
     MInstall(class MIni &acfg, const class QCommandLineParser &args, const QString &cfgfile, QWidget *parent = nullptr) noexcept;
     ~MInstall();
 
-    static constexpr int TUI_KEY_ALT_LEFT = 10001;
-    static constexpr int TUI_KEY_ALT_RIGHT = 10002;
+    static constexpr int TUI_KEY_ALT_LEFT = 600;
+    static constexpr int TUI_KEY_ALT_RIGHT = 601;
 
     QString PROJECTFORUM;
     QString PROJECTNAME;
