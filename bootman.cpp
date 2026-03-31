@@ -102,10 +102,21 @@ void BootMan::buildBootLists() noexcept
     const bool canPBR = (gui.comboBoot->count() > 0);
     gui.radioBootPBR->setEnabled(canPBR);
     const bool canESP = core.detectEFI();
-    gui.radioBootESP->setEnabled(canESP);
+    //do not set esp if nothing in boot combo
+    bool haveESPdev = true;
+    if (canESP) {
+        const PartMan::Device *espdev = partman.findByMount(u"/boot/efi"_s);
+        if (espdev == nullptr) {
+            gui.radioBootESP->setEnabled(false);
+            haveESPdev = false;
+        } else {
+            gui.radioBootESP->setEnabled(true);
+            haveESPdev = true;
+        }
+    }
 
     // load one as the default in preferential order: ESP, MBR, PBR
-    if (canESP) gui.radioBootESP->setChecked(true);
+    if (canESP && haveESPdev) gui.radioBootESP->setChecked(true);
     else if (canMBR) {
         chosenBootMBR();
         gui.radioBootMBR->setChecked(true);
