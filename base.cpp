@@ -386,6 +386,11 @@ void Base::copyLinux(bool skiphome)
     if (useRsync) {
         prog = "rsync"_L1;
         if (sync) args << u"--delete"_s;
+        args << u"--exclude=/home/*/.cache"_s
+            << u"--exclude=/home/*/.dbus"_s
+            << u"--exclude=/home/*/.gvfs"_s
+            << u"--exclude=/home/*/.Xauthority"_s
+            << u"--exclude=/home/*/.ICEauthority"_s;
         if (archLive) {
             args << u"--exclude=/dev/*"_s
                 << u"--exclude=/proc/*"_s
