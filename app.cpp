@@ -78,32 +78,32 @@ int main(int argc, char *argv[])
         qputenv("QT_QPA_PLATFORM", "offscreen");
     }
 
-    const bool defskin = (!getenv("QT_QPA_PLATFORMTHEME") && !getenv("XDG_CURRENT_DESKTOP"));
-    if (defskin && !isTuiMode) {
-        // The default style in the OOBE environment is hideous and unusable.
-        QApplication::setStyle(u"cde"_s); // Qt docs say do this before the QApplication instance.
-        QPalette pal;
-        pal.setColor(QPalette::Window, Qt::black);
-        pal.setColor(QPalette::WindowText, Qt::white);
-        pal.setColor(QPalette::Base, Qt::black);
-        pal.setColor(QPalette::AlternateBase, Qt::black);
-        pal.setColor(QPalette::Text, Qt::white);
-        pal.setColor(QPalette::Button, Qt::black);
-        pal.setColor(QPalette::ButtonText, Qt::white);
-        pal.setColor(QPalette::BrightText, Qt::white);
-        pal.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
-        pal.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
-        pal.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
-        pal.setColor(QPalette::Highlight, Qt::lightGray);
-        pal.setColor(QPalette::HighlightedText, Qt::black);
-        pal.setColor(QPalette::ToolTipBase, Qt::black);
-        pal.setColor(QPalette::ToolTipText, Qt::white);
-        pal.setColor(QPalette::Link, Qt::cyan);
-        QApplication::setPalette(pal); // Qt docs say do this after setting the style.
-    }
+    //const bool defskin = (!getenv("QT_QPA_PLATFORMTHEME") && !getenv("XDG_CURRENT_DESKTOP"));
+    //if (defskin && !isTuiMode) {
+        //// The default style in the OOBE environment is hideous and unusable.
+        //QApplication::setStyle(u"cde"_s); // Qt docs say do this before the QApplication instance.
+        //QPalette pal;
+        //pal.setColor(QPalette::Window, Qt::black);
+        //pal.setColor(QPalette::WindowText, Qt::white);
+        //pal.setColor(QPalette::Base, Qt::black);
+        //pal.setColor(QPalette::AlternateBase, Qt::black);
+        //pal.setColor(QPalette::Text, Qt::white);
+        //pal.setColor(QPalette::Button, Qt::black);
+        //pal.setColor(QPalette::ButtonText, Qt::white);
+        //pal.setColor(QPalette::BrightText, Qt::white);
+        //pal.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
+        //pal.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
+        //pal.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+        //pal.setColor(QPalette::Highlight, Qt::lightGray);
+        //pal.setColor(QPalette::HighlightedText, Qt::black);
+        //pal.setColor(QPalette::ToolTipBase, Qt::black);
+        //pal.setColor(QPalette::ToolTipText, Qt::white);
+        //pal.setColor(QPalette::Link, Qt::cyan);
+        //QApplication::setPalette(pal); // Qt docs say do this after setting the style.
+    //}
 
     QApplication a(argc, argv);
-    if (defskin && !isTuiMode) a.setStyleSheet(u"QDialog { border: 2px ridge gray; }"_s);
+    // if (defskin && !isTuiMode) a.setStyleSheet(u"QDialog { border: 2px ridge gray; }"_s);
     //a.setWindowIcon(QIcon(u"/usr/share/gazelle-installer-data/logo.png"_s));
 
     const QString &transpath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
