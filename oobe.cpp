@@ -850,7 +850,9 @@ void Oobe::handleLiveUsbStorage() const
     if (!doCopy) return;
     const QString installHome = online ? u"/home"_s : u"/mnt/antiX/home"_s;
     const QDir homeDir(u"/home"_s);
-    const QStringList users = homeDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    const QStringList users = haveSnapshotUserAccounts
+        ? homeDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)
+        : QStringList{curUser};
     const QString &username = gui.textUserName->text();
     for (const QString &user : users) {
         const QString sourceStorage = u"/home/"_s + user + u"/Live-usb-storage"_s;

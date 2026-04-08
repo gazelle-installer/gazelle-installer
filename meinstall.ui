@@ -1944,7 +1944,7 @@ QSlider::handle:horizontal:disabled {
               <string>Copy Live-usb-storage to installed system</string>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
