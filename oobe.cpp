@@ -165,19 +165,30 @@ Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, MIni &appConf, bool 
     }
     qDebug() << "Current user:" << curUser << curHome;
 
-    // Detect Live-usb-storage symlinks in live user homes
+    // Detect Live-usb-storage symlinks or mountpoints in live user homes
     bool hasLiveUsbStorage = false;
     {
         const QDir homeDir(u"/home"_s);
         const QStringList users = homeDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (const QString &user : users) {
-            if (QFileInfo(u"/home/"_s + user + u"/Live-usb-storage"_s).isSymLink()) {
+            const QString storagePath = u"/home/"_s + user + u"/Live-usb-storage"_s;
+            const QFileInfo fi(storagePath);
+            if (fi.isSymLink()) {
                 hasLiveUsbStorage = true;
                 break;
             }
+            if (fi.isDir()) {
+                struct stat stPath, stParent;
+                if (stat(storagePath.toUtf8().constData(), &stPath) == 0
+                    && stat((u"/home/"_s + user).toUtf8().constData(), &stParent) == 0
+                    && stPath.st_dev != stParent.st_dev) {
+                    hasLiveUsbStorage = true;
+                    break;
+                }
+            }
         }
     }
-    if (online || !hasLiveUsbStorage) {
+    if (oem || online || !hasLiveUsbStorage) {
         gui.checkCopyLiveUsb->hide();
     }
 }
@@ -833,20 +844,30 @@ void Oobe::setUserInfo() const
 
 void Oobe::handleLiveUsbStorage() const
 {
+    if (oem) return;
     if (gui.checkCopyLiveUsb->isHidden()) return;
     const bool doCopy = gui.checkCopyLiveUsb->isChecked();
+    if (!doCopy) return;
     const QString installHome = online ? u"/home"_s : u"/mnt/antiX/home"_s;
-    const QDir homeDir(installHome);
+    const QDir homeDir(u"/home"_s);
     const QStringList users = homeDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    const QString &username = gui.textUserName->text();
     for (const QString &user : users) {
-        const QString installedStorage = installHome + u'/' + user + u"/Live-usb-storage"_s;
-        const QFileInfo fi(installedStorage);
-        if (!fi.isSymLink()) continue;
-        proc.exec(u"rm"_s, {u"-f"_s, installedStorage});
-        if (doCopy) {
+        const QString sourceStorage = u"/home/"_s + user + u"/Live-usb-storage"_s;
+        const QString &targetUser = (!haveSnapshotUserAccounts && user == curUser) ? username : user;
+        const QString installedStorage = installHome + u'/' + targetUser + u"/Live-usb-storage"_s;
+        const QFileInfo fi(sourceStorage);
+        if (fi.isSymLink()) {
             const QString source = fi.symLinkTarget();
             if (!source.isEmpty() && QFileInfo::exists(source)) {
                 proc.exec(u"cp"_s, {u"-a"_s, source, installedStorage});
+            }
+        } else if (fi.isDir()) {
+            struct stat stPath, stParent;
+            if (stat(sourceStorage.toUtf8().constData(), &stPath) == 0
+                && stat((u"/home/"_s + user).toUtf8().constData(), &stParent) == 0
+                && stPath.st_dev != stParent.st_dev) {
+                proc.exec(u"cp"_s, {u"-a"_s, sourceStorage, installedStorage});
             }
         }
     }

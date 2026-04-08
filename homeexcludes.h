@@ -39,6 +39,8 @@ inline constexpr std::array homeExcludes {
     // Clipboard and recent files
     QLatin1StringView(".local/share/xfce4/clipman"),
     QLatin1StringView(".local/share/recently-used.xbel"),
+    // Optional live-media persistence storage
+    QLatin1StringView("Live-usb-storage"),
 };
 
 #endif // HOMEEXCLUDES_H
