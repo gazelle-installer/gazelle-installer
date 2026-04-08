@@ -33,6 +33,7 @@
 #include "core.h"
 #include "msettings.h"
 #include "oobe.h"
+#include "homeexcludes.h"
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -297,10 +298,12 @@ void Oobe::process() const
     }
     if (haveSnapshotUserAccounts) {
         // Copy the whole /home/ directory for snapshot accounts.
-        proc.exec(u"rsync"_s, {u"-a"_s, u"/home/"_s, u"/mnt/antiX/home/"_s,
-            u"--exclude"_s, u".cache"_s, u"--exclude"_s, u".gvfs"_s, u"--exclude"_s, u".dbus"_s,
-            u"--exclude"_s, u".Xauthority"_s, u"--exclude"_s, u".ICEauthority"_s,
-            u"--exclude"_s, u".config/session"_s});
+        QStringList snapshotArgs{u"-a"_s, u"/home/"_s, u"/mnt/antiX/home/"_s};
+        for (const auto &exclude : homeExcludes) {
+            snapshotArgs << u"--exclude"_s << QString(exclude);
+        }
+        snapshotArgs << u"--exclude"_s << u".config/session"_s;
+        proc.exec(u"rsync"_s, snapshotArgs);
     } else if (!oem) {
         setUserInfo();
     }
@@ -752,9 +755,12 @@ void Oobe::setUserInfo() const
     if (gui.checkSaveDesktop->isChecked()) {
         resetBlueman();
         // rsync home folder
-        QString cmd = ("rsync -a %1/ %2 "
-               "--exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' "
-               "--exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' "
+        QString excludes;
+        for (const auto &exclude : homeExcludes) {
+            excludes += " --exclude '"_L1 + exclude + '\'';
+        }
+        QString cmd = ("rsync -a %1/ %2"_L1 + excludes +
+               " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' "
                "--exclude '.idesktop/gazelle.lnk' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' "
                "--exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' "
                "--exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' "
@@ -815,6 +821,14 @@ void Oobe::setUserInfo() const
         replaceStringInFile(u"User=.*"_s, u"User="_s, rootpath + "/etc/plasmalogin.conf.d/autologin.conf"_L1);
     }
     proc.exec(u"touch"_s, {rootpath + "/var/mail/"_L1 + username});
+
+    // Remove the old user home directory if the username changed.
+    if (curUser != username) {
+        const QString oldHome = rootpath + curHome;
+        if (QFileInfo::exists(oldHome)) {
+            proc.exec(u"rm"_s, {u"-rf"_s, oldHome});
+        }
+    }
 }
 
 void Oobe::handleLiveUsbStorage() const

@@ -32,6 +32,7 @@
 #include "msettings.h"
 #include "partman.h"
 #include "base.h"
+#include "homeexcludes.h"
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -386,11 +387,13 @@ void Base::copyLinux(bool skiphome)
     if (useRsync) {
         prog = "rsync"_L1;
         if (sync) args << u"--delete"_s;
-        args << u"--exclude=/home/*/.cache"_s
-            << u"--exclude=/home/*/.dbus"_s
-            << u"--exclude=/home/*/.gvfs"_s
-            << u"--exclude=/home/*/.Xauthority"_s
-            << u"--exclude=/home/*/.ICEauthority"_s;
+        for (const auto &exclude : homeExcludes) {
+            args << u"--exclude=/home/*/"_s + exclude;
+        }
+        // Exclude sensitive history from root as well.
+        for (const auto &exclude : homeExcludes) {
+            args << u"--exclude=/root/"_s + exclude;
+        }
         if (archLive) {
             args << u"--exclude=/dev/*"_s
                 << u"--exclude=/proc/*"_s
@@ -618,6 +621,21 @@ void Base::copyLinux(bool skiphome)
     if (proc.exitStatus() != QProcess::NormalExit) {
         proc.log(logEntry, MProcess::STATUS_CRITICAL);
         throw QT_TR_NOOP("Failed to copy the new system.");
+    }
+    if (!useRsync) {
+        const auto removeExcludedPaths = [this](const QString &basePath) {
+            for (const auto &exclude : homeExcludes) {
+                proc.exec(u"rm"_s, {u"-rf"_s, basePath + u'/' + QString(exclude)});
+            }
+        };
+        removeExcludedPaths(u"/mnt/antiX/root"_s);
+        if (!skiphome) {
+            const QDir homeDir(u"/mnt/antiX/home"_s);
+            const QStringList users = homeDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+            for (const QString &user : users) {
+                removeExcludedPaths(homeDir.filePath(user));
+            }
+        }
     }
     proc.log(logEntry, proc.exitCode() ? MProcess::STATUS_ERROR : MProcess::STATUS_OK);
 }
