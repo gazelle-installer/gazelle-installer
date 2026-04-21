@@ -754,9 +754,13 @@ void Oobe::setUserInfo() const
             sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to create user directory."));
             proc.exec(u"cp"_s, {u"-a"_s, skelpath, dpath});
         } else { // still rename the demo directory even if remastered demo home folder is detected
-            // /home/demo needs copied from the linuxfs, as its not copied over in previous steps otherwise
+            // /home/demo needs copied from the running system or  linuxfs, as its not copied over in previous steps otherwise
+            QString demoHOME = "/live/linux/"_L1 + curHome;
+            if (QFile::exists(curHome)) {
+                demoHOME = curHome;
+            }
             sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to name user directory."));
-            proc.exec(u"cp"_s, {u"-a"_s, "/live/linux"_L1 + curHome, dpath});
+            proc.exec(u"cp"_s, {u"-a"_s,demoHOME, dpath});
         }
     }
     setUserClockFormat(dpath);
