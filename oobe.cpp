@@ -756,6 +756,9 @@ void Oobe::setUserInfo() const
         } else { // still rename the demo directory even if remastered demo home folder is detected
             // /home/demo needs copied from the running system or  linuxfs, as its not copied over in previous steps otherwise
             QString demoHOME = "/live/linux/"_L1 + curHome;
+            if (QFile::exists(curHome)) {
+                demoHOME = curHome;
+            }
             sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to name user directory."));
             //use the /home/demo that is previousy copied, if it exists
             if (QFileInfo::exists(rootpath.toUtf8() + curHome.toUtf8())){
