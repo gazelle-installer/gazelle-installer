@@ -22,6 +22,7 @@
 
 #include <utility>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <QDebug>
 #include <QDir>
 #include <QMessageBox>
