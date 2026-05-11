@@ -106,6 +106,15 @@ void QLabel::setWidth(int width)
     }
 }
 
+void QLabel::setWordWrap(bool wrap)
+{
+    if (m_guiLabel) {
+        m_guiLabel->setWordWrap(wrap);
+    } else if (m_tuiLabel) {
+        m_tuiLabel->setWordWrap(wrap);
+    }
+}
+
 QWidget* QLabel::widget() const
 {
     return m_guiLabel;

@@ -26,6 +26,7 @@ public:
     
     void setPosition(int row, int col);
     void setWidth(int width);
+    void setWordWrap(bool wrap);
     
     QWidget* widget() const;
     qtui::Widget* tuiWidget() const;

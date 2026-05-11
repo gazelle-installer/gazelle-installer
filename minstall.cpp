@@ -2701,10 +2701,15 @@ void MInstall::renderPageSplash() noexcept
     if (tui_labelSplash) {
         auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_labelSplash->tuiWidget());
         if (tuiWidget) {
+            int maxY, maxX;
+            getmaxyx(stdscr, maxY, maxX);
+            (void)maxY;
+            tuiWidget->setWordWrap(true);
+            tuiWidget->setWidth(maxX - 12);
             tuiWidget->render();
         }
     }
-    
+
     // Show instruction at bottom
     mvprintw(12, 10, "Press ENTER or SPACE to continue...");
 }
@@ -2722,6 +2727,11 @@ void MInstall::renderPageEnd() noexcept
     if (tui_textReminders) {
         auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_textReminders->tuiWidget());
         if (tuiWidget) {
+            int maxY, maxX;
+            getmaxyx(stdscr, maxY, maxX);
+            (void)maxY;
+            tuiWidget->setWordWrap(true);
+            tuiWidget->setWidth(maxX - 7);
             tuiWidget->render();
         }
     }
@@ -2738,6 +2748,11 @@ void MInstall::renderPageTerms() noexcept
     if (tui_textCopyright) {
         auto* tuiWidget = dynamic_cast<qtui::TLabel*>(tui_textCopyright->tuiWidget());
         if (tuiWidget) {
+            int maxY, maxX;
+            getmaxyx(stdscr, maxY, maxX);
+            (void)maxY;
+            tuiWidget->setWordWrap(true);
+            tuiWidget->setWidth(maxX - 4);
             tuiWidget->render();
         }
     }
