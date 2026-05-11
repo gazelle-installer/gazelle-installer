@@ -1401,7 +1401,7 @@ void MInstall::gotoPage(int next) noexcept
     if (ui::Context::isTUI()) {
         gui.widgetStack->setCurrentIndex(next);
         clear();  // Clear screen before rendering new page
-        mvprintw(0, 0, "%s (TUI Mode) - Press ESC to quit (Alt+Left = Back)", QApplication::applicationDisplayName().toUtf8().constData());
+        mvprintw(0, 0, "%s (TUI Mode) - Press ESC to quit (Ctrl-P = Back, Ctrl-N = Next)", QApplication::applicationDisplayName().toUtf8().constData());
         mvprintw(1, 0, "========================================================");
         renderCurrentPage();
         
@@ -1412,7 +1412,7 @@ void MInstall::gotoPage(int next) noexcept
         if (next == Step::TIPS) {
             mvprintw(maxY - 1, 0, "Installation in progress - please wait");
         } else {
-            mvprintw(maxY - 1, 0, "SPACE: Toggle | ESC: Quit | Alt+Left: Back");
+            mvprintw(maxY - 1, 0, "SPACE: Toggle | ESC: Quit | Ctrl-P: Back | Ctrl-N: Next");
         }
         
         refresh();

@@ -312,15 +312,15 @@ int main(int argc, char *argv[])
 
         while (running) {
             clear();
-            // Show header with Alt+Left status
+            // Show header with navigation status
             if (minstall.canGoBack()) {
-                mvprintw(0, 0, "%s (TUI Mode) - Press Ctrl-C to quit (Alt+Left = Back)", a.applicationDisplayName().toUtf8().constData());
+                mvprintw(0, 0, "%s (TUI Mode) - Press Ctrl-C to quit (Ctrl-P = Back, Ctrl-N = Next)", a.applicationDisplayName().toUtf8().constData());
             } else {
                 attron(COLOR_PAIR(2));
                 mvprintw(0, 0, "%s (TUI Mode) - Press Ctrl-C to quit", a.applicationDisplayName().toUtf8().constData());
                 attroff(COLOR_PAIR(2));
                 attron(A_DIM);
-                printw(" (Alt+Left unavailable)");
+                printw(" (Back unavailable)");
                 attroff(A_DIM);
             }
             mvprintw(1, 0, "========================================================");
