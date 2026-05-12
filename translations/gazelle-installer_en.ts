@@ -84,32 +84,32 @@ Minimum: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="260"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Failed to delete old system on destination.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="263"/>
+        <location filename="../base.cpp" line="264"/>
         <source>Deleting old system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="287"/>
+        <location filename="../base.cpp" line="288"/>
         <source>Failed to set the system configuration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="289"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Setting system configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="451"/>
+        <location filename="../base.cpp" line="452"/>
         <source>Copying new system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="623"/>
+        <location filename="../base.cpp" line="624"/>
         <source>Failed to copy the new system.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -935,12 +935,12 @@ This may take several minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="4123"/>
+        <location filename="../minstall.cpp" line="4128"/>
         <source>Installing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="4442"/>
+        <location filename="../minstall.cpp" line="4447"/>
         <source>Could not unlock device. Incorrect password?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1095,68 +1095,68 @@ Choose what to do with it:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="4937"/>
+        <location filename="../minstall.cpp" line="4942"/>
         <source>Passwords must match and not be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5274"/>
+        <location filename="../minstall.cpp" line="5279"/>
         <source>Please enter a computer name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5277"/>
+        <location filename="../minstall.cpp" line="5282"/>
         <source>The computer name contains invalid characters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5280"/>
+        <location filename="../minstall.cpp" line="5285"/>
         <source>Please enter a domain name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5283"/>
+        <location filename="../minstall.cpp" line="5288"/>
         <source>The computer domain contains invalid characters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5286"/>
+        <location filename="../minstall.cpp" line="5291"/>
         <source>Please enter a workgroup.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5617"/>
+        <location filename="../minstall.cpp" line="5622"/>
         <source>Please fill in all required fields before continuing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5625"/>
+        <location filename="../minstall.cpp" line="5630"/>
         <source>The user name cannot contain special characters or spaces.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5628"/>
-        <location filename="../minstall.cpp" line="5631"/>
+        <location filename="../minstall.cpp" line="5633"/>
+        <location filename="../minstall.cpp" line="5636"/>
         <source>Please ensure the passwords match.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5646"/>
+        <location filename="../minstall.cpp" line="5651"/>
         <source>The chosen user name is in use.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5650"/>
+        <location filename="../minstall.cpp" line="5655"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5658"/>
+        <location filename="../minstall.cpp" line="5663"/>
         <source>You did not provide a password for the root account.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="5747"/>
+        <location filename="../minstall.cpp" line="5752"/>
         <source>Please select an option to continue.</source>
         <translation type="unfinished"></translation>
     </message>
