@@ -106,6 +106,7 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     MIni squashInfo(infile, MIni::ReadOnly);
 
     // Default EFI System Partition size.
+    partman.volSpecs[u"/boot/efi"_s].minimum = partman.volSpecs[u"ESP"_s].minimum = 100*MB;
     partman.volSpecs[u"ESP"_s].preferred = 256*MB;
 
     PartMan::VolumeSpec &vspecRoot = partman.volSpecs[u"/"_s];
