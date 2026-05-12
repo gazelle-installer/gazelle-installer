@@ -338,6 +338,7 @@ private:
     void loadConfig(int stage) noexcept;
     void saveConfig() noexcept;
     void runShutdown(const QString &action) noexcept;
+    bool confirmRebootCountdown() noexcept;
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 
     // TUI functions

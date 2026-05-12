@@ -38,6 +38,10 @@
 #include <QToolTip>
 #include <QPainter>
 #include <QMessageBox>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QDialog>
 #include "ui/qmessagebox.h"
 #include <QDebug>
 #include <QTreeWidgetItem>
@@ -402,6 +406,108 @@ void MInstall::runShutdown(const QString &action) noexcept
     proc.exec(fallback);
 }
 
+bool MInstall::confirmRebootCountdown() noexcept
+{
+    constexpr int countdownSeconds = 5;
+
+    if (ui::Context::isGUI()) {
+        QDialog dlg(this);
+        dlg.setWindowTitle(tr("Restarting"));
+        dlg.setModal(true);
+
+        QVBoxLayout *layout = new QVBoxLayout(&dlg);
+        QLabel *header = new QLabel(&dlg);
+        header->setAlignment(Qt::AlignCenter);
+        header->setText(QStringLiteral("<b>%1</b>").arg(tr("Installation successful")));
+        QLabel *label = new QLabel(&dlg);
+        label->setAlignment(Qt::AlignCenter);
+        QPushButton *cancelBtn = new QPushButton(tr("Cancel Restart"), &dlg);
+        layout->addWidget(header);
+        layout->addWidget(label);
+        layout->addWidget(cancelBtn);
+
+        int remaining = countdownSeconds;
+        auto updateText = [&]() {
+            label->setText(tr("The system will restart in %n second(s)...", "", remaining));
+        };
+        updateText();
+
+        bool cancelled = false;
+        QTimer timer;
+        timer.setInterval(1000);
+        QObject::connect(&timer, &QTimer::timeout, &dlg, [&]() {
+            --remaining;
+            if (remaining <= 0) {
+                dlg.accept();
+            } else {
+                updateText();
+            }
+        });
+        QObject::connect(cancelBtn, &QPushButton::clicked, &dlg, [&]() {
+            cancelled = true;
+            dlg.reject();
+        });
+
+        const bool hadOverride = (qApp->overrideCursor() != nullptr);
+        if (hadOverride) qApp->restoreOverrideCursor();
+        timer.start();
+        dlg.exec();
+        if (hadOverride) qApp->setOverrideCursor(Qt::WaitCursor);
+
+        return !cancelled;
+    }
+
+    // TUI path: take over the screen and poll for cancel keypress.
+    int maxY = 0, maxX = 0;
+    getmaxyx(stdscr, maxY, maxX);
+    bool cancelled = false;
+    timeout(100); // 100 ms polling
+
+    for (int remaining = countdownSeconds; remaining > 0 && !cancelled; --remaining) {
+        for (int tick = 0; tick < 10 && !cancelled; ++tick) {
+            clear();
+            const QString header = tr("Installation successful");
+            const QString title = tr("Restarting");
+            const QString msg = tr("The system will restart in %n second(s)...", "", remaining);
+            const QString btn = tr("[ Cancel Restart ]");
+            const QString hint = tr("Press C or Esc to cancel");
+
+            attron(A_BOLD);
+            mvprintw(maxY / 2 - 5, qMax(0, int(maxX -header.length()) / 2),
+                "%s", header.toUtf8().constData());
+            attroff(A_BOLD);
+            mvprintw(maxY / 2 - 3, qMax(0, int(maxX -title.length()) / 2),
+                "%s", title.toUtf8().constData());
+            mvprintw(maxY / 2 - 1, qMax(0, int(maxX -msg.length()) / 2),
+                "%s", msg.toUtf8().constData());
+            attron(A_REVERSE);
+            mvprintw(maxY / 2 + 1, qMax(0, int(maxX -btn.length()) / 2),
+                "%s", btn.toUtf8().constData());
+            attroff(A_REVERSE);
+            mvprintw(maxY / 2 + 3, qMax(0, int(maxX -hint.length()) / 2),
+                "%s", hint.toUtf8().constData());
+            refresh();
+
+            int ch = getch();
+            if (ch == 'c' || ch == 'C' || ch == 27 /*Esc*/) {
+                cancelled = true;
+            } else if (ch == KEY_MOUSE) {
+                MEVENT event;
+                if (getmouse(&event) == OK
+                    && (event.bstate & (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED))
+                    && event.y == maxY / 2 + 1) {
+                    cancelled = true;
+                }
+            }
+        }
+    }
+
+    timeout(-1);
+    clear();
+    refresh();
+    return !cancelled;
+}
+
 MInstall::~MInstall() {
     if (oobe) delete oobe;
     if (base) delete base;
@@ -717,13 +823,22 @@ void MInstall::processNextPhase() noexcept
             }
             // TUI mode: check if automatic reboot checkbox is selected
             if (ui::Context::isTUI() && tui_checkTipsReboot && tui_checkTipsReboot->isChecked()) {
-                runShutdown(u"reboot"_s);
+                if (confirmRebootCountdown()) {
+                    runShutdown(u"reboot"_s);
+                }
             }
             // GUI mode: skip END page and reboot if checkbox was checked
             if (ui::Context::isGUI() && gui.checkExitReboot->isChecked()) {
-                if (!pretend) runShutdown(u"reboot"_s);
-                qApp->exit(EXIT_SUCCESS);
-                return;
+                if (pretend) {
+                    qApp->exit(EXIT_SUCCESS);
+                    return;
+                }
+                if (confirmRebootCountdown()) {
+                    runShutdown(u"reboot"_s);
+                    qApp->exit(EXIT_SUCCESS);
+                    return;
+                }
+                // User cancelled the restart — fall through to the END page.
             }
             gotoPage(Step::END);
         }
@@ -774,7 +889,9 @@ void MInstall::pretendNextPhase() noexcept
         phase = PH_FINISHED;
         // TUI mode: check if automatic reboot checkbox is selected (skip in pretend mode)
         if (!pretend && ui::Context::isTUI() && tui_checkTipsReboot && tui_checkTipsReboot->isChecked()) {
-            runShutdown(u"reboot"_s);
+            if (confirmRebootCountdown()) {
+                runShutdown(u"reboot"_s);
+            }
         }
         gotoPage(Step::END);
     }
@@ -1468,6 +1585,17 @@ void MInstall::gotoPage(int next) noexcept
         }
 
         if (!pretend && shouldReboot) {
+            if (!confirmRebootCountdown()) {
+                // User cancelled the restart — abort the finish and stay in place.
+                if (ui::Context::isGUI()) {
+                    qApp->restoreOverrideCursor();
+                    gui.widgetStack->setEnabled(true);
+                    gui.pushNext->setEnabled(true);
+                    gui.pushBack->setEnabled(true);
+                }
+                currentPageIndex = curr;
+                return;
+            }
             runShutdown(u"reboot"_s);
         }
         qApp->exit(EXIT_SUCCESS);
@@ -4217,6 +4345,16 @@ void MInstall::handleInput(int key) noexcept
             }
         }
         if (key == '\n' || key == KEY_ENTER) {
+            bool wantReboot = false;
+            if (tui_checkExitReboot) {
+                auto* checkbox = dynamic_cast<qtui::TCheckBox*>(tui_checkExitReboot->tuiWidget());
+                if (checkbox) wantReboot = checkbox->isChecked();
+            }
+            if (!pretend && wantReboot) {
+                if (confirmRebootCountdown()) {
+                    runShutdown(u"reboot"_s);
+                }
+            }
             tui_exitRequested = true;
         }
     } else if (currentPageIndex == Step::TERMS) {
@@ -5776,9 +5914,14 @@ void MInstall::handleInput(int key) noexcept
                 if (rebootCheck) {
                     gui.checkExitReboot->setChecked(rebootCheck->isChecked());
                 }
-                // If reboot is checked, reboot directly; otherwise go to END page
+                // If reboot is checked, show countdown then reboot; otherwise go to END page
                 if (gui.checkExitReboot->isChecked()) {
-                    runShutdown(u"reboot"_s);
+                    if (confirmRebootCountdown()) {
+                        runShutdown(u"reboot"_s);
+                    } else {
+                        // User cancelled — fall back to the END page.
+                        gotoPage(Step::END);
+                    }
                 } else {
                     gotoPage(Step::END);
                 }
