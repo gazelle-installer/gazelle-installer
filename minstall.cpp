@@ -3665,6 +3665,7 @@ void MInstall::renderPagePartitions() noexcept
                 mvprintw(17, 2, "UP/DOWN: select option | ENTER: apply | ESC: cancel");
             }
             move(18, 2); clrtoeol();
+            move(19, 2); clrtoeol();
         } else {
             mvprintw(17, 2, "UP/DOWN: select | LEFT/RIGHT: column | ENTER: edit | SPACE: toggle encrypt");
 
@@ -3693,9 +3694,12 @@ void MInstall::renderPagePartitions() noexcept
                     || (selectedDevice->flags.oldLayout && selectedDevice->curFormat == "crypto_LUKS"_L1));
 
             int col = 2;
+            int row = 18;
+            move(18, 2); clrtoeol();
+            move(19, 2); clrtoeol();
             auto printAction = [&](const char *text, bool enabled) {
                 if (!enabled) attron(A_DIM);
-                mvprintw(18, col, "%s", text);
+                mvprintw(row, col, "%s", text);
                 if (!enabled) attroff(A_DIM);
                 col += static_cast<int>(std::strlen(text));
             };
@@ -3705,9 +3709,10 @@ void MInstall::renderPagePartitions() noexcept
             printAction(" | D: delete", canDelete);
             printAction(" | N: new subvol", canNewSubvol);
             printAction(" | S: scan subvols", canScanSubvols);
-            printAction(" | R: reload", true);
+            row = 19; col = 2;
+            printAction("R: reload", true);
             printAction(" | P: partition manager", true);
-            printAction(" | TAB: focus apply", true);
+            printAction(" | TAB: focus apply [Apply]", true);
             if (canUnlock) printAction(" | U: unlock", true);
             if (canLock) printAction(" | L: lock", true);
             if (canCrypttab) printAction(" | T: crypttab", true);

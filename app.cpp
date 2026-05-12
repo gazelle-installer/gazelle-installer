@@ -332,6 +332,8 @@ int main(int argc, char *argv[])
             // Show different footer based on page
             if (minstall.getCurrentPage() == 14) {  // Step::TIPS
                 mvprintw(maxY - 1, 0, "Installation in progress - please wait");
+            } else if (minstall.getCurrentPage() == 15) {  // Step::END
+                // no footer — ENTER: exit hint is shown inline by renderPageEnd
             } else {
                 // Render Previous button (Ctrl-P)
                 move(maxY - 1, 0);
