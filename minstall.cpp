@@ -3528,7 +3528,7 @@ void MInstall::renderPagePartitions() noexcept
     const int colUseFor = 30;
     const int colLabel = 44;
     const int colFormat = 60;
-    const int colEncrypt = 72;
+    const int colEncrypt = 76;
 
     attron(A_BOLD | A_UNDERLINE);
     mvprintw(3, colDevice, "Device");
@@ -3640,10 +3640,16 @@ void MInstall::renderPagePartitions() noexcept
                 fmt = dev->shownFormat(dev->format);
             }
             if (!fmt.isEmpty()) {
+                // "Preserve /home (ext4)" doesn't fit the 16-char Format column;
+                // drop the parenthetical filesystem name only when it would overflow.
+                if (fmt.length() > 16) {
+                    const int parenIdx = fmt.indexOf(QStringLiteral(" ("));
+                    if (parenIdx >= 0) fmt.truncate(parenIdx);
+                }
                 if (selected && tui_partitionCol == PART_COL_FORMAT) {
                     attron(A_REVERSE);
                 }
-                mvprintw(row, colFormat, "%-10s", fmt.left(10).toUtf8().constData());
+                mvprintw(row, colFormat, "%-16s", fmt.left(16).toUtf8().constData());
                 if (selected && tui_partitionCol == PART_COL_FORMAT) {
                     attroff(A_REVERSE);
                 }
@@ -3714,7 +3720,11 @@ void MInstall::renderPagePartitions() noexcept
                 }
                 QString displayOpt = (tui_partitionCol == PART_COL_FORMAT)
                     ? dev->shownFormat(options[optIdx]) : options[optIdx];
-                mvprintw(popupRow + i, popupCol, "%-14s", displayOpt.left(14).toUtf8().constData());
+                if (tui_partitionCol == PART_COL_FORMAT && displayOpt.length() > 16) {
+                    const int parenIdx = displayOpt.indexOf(QStringLiteral(" ("));
+                    if (parenIdx >= 0) displayOpt.truncate(parenIdx);
+                }
+                mvprintw(popupRow + i, popupCol, "%-16s", displayOpt.left(16).toUtf8().constData());
                 if (highlighted) {
                     attroff(A_BOLD);
                     attron(A_REVERSE);
