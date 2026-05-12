@@ -3762,11 +3762,6 @@ void MInstall::renderPagePartitions() noexcept
         tui_partitionLabelEdit->hide();
     }
 
-    if (tui_buttonPartitionsApply) {
-        tui_buttonPartitionsApply->setFocus(tui_focusPartitions == 1);
-        tui_buttonPartitionsApply->render();
-    }
-
     // Instructions and action keys
     if (tui_partitionUnlocking) {
         move(17, 0); clrtoeol();
@@ -3847,14 +3842,22 @@ void MInstall::renderPagePartitions() noexcept
             printAction(" | D: delete", canDelete);
             printAction(" | N: new subvol", canNewSubvol);
             printAction(" | S: scan subvols", canScanSubvols);
-            row = 19; col = 2;
+            // Row 19 begins with the [Apply] button (rendered below); start text after it.
+            row = 19; col = 12;
             printAction("R: reload", true);
             printAction(" | P: partition manager", true);
-            printAction(" | TAB: focus apply [Apply]", true);
+            printAction(" | TAB: focus apply", true);
             if (canUnlock) printAction(" | U: unlock", true);
             if (canLock) printAction(" | L: lock", true);
             if (canCrypttab) printAction(" | T: crypttab", true);
         }
+    }
+
+    // Render the Apply button last so the action-key footer never overwrites it.
+    // Hide it while editing a cell or unlocking, when the footer is replaced.
+    if (tui_buttonPartitionsApply && !tui_partitionEditing && !tui_partitionUnlocking) {
+        tui_buttonPartitionsApply->setFocus(tui_focusPartitions == 1);
+        tui_buttonPartitionsApply->render();
     }
 }
 
