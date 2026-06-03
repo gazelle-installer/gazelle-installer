@@ -108,7 +108,7 @@ else
         IFS='=' read -r k v  <<<"$REPLY"
         # remove any 'bad' special char's like back-quotes and dollar sign
         v="${v//[\`\$]/}"
-        export $k="$v"
+        export "$k=$v"
     done < <( xargs -0 -L1 -a /proc/$PPID/environ \
             | grep -E "${__ENVIRONEMENT_PATTERN__}")
 
