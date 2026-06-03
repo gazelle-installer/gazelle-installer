@@ -218,7 +218,7 @@ void BootMan::install(const QStringList &cmdextra)
             proc.shell(u"for f in /usr/share/locale/*/LC_MESSAGES/grub.mo; do "
                 u"[ -f \"$f\" ] && install -Dm644 \"$f\" "
                 u"\"/mnt/antiX/boot/grub/locale/$(basename $(dirname $(dirname \"$f\"))).mo\"; "
-                u"done"_s, nullptr, true);
+                u"done; true"_s, nullptr, true);
         } else {
             if (efivars_ismounted) {
                 //ensure efivarfs mounted as read-write
@@ -263,7 +263,7 @@ void BootMan::install(const QStringList &cmdextra)
             proc.shell(u"for f in /usr/share/locale/*/LC_MESSAGES/grub.mo; do "
                 u"[ -f \"$f\" ] && install -Dm644 \"$f\" "
                 u"\"/boot/grub/locale/$(basename $(dirname $(dirname \"$f\"))).mo\"; "
-                u"done"_s, nullptr, true);
+                u"done; true"_s, nullptr, true);
 
             // Copy fallback files (not copied above because of --no-nvram switch).
             if (espdev != nullptr) {
