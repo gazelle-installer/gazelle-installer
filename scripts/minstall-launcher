@@ -117,8 +117,11 @@ else
 
     # unset QT_QPA_PLATFORM to let Qt auto-detect; a user-set value (e.g. wayland)
     # can cause failures when running as root since the Wayland socket belongs to
-    # the user session and qt6-wayland may not be present on the live ISO
-    unset QT_QPA_PLATFORM
+    # the user session and qt6-wayland may not be present on the live ISO.
+    # Also drop the plugin path variables: a user-set value could otherwise make
+    # Qt dlopen arbitrary shared objects as root. The installer uses system Qt
+    # with plugins in the default location, so these are not needed.
+    unset QT_QPA_PLATFORM QT_PLUGIN_PATH QT_QPA_PLATFORM_PLUGIN_PATH QT_QPA_GENERIC_PLUGINS
 
     # set XDG_RUNTIME_DIR - create a valid runtime dir
     if [ "$XDG_RUNTIME_DIR" != "/run/user/0" ]; then
