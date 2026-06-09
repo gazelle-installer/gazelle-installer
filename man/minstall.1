@@ -1,0 +1,236 @@
+.\" Manpage for minstall (gazelle-installer).
+.\" Contact the MX Linux / antiX Linux projects to report errors or typos.
+.TH MINSTALL 1 "2026-06-09" "gazelle-installer" "System Manager's Manual"
+.SH NAME
+minstall \- customizable GUI/TUI system installer for MX Linux and antiX Linux
+.SH SYNOPSIS
+.B minstall
+.RI [ OPTIONS ]
+.RI [ config-file ]
+.SH DESCRIPTION
+.B minstall
+is the
+.I gazelle-installer
+back end, a customizable installer ported from MX Linux and antiX Linux.
+It installs the running live system onto a target disk, guiding the user
+through media checking, partitioning, encryption, boot loader setup,
+service selection, localization and user account creation.
+.PP
+By default the installer presents a graphical (GUI) interface. When no
+display server is detected, or when forced with
+.BR \-\-tui ,
+it runs as a text user interface (TUI) driven by ncurses (see
+.B ENVIRONMENT
+and the
+.B \-\-tui
+option).
+.PP
+.B minstall
+must be run as root and only one instance may run at a time (see
+.BR NOTES ).
+On live systems it is normally launched through
+.BR minstall\-launcher (1),
+which elevates privileges and preserves the graphical environment.
+.PP
+An optional
+.I config-file
+positional argument names a configuration file to load; this is equivalent
+to passing it with
+.BR \-\-config .
+At most one positional argument is accepted.
+.SH OPTIONS
+.SS General options
+.TP
+.B \-h, \-\-help
+Display usage information and exit.
+.TP
+.B \-v, \-\-version
+Display the installer version and exit.
+.TP
+.B \-\-advanced
+Enable advanced settings, even in regular installation mode.
+.TP
+.B \-\-auto
+Install automatically using the configuration file (see
+.BR \-\-config ).
+.br
+.B WARNING:
+potentially dangerous option \(em it will wipe the partition(s)
+automatically.
+.TP
+.B \-\-brave
+Overrule sanity checks on partitions and drives, causing them to be
+displayed.
+.br
+.B WARNING:
+this can break things; use it only if you do not care about the data on the
+drive.
+.TP
+.BI "\-c, \-\-config " <config-file>
+Load a configuration file as specified by
+.IR <config-file> .
+By default
+.I /etc/minstall.conf
+is used. This configuration can be used with
+.B \-\-auto
+for an unattended installation. The installer creates (or overwrites)
+.I /mnt/antiX/etc/minstall.conf
+and saves a copy to
+.I /etc/minstalled.conf
+for future use. The installer will not write any passwords or ignored
+settings to the new configuration file.
+.br
+Note: this is experimental. Future installer versions may break
+compatibility with existing configuration files.
+.TP
+.B \-f, \-\-poweroff
+Shut down automatically when done installing.
+.TP
+.B \-m, \-\-mount\-keep
+Do not unmount
+.I /mnt/antiX
+or close any of the associated LUKS containers when finished.
+.TP
+.B \-o, \-\-oem
+Install the operating system, delaying prompts for user-specific options
+until the first reboot. Upon rebooting, the installer is run with
+.B \-\-oobe
+so that the user can provide these details. This is useful for OEM
+installations \(em selling or giving away a computer with an OS pre-loaded
+on it.
+.TP
+.B \-\-oobe
+Out Of the Box Experience mode. This starts automatically if the system was
+installed with the
+.B \-\-oem
+option.
+.TP
+.B \-r, \-\-reboot
+Reboot automatically when done installing.
+.TP
+.B \-s, \-\-sync
+Install with
+.BR rsync (1)
+instead of
+.BR cp (1)
+on custom partitioning.
+.br
+Note: this does not format
+.I /root
+and it does not work with encryption.
+.TP
+.B \-\-media\-check
+Always check the installation media at the beginning.
+.TP
+.B \-\-no\-media\-check
+Do not check the installation media at the beginning. Not recommended
+unless the installation media is guaranteed to be free from errors.
+.TP
+.B \-\-tui
+Force TUI (Text User Interface) mode instead of GUI. The single-dash form
+.B \-tui
+is also accepted and, like
+.BR \-\-tui ,
+is honoured before the GUI toolkit is initialized so that the installer can
+start without a display server.
+.SS Testing and debugging options
+.TP
+.B \-\-pretend
+Test mode for the GUI: advance through the different screens without
+actually installing anything.
+.TP
+.BI "\-\-test\-page " <page-name>
+Jump directly to a specific page for testing (use together with
+.BR \-\-pretend ).
+Recognized page names are:
+.IR splash ,
+.IR terms ,
+.IR installation ,
+.IR replace ,
+.IR partitions ,
+.IR encryption ,
+.IR confirm ,
+.IR boot ,
+.IR swap ,
+.IR services ,
+.IR network ,
+.IR localization ,
+.IR user ,
+.IR oldhome ,
+.IR tips ,
+and
+.IR end .
+.SH ENVIRONMENT
+.TP
+.B DISPLAY
+.TQ
+.B WAYLAND_DISPLAY
+If neither of these is set, the installer assumes that no display server is
+available and automatically selects TUI mode (equivalent to
+.BR \-\-tui ).
+.SH FILES
+.TP
+.I /etc/minstall.conf
+Default configuration file read with
+.B \-\-config
+(and, with
+.BR \-\-auto ,
+used for unattended installation).
+.TP
+.I /mnt/antiX/etc/minstall.conf
+Configuration file written to the target system during installation.
+.TP
+.I /etc/minstalled.conf
+Copy of the generated configuration saved for future use.
+.TP
+.I /var/log/minstall.log
+Installer log file. It is copied to
+.I /mnt/antiX/var/log/minstall.log
+on the target system at the end of a successful install.
+.TP
+.I /var/lock/gazelle-installer.lock
+Lock file used to ensure that only one instance runs at a time.
+.TP
+.I /usr/share/gazelle-installer-data/installer.conf
+.TQ
+.I /etc/gazelle-installer-data/installer.conf
+Branding and customization settings (project name, logo, default drive
+sizes, authentication helper, services, etc.). If the file in
+.I /etc
+exists it takes precedence over the one in
+.IR /usr/share .
+.TP
+.I /usr/share/gazelle-installer/locale/
+Compiled translation catalogs.
+.SH EXIT STATUS
+.TP
+.B 0
+The installer started (and, where applicable, completed) successfully.
+.TP
+.B 1
+An error occurred, for example: another instance is already running, the
+installer was not run as root, the requested configuration file was not
+found, or too many arguments were supplied.
+.SH NOTES
+.B minstall
+requires root privileges except when started with
+.BR \-\-pretend .
+Only a single instance may run at a time; if a second instance is started
+it reports that the installer is already running and exits. Should an
+instance become stuck, it can be terminated with
+.RB ' "pkill minstall" '.
+.SH SEE ALSO
+.BR minstall\-launcher (1),
+.BR guess\-hwclock (1),
+.BR oobe.sh (1)
+.PP
+Project home page:
+.UR https://github.com/gazelle-installer
+.UE
+.SH AUTHORS
+Originally written by Warren Woodford. Heavily revised by anticapitalista,
+dolphin oracle, adrian and others for the antiX Linux and MX Linux projects.
+.SH COPYRIGHT
+Licensed under the Apache License, Version 2.0. See
+.I /usr/share/doc/gazelle-installer/LICENSE
+for details.
