@@ -13,23 +13,21 @@
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
-#don't start on rpi first boot
-FILE="/etc/rpi_skip_first_boot"
-if [ -e "$FILE" ]; then
-	if [ -x /etc/resize-root-fs ]; then
-		/etc/resize-root-fs
-	fi
-	rm "$FILE"
-	exit 0
-fi
-	
-
-
 case "$1" in
   start)
+    #classic X11 mode
+    CMD="/usr/bin/startx"
 	# Boot will hold here since the process is not being forked.
 	echo "Loading Out-of-Box Experience..."
-	startx /usr/bin/oobe.sh 2>/dev/null
+	#check for kwin-wayland
+	if [ -x "/usr/bin/kwin-wayland" ]; then
+		export XDG_RUNTIME_DIR=/run/user/0
+		mkdir -p $XDG_RUNTIME_DIR
+		chmod 0700 $XDG_RUNTIME_DIR
+		export KWIN_ALLOW_OWNS_WINDOW=1
+		CMD="/usr/bin/kwin-wayland --xwayland --exit-with-session"
+	fi
+	"$CMD" /usr/bin/oobe.sh 2>/dev/null
 	# Boot will continue after the OOBE application and X exits.
 	;;
 esac
