@@ -1516,7 +1516,7 @@ void PartMan::prepareSubvolumes(Device *part)
     proc.status(tr("Preparing subvolumes"));
     const QString &scratchpath = u"/mnt/scratch"_s;
 
-    proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,noatime"_s, part->mappedDevice(), scratchpath});
+    proc.exec(u"mount"_s, {u"--mkdir"_s, u"-o"_s, u"subvolid=5,noatime,lazytime"_s, part->mappedDevice(), scratchpath});
     const char *errmsg = nullptr;
     try {
         // Current default subvolume, which could be on the volume itself, but not in the device tree.
@@ -2480,7 +2480,7 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
         if (usefor == "SWAP"_L1) {
             options = discgran ? "discard=once"_L1 : "defaults"_L1;
         } else if (finalFormat().startsWith("FAT"_L1)) {
-            options = "noatime,dmask=0002,fmask=0113"_L1;
+            options = "noatime,lazytime,dmask=0002,fmask=0113"_L1;
             pass = 0;
             dump = false;
         } else {
@@ -2490,7 +2490,7 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
             options.clear();
             const bool btrfs = (format == "btrfs"_L1 || type == SUBVOLUME);
             if (!flags.rotational && btrfs) options += "ssd,"_L1;
-            options += "noatime"_L1;
+            options += "noatime,lazytime"_L1;
             if (btrfs && usefor != "/swap"_L1) options += ",compress=zstd:1"_L1;
             dump = true;
         }
@@ -2790,7 +2790,7 @@ void PartMan::ItemDelegate::partOptionsMenu() noexcept
     if ((part->type == PartMan::Device::PARTITION && selFS == "btrfs"_L1) || part->type == PartMan::Device::SUBVOLUME) {
         QString tcommon;
         if (!part->flags.rotational) tcommon = "ssd,"_L1;
-        tcommon += "noatime"_L1;
+        tcommon += "noatime,lazytime"_L1;
         QAction *action = menuTemplates->addAction(tr("Compression (Z&STD)"));
         action->setData(tcommon + ",compress=zstd"_L1);
         action = menuTemplates->addAction(tr("Compression (&LZO)"));
