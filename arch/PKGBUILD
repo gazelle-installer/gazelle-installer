@@ -4,11 +4,13 @@
 # PKGBUILD for building on the Open Build Service.
 #
 # OBS build VMs have no network, so every source has to be present in the
-# package's OBS sources before the build starts. This consumes the Debian
-# native tarball that release builds commit to debs/ - it carries the complete
-# source tree - instead of fetching a GitHub tarball the way aur/PKGBUILD does.
+# package's OBS sources before the build starts. Unlike the MX repositories this
+# one does not commit its source tarball - debs/ exists on disk but nothing
+# under it is tracked - so the OBS tar_scm service packs the git checkout into a
+# tarball under a constant name, which is what source= below refers to.
 #
-# Keep pkgver in step with debian/changelog: it names the tarball.
+# pkgver tracks debian/changelog. It no longer names the tarball, so the two are
+# independent, but the packaged version should still say what was built.
 
 pkgname=gazelle-installer
 pkgver=26.09mx25
@@ -39,12 +41,12 @@ optdepends=(
     'partitionmanager: KDE partition manager'
     'cryptsetup: LUKS encryption support'
 )
-source=("${pkgname}_${pkgver}.tar.xz")
+source=("${pkgname}-source.tar")
 sha256sums=('SKIP')
 
 # dpkg-source packed this tarball from a directory called "src", so that - not
 # ${pkgname}-${pkgver} - is what it unpacks to.
-_srcdir="src"
+_srcdir="${pkgname}-source"
 
 build() {
     cd "${srcdir}/${_srcdir}"
