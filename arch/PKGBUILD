@@ -102,4 +102,8 @@ package() {
 
     # Install man page
     install -Dm644 "man/minstall.1" "${pkgdir}/usr/share/man/man1/minstall.1"
+    # namcap flags a declared license= with nothing under
+    # /usr/share/licenses. The file is in the source; it was simply never
+    # installed.
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
