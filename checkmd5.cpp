@@ -173,6 +173,7 @@ void CheckMD5::check(QPromise<CheckResult> &promise) const noexcept
     for (const QString &mpath : missing) {
         promise.emplaceResult(mpath, CheckState::MISSING);
     }
+    if (targets.empty()) return; // Nothing found to hash (already reported as missing above).
 
     // Check the hash of each file.
     std::unique_ptr<char[]> buf(new char[bufsize]);
@@ -184,7 +185,6 @@ void CheckMD5::check(QPromise<CheckResult> &promise) const noexcept
 
     qint64 bprog = 0;
     int progress = 0;
-    assert(btotal != 0);
     for(const auto &target : targets) {
         if (promise.isCanceled()) break;
         promise.emplaceResult(target.path, CheckState::STARTED);
