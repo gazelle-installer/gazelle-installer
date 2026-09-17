@@ -1,0 +1,13 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  create-release:
+    uses: MX-Linux/.github/.github/workflows/release.yaml@main
+    secrets: inherit
+    permissions:
+      contents: write

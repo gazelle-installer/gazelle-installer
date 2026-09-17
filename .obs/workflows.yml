@@ -1,0 +1,7 @@
+workflow:
+  steps:
+    - trigger_services:
+        project: home:mx-packaging
+        package: gazelle-installer
+  filters:
+    event: tag_push
