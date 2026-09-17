@@ -5,9 +5,37 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+
 jobs:
   create-release:
-    uses: MX-Linux/.github/.github/workflows/release.yaml@main
-    secrets: inherit
-    permissions:
-      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          generateReleaseNotes: true
+          draft: false
+          prerelease: false
+
+      - name: Trigger OBS workflow
+        env:
+          OBS_WORKFLOW_TOKEN: ${{ secrets.OBS_WORKFLOW_TOKEN }}
+        run: |
+          if [[ -z "${OBS_WORKFLOW_TOKEN}" ]]; then
+              echo "::error::Missing OBS_WORKFLOW_TOKEN repository or organization secret"
+              exit 1
+          fi
+
+          curl --fail --show-error --silent --request POST \
+              --header "Authorization: Token ${OBS_WORKFLOW_TOKEN}" \
+              --header "X-GitHub-Event: push" \
+              --header "Content-Type: application/json" \
+              --data-binary "@${GITHUB_EVENT_PATH}" \
+              https://api.opensuse.org/trigger/workflow
