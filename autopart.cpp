@@ -128,8 +128,9 @@ void AutoPart::scan() noexcept
     }
 
     // Determine if the check box can be changed. If not, check/uncheck according to what is possible.
+    // Block signals so that setChecked() below cannot re-enter scan() and cause infinite recursion.
+    gui.checkDualDrive->blockSignals(true);
     canChangeDualDrive = true; // This is used by the event filter with boxAutoPart enabled property.
-    // Toggling the check box should automatically re-run the scan.
     if (gui.comboDriveSystem->count() < 1) {
         gui.checkDualDrive->setChecked(true);
         canChangeDualDrive = false;
@@ -140,6 +141,12 @@ void AutoPart::scan() noexcept
         gui.checkDualDrive->setChecked(gui.comboDriveHome->itemData(0) != gui.comboDriveSystem->itemData(0));
         canChangeDualDrive = false;
     }
+    gui.checkDualDrive->blockSignals(false);
+    // Signals were blocked above, so apply the visibility side effects of checkDualDrive_toggled directly.
+    const bool dualDriveNow = gui.checkDualDrive->isChecked();
+    gui.labelDriveHome->setVisible(dualDriveNow);
+    gui.comboDriveHome->setVisible(dualDriveNow);
+    gui.boxSliderPart->setHidden(dualDriveNow);
     gui.checkDualDrive->setEnabled(gui.boxAutoPart->isEnabled() && canChangeDualDrive);
 
     gui.comboDriveHome->blockSignals(false);
