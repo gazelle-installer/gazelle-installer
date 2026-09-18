@@ -9,11 +9,14 @@
 # under it is tracked - so the OBS tar_scm service packs the git checkout into a
 # tarball under a constant name, which is what source= below refers to.
 #
-# pkgver tracks debian/changelog. It no longer names the tarball, so the two are
-# independent, but the packaged version should still say what was built.
+# pkgver() below reads the newest tag reachable from the packed checkout, so a
+# tag-push-triggered rebuild (see .obs/workflows.yml) picks up the new version
+# on its own instead of needing a manual bump here. git tag --sort=-v:refname
+# was tried first, but its lexical version sort ranks 26.5mx5 above 26.09.1, so
+# it uses git describe, which walks history from HEAD instead.
 
 pkgname=gazelle-installer
-pkgver=26.09mx25
+pkgver=26.09.1mx25
 pkgrel=1
 pkgdesc="Customizable GUI installer ported from MX Linux and antiX"
 arch=('x86_64' 'i686')
@@ -48,8 +51,15 @@ sha256sums=('SKIP')
 # ${pkgname}-${pkgver} - is what it unpacks to.
 _srcdir="${pkgname}-source"
 
+pkgver() {
+    cd "${srcdir}/${_srcdir}"
+    git describe --tags --abbrev=0 2>/dev/null || printf '%s\n' "${pkgver}"
+}
+
 build() {
     cd "${srcdir}/${_srcdir}"
+    local version_tag
+    version_tag="$(pkgver)"
 
     # GAZELLE_VERSION_SOURCE=tag with an explicit tag: the default source reads
     # debian/changelog through dpkg-parsechangelog, which does not exist on
@@ -58,7 +68,7 @@ build() {
     cmake --preset arch \
         -DUSE_ZXCVBN=OFF \
         -DGAZELLE_VERSION_SOURCE=tag \
-        -DGAZELLE_VERSION_TAG="${pkgver}"
+        -DGAZELLE_VERSION_TAG="${version_tag}"
     cmake --build --preset arch
 }
 
