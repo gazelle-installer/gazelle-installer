@@ -583,7 +583,7 @@ void MInstall::startup()
         partman = new PartMan(proc, core, gui, *crypto, appConf, appArgs, this);
         base = new Base(proc, core, *partman, appConf, appArgs);
         bootman = new BootMan(proc, core, *partman, gui, appConf, appArgs, this);
-        swapman = new SwapMan(proc, core, *partman, gui, this);
+        swapman = new SwapMan(proc, core, *partman, gui, appConf, this);
         autopart = new AutoPart(proc, core, partman, gui, appConf, this);
         partman->autopart = autopart;
         replacer = new Replacer(proc, partman, gui, *crypto, appConf);

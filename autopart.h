@@ -37,6 +37,7 @@ class AutoPart : public QObject
     long long minHome = 0, recHome = 0, sizeHome = 0;
     long long addSnapshot = 0;
     bool installFromRootDevice = false;
+    bool checkSwapFileBox = true;
     bool snapToRec = false;
     // Layout Builder
     class QCheckBox *checkSnapshot = nullptr;

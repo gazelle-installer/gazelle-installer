@@ -30,9 +30,18 @@
 
 using namespace Qt::Literals::StringLiterals;
 
-SwapMan::SwapMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui, QObject *parent) noexcept
+SwapMan::SwapMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui, MIni &appConf, QObject *parent) noexcept
     : QObject(parent), proc(mproc), core(mcore), partman(pman), gui(ui)
 {
+    appConf.setSection(u"Swap"_s);
+    checkSwapFileBox = appConf.getBoolean(u"CheckSwapFileBox"_s, true);
+    checkZramSwapBox = appConf.getBoolean(u"CheckZramSwapBox"_s, true);
+    appConf.setSection();
+
+    // Apply the configured default immediately, in case setupDefaults() is
+    // never reached (e.g. --test-page jumps straight to the swap page).
+    gui.boxSwapFile->setChecked(checkSwapFileBox);
+
     connect(ui.textSwapFile, &QLineEdit::textEdited, this, [this](const QString &) {
         gui.pushNext->setEnabled(setupBounds());
     });
@@ -67,6 +76,8 @@ SwapMan::SwapMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui,
         gui.boxSwapZram->setEnabled(false);
         gui.radioZramSize->setEnabled(false);
         gui.labelZramRecSize->setEnabled(false);
+    } else {
+        gui.boxSwapZram->setChecked(checkZramSwapBox);
     }
 }
 
@@ -80,7 +91,8 @@ void SwapMan::manageConfig(MSettings &config) noexcept
 }
 void SwapMan::setupDefaults() noexcept
 {
-    gui.boxSwapFile->setChecked(partman.findByMount(u"swap"_s) == nullptr);
+    gui.boxSwapFile->setChecked(checkSwapFileBox && partman.findByMount(u"swap"_s) == nullptr);
+    gui.boxSwapZram->setChecked(checkZramSwapBox && partman.findByMount(u"swap"_s) == nullptr);
     setupBounds();
     sizeResetClicked();
 }

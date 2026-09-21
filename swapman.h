@@ -29,6 +29,8 @@ class SwapMan : public QObject
     class Core &core;
     class PartMan &partman;
     Ui::MeInstall &gui;
+    bool checkSwapFileBox = true;
+    bool checkZramSwapBox = false;
     bool setupBounds() noexcept;
     // Slots
     void sizeResetClicked() noexcept;
@@ -38,7 +40,7 @@ class SwapMan : public QObject
     bool configureZRam() const noexcept;
 public:
     SwapMan(class MProcess &mproc, class Core &mcore, class PartMan &pman,
-        Ui::MeInstall &ui, QObject *parent = nullptr) noexcept;
+        Ui::MeInstall &ui, class MIni &appConf, QObject *parent = nullptr) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void setupDefaults() noexcept;
     bool updateBounds() noexcept;

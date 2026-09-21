@@ -63,6 +63,8 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     gui.spinHome->setSpecialValueText(strNone);
     appConf.setSection(u"Storage"_s);
     installFromRootDevice = appConf.getBoolean(u"InstallFromRootDevice"_s);
+    appConf.setSection(u"Swap"_s);
+    checkSwapFileBox = appConf.getBoolean(u"CheckSwapFileBox"_s, true);
     appConf.setSection();
     refresh();
     // Ensure the displayed auto partition controls are appropriate.
@@ -320,7 +322,8 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
     connect(checkEncrypt, &QCheckBox::toggled, &dialog, [&](){ updateUI(checkEncrypt); });
     connect(checkHibernation, &QCheckBox::toggled, &dialog, [&](){ updateUI(checkHibernation); });
     connect(checkSnapshot, &QCheckBox::toggled, &dialog, [&](){ updateUI(checkSnapshot); });
-    checkSwapFile->setChecked(true); // Automatically triggers UI update.
+    checkSwapFile->setChecked(checkSwapFileBox);
+    updateUI(checkSwapFile); // Ensure the UI is initialized even if setChecked above was a no-op.
 
     QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         Qt::Horizontal, &dialog);
