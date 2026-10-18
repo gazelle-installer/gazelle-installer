@@ -614,7 +614,7 @@ void Oobe::setUserClockFormat(const QString &skelpath) const noexcept
         sedIfExists("sed -i '/use24hFormat=/c\\use24hFormat=0' "_L1, skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc"_L1);
 
         //mx fluxbox
-        sedIfExists("sed -i '/time1_format/c\\time1_format=%l:%M' "_L1, skelpath + "/.config/tint2/tint2rc"_L1);
+        sedIfExists("sed -i -E '/^[[:space:]]*time1_format[[:space:]]*=/ s/%[Hk]/%l/g' "_L1, skelpath + "/.config/tint2/tint2rc"_L1);
 
         //antix systems
         sedIfExists("sed -i 's/%H:%M/%l:%M/g' "_L1, skelpath + "/.icewm/preferences"_L1);
@@ -630,7 +630,7 @@ void Oobe::setUserClockFormat(const QString &skelpath) const noexcept
         sedIfExists("sed -i '/use24hFormat=/c\\use24hFormat=2' "_L1, skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc"_L1);
 
         //mx fluxbox
-        sedIfExists("sed -i '/time1_format/c\\time1_format=%H:%M' "_L1, skelpath + "/.config/tint2/tint2rc"_L1);
+        sedIfExists("sed -i -E '/^[[:space:]]*time1_format[[:space:]]*=/ s/%[lI]/%H/g' "_L1, skelpath + "/.config/tint2/tint2rc"_L1);
 
         //antix systems
         sedIfExists("sed -i 's/%H:%M/%H:%M/g' "_L1, skelpath + "/.icewm/preferences"_L1);
