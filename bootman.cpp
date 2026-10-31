@@ -275,9 +275,22 @@ void BootMan::install(const QStringList &cmdextra)
                 if (QFile("/mnt/antiX" + fbx64efi).exists()) {
                     proc.exec(u"cp"_s, {u"-p"_s, fbx64efi, espdst + "BOOT/"_L1});
                 }
-                if (QFile("/mnt/antiX" + debianGrub).exists()){
-                    core.mkpath("/mnt/antiX"_L1 + espdst + "debian/"_L1);
-                    proc.exec(u"cp"_s, {u"-p"_s, debianGrub, espdst + "debian/"_L1});
+                if (QFile("/mnt/antiX" + debianGrub).exists()) {
+                    QString debianDir = espdst + "debian"_L1;
+                    if (!QFileInfo::exists("/mnt/antiX"_L1 + debianDir)) {
+                        // Reuse the stored spelling if lookup by lowercase fails on the ESP.
+                        const QDir espDir("/mnt/antiX"_L1 + espdst);
+                        const QStringList dirs = espDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+                        for (const QString &dir : dirs) {
+                            if (dir.compare(u"debian"_s, Qt::CaseInsensitive) == 0) {
+                                debianDir = espdst + dir;
+                                break;
+                            }
+                        }
+                    }
+                    // Run in the target chroot so failures include mkdir's diagnostic in the log.
+                    proc.exec(u"mkdir"_s, {u"-p"_s, debianDir});
+                    proc.exec(u"cp"_s, {u"-p"_s, debianGrub, debianDir + '/'});
                 }
             }
 
