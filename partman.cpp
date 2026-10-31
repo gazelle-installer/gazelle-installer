@@ -1560,6 +1560,23 @@ void PartMan::prepareSubvolumes(Device *part)
     if (errmsg) throw errmsg;
 }
 
+static QStringList mountOptionsWithFatDefaults(const QString &format, const QString &options)
+{
+    QStringList opts = options.split(',', Qt::SkipEmptyParts);
+    if (format.startsWith("FAT"_L1)
+        && std::none_of(opts.cbegin(), opts.cend(),
+            [](const QString &opt) { return opt.startsWith("iocharset="_L1); })) {
+        // iocharset=utf8 disables ASCII case folding on FAT, including EFI path lookups.
+        opts.append(u"iocharset=ascii"_s);
+        // Keep UTF-8 filename encoding unless the user explicitly selected otherwise.
+        if (std::none_of(opts.cbegin(), opts.cend(),
+            [](const QString &opt) { return opt == "utf8"_L1 || opt.startsWith("utf8="_L1); })) {
+            opts.append(u"utf8"_s);
+        }
+    }
+    return opts;
+}
+
 // create /etc/fstab file
 bool PartMan::makeFstab() noexcept
 {
@@ -1618,7 +1635,7 @@ bool PartMan::makeFstab() noexcept
         if (fsfmt.startsWith("FAT"_L1)) out << " vfat";
         else out << ' ' << fsfmt;
         // Options
-        const QString &mountopts = volume->options;
+        const QString mountopts = mountOptionsWithFatDefaults(fsfmt, volume->options).join(',');
         if (volume->type == Device::SUBVOLUME) {
             //set format information if fsfmt is empty
             if (fsfmt.isEmpty()){
@@ -1659,7 +1676,7 @@ void PartMan::mountPartitions()
             opts.append("subvol="_L1 + it.second->label);
         }
         // Use noatime to speed up the installation.
-        opts.append(it.second->options.split(','));
+        opts.append(mountOptionsWithFatDefaults(it.second->finalFormat(), it.second->options));
         opts.removeAll("ro");
         opts.removeAll("defaults");
         opts.removeAll("atime");
@@ -2480,7 +2497,7 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
         if (usefor == "SWAP"_L1) {
             options = discgran ? "discard=once"_L1 : "defaults"_L1;
         } else if (finalFormat().startsWith("FAT"_L1)) {
-            options = "noatime,lazytime,dmask=0002,fmask=0113"_L1;
+            options = "noatime,lazytime,dmask=0002,fmask=0113,iocharset=ascii,utf8"_L1;
             pass = 0;
             dump = false;
         } else {
