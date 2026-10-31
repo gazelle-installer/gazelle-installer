@@ -276,6 +276,9 @@ void BootMan::install(const QStringList &cmdextra)
                     proc.exec(u"cp"_s, {u"-p"_s, fbx64efi, espdst + "BOOT/"_L1});
                 }
                 if (QFile("/mnt/antiX" + debianGrub).exists()) {
+                    // The Debian path is a compatibility fallback for the loader's own grub.cfg.
+                    MProcess::Section fallbackSection(proc);
+                    fallbackSection.setExceptionStrict(false);
                     QString debianDir = espdst + "debian"_L1;
                     if (!QFileInfo::exists("/mnt/antiX"_L1 + debianDir)) {
                         // Reuse the stored spelling if lookup by lowercase fails on the ESP.
@@ -289,8 +292,9 @@ void BootMan::install(const QStringList &cmdextra)
                         }
                     }
                     // Run in the target chroot so failures include mkdir's diagnostic in the log.
-                    proc.exec(u"mkdir"_s, {u"-p"_s, debianDir});
-                    proc.exec(u"cp"_s, {u"-p"_s, debianGrub, debianDir + '/'});
+                    if (proc.exec(u"mkdir"_s, {u"-p"_s, debianDir})) {
+                        proc.exec(u"cp"_s, {u"-p"_s, debianGrub, debianDir + '/'});
+                    }
                 }
             }
 
