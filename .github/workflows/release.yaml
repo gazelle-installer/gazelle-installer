@@ -1,6 +1,12 @@
 name: Create Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to publish and build
+        required: true
+        type: string
   push:
     tags:
       - '*'
@@ -15,11 +21,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          name: Release ${{ github.ref_name }}
+          tag: ${{ inputs.tag || github.ref_name }}
+          name: Release ${{ inputs.tag || github.ref_name }}
+          allowUpdates: true
+          omitBodyDuringUpdate: true
           generateReleaseNotes: true
           draft: false
           prerelease: false
@@ -27,15 +38,35 @@ jobs:
       - name: Trigger OBS workflow
         env:
           OBS_WORKFLOW_TOKEN: ${{ secrets.OBS_WORKFLOW_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           if [[ -z "${OBS_WORKFLOW_TOKEN}" ]]; then
               echo "::error::Missing OBS_WORKFLOW_TOKEN repository or organization secret"
               exit 1
           fi
 
-          curl --fail --show-error --silent --request POST \
+          # OBS expects a tag-push payload, including for a manual retry.
+          python3 - <<'PY'
+          import json
+          import os
+          import subprocess
+
+          with open(os.environ["GITHUB_EVENT_PATH"]) as stream:
+              payload = json.load(stream)
+          payload.update(
+              ref="refs/tags/" + os.environ["RELEASE_TAG"],
+              after=subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+              before="0" * 40,
+              created=True,
+              deleted=False,
+          )
+          with open("/tmp/obs-event.json", "w") as stream:
+              json.dump(payload, stream)
+          PY
+
+          curl --fail-with-body --show-error --silent --request POST \
               --header "Authorization: Token ${OBS_WORKFLOW_TOKEN}" \
               --header "X-GitHub-Event: push" \
               --header "Content-Type: application/json" \
-              --data-binary "@${GITHUB_EVENT_PATH}" \
+              --data-binary @/tmp/obs-event.json \
               https://api.opensuse.org/trigger/workflow
