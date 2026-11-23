@@ -177,7 +177,12 @@ void BootMan::install(const QStringList &cmdextra)
         proc.exec(u"rm"_s, {u"-f"_s, "/mnt/antiX/boot/"_L1 + val});
     }
 
-    bool efivars_ismounted = false;
+    // EFI variables (NVRAM) need efivarfs, and efivarfs needs the firmware's
+    // runtime services. Without them (e.g. efi=noruntime, used on 32-bit UEFI
+    // where the 64-bit kernel may crash in firmware calls) the boot loader is
+    // still installed to the ESP, including the EFI/BOOT fallback path that
+    // the firmware boots by itself - only the NVRAM boot entry is skipped.
+    bool efivarsAvailable = false;
     const bool replacementMode = gui.radioReplace->isChecked();
     const bool espRequested = gui.boxBoot->isChecked() && gui.radioBootESP->isChecked();
     const PartMan::Device *espdev = nullptr;
@@ -194,10 +199,22 @@ void BootMan::install(const QStringList &cmdextra)
     if (useEsp) {
         const QString &efivars = u"/sys/firmware/efi/efivars"_s;
         if (QFileInfo(efivars).isDir()) {
-            efivars_ismounted = proc.exec(u"mountpoint"_s, {u"-q"_s, efivars});
+            efivarsAvailable = proc.exec(u"mountpoint"_s, {u"-q"_s, efivars});
+            // Not mounted: try it, unless the firmware's runtime services are
+            // switched off (efi=noruntime, noefi) - efivarfs cannot work then,
+            // even though the kernel may still list it in /proc/filesystems.
+            if (!efivarsAvailable && !proc.shell(u"grep -qwE 'efi=noruntime|noefi' /proc/cmdline"_s)) {
+                efivarsAvailable = proc.exec(u"mount"_s, {u"-t"_s, u"efivarfs"_s, u"efivarfs"_s, efivars});
+            }
+            // Mounted: really usable? efibootmgr only succeeds when it can read
+            // the boot variables (catches an empty or broken efivarfs).
+            if (efivarsAvailable) {
+                efivarsAvailable = proc.exec(u"efibootmgr"_s, {}, nullptr, true);
+            }
         }
-        if (!efivars_ismounted) {
-            proc.exec(u"mount"_s, {u"-t"_s, u"efivarfs"_s, u"efivarfs"_s, efivars});
+        if (!efivarsAvailable) {
+            qDebug() << "EFI variables not available: installing the EFI boot loader"
+                " without an NVRAM boot entry (the firmware uses the EFI/BOOT fallback path).";
         }
     }
 
@@ -220,7 +237,7 @@ void BootMan::install(const QStringList &cmdextra)
                 u"\"/mnt/antiX/boot/grub/locale/$(basename $(dirname $(dirname \"$f\"))).mo\"; "
                 u"done; true"_s, nullptr, true);
         } else {
-            if (efivars_ismounted) {
+            if (efivarsAvailable) {
                 //ensure efivarfs mounted as read-write
                 //issue with some init systems
                 proc.exec(u"mount"_s, {u"-o"_s,u"remount,rw"_s,u"-t"_s,u"efivarfs"_s,u"efivarfs"_s,u"/sys/firmware/efi/efivars"_s});
@@ -299,19 +316,22 @@ void BootMan::install(const QStringList &cmdextra)
             }
 
             // Update the boot NVRAM variables. Non-critial step so no need to fail.
+            // Skipped without EFI variables (see efivarsAvailable above).
             sect.setExceptionStrict(false);
             // Remove old boot variables of the same label.
-            proc.exec(u"efibootmgr"_s, {}, nullptr, true);
-            const QStringList &existing = proc.readOutLines();
-            static const QRegularExpression regex(u"^Boot([0-9A-F]{4})\\*?\\s(.*)\\t.*$"_s);
-            for (const QString &entry : existing) {
-                const QRegularExpressionMatch &match = regex.match(entry);
-                if (match.hasMatch() && match.captured(2) == loaderLabel) {
-                    proc.exec(u"efibootmgr"_s, {u"-qBb"_s, match.captured(1)});
+            if (efivarsAvailable) {
+                proc.exec(u"efibootmgr"_s, {}, nullptr, true);
+                const QStringList &existing = proc.readOutLines();
+                static const QRegularExpression regex(u"^Boot([0-9A-F]{4})\\*?\\s(.*)\\t.*$"_s);
+                for (const QString &entry : existing) {
+                    const QRegularExpressionMatch &match = regex.match(entry);
+                    if (match.hasMatch() && match.captured(2) == loaderLabel) {
+                        proc.exec(u"efibootmgr"_s, {u"-qBb"_s, match.captured(1)});
+                    }
                 }
             }
             // Add a new NVRAM boot variable.
-            if (espdev != nullptr) {
+            if (efivarsAvailable && espdev != nullptr) {
                 const PartMan::NameParts &bs = PartMan::splitName(espdev->name);
                 //efi size & secureboot
                 //if 32, don't bother with secure boot
